@@ -18,41 +18,40 @@ namespace DiscoNet
 
         // 4.1. DH functions
 
-        public class KeyPair
-        {
-            public byte[] PrivateKey { get; set; } = new byte[32];
-            public byte[] PublicKey { get; set; } = new byte[32];
-
-            public string ExportPublicKey()
-            {
-                return BitConverter.ToString(PublicKey).Replace("-", string.Empty);
-            }
-        }
-
         /// <summary>
         /// GenerateKeypair creates a X25519 static keyPair out of a private key. 
         /// If privateKey is null the function generates a random key pair.
         /// </summary>
-        /// <param name="privateKey"></param>
-        /// <returns></returns>
-        public KeyPair GenerateKeyPair(byte[] privateKey)
+        /// <param name="privateKey">Private key</param>
+        public KeyPair GenerateKeyPair(byte[] privateKey = null)
         {
-            //#Q_ source + check if 32 bytes
             var keyPair = new KeyPair();
-            if (privateKey != null)
-            {
-                keyPair.PrivateKey = privateKey;
-            }
-            else
+
+            if (privateKey == null)
             {
                 var random = new RNGCryptoServiceProvider();
                 random.GetBytes(keyPair.PrivateKey, 0, keyPair.PrivateKey.Length);
             }
+            else
+            {
+                if (privateKey.Length != 32)
+                {
+                    throw new Exception("disco: expecting 32 byte key array");
+                }
+                privateKey.CopyTo(keyPair.PrivateKey, 0);
+            }
+
             keyPair.PublicKey = ScalarMult.Base(keyPair.PrivateKey);
 
             return keyPair;
         }
-
+        
+        /// <summary>
+        /// Perform DH on public key
+        /// </summary>
+        /// <param name="keyPair"></param>
+        /// <param name="publicKey"></param>
+        /// <returns></returns>
         public byte[] Dh(KeyPair keyPair, byte[] publicKey)
         {
             //#Q_ source - shared [32]byte ???

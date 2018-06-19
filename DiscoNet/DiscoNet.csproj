@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <PackageReference Include="Sodium.Core" Version="1.2.0" />
+    <PackageReference Include="StrobeNet" Version="0.0.2.1" />
   </ItemGroup>
 
 </Project>
