@@ -26,7 +26,7 @@
         }
 
         /// <summary>
-        ///     Get copy of the DiscoHash in its current state.
+        /// Get copy of the DiscoHash in its current state.
         /// </summary>
         /// <returns></returns>
         public object Clone()
