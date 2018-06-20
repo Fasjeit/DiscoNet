@@ -6,7 +6,7 @@ namespace DiscoNet
 {
     // The following code defines the X25519, chacha20poly1305, SHA-256 suite.
 
-    class Asymmetric
+    public class Asymmetric
     {
         /// <summary>
         /// A constant specifying the size in bytes of public keys and DH outputs.
@@ -23,7 +23,7 @@ namespace DiscoNet
         /// If privateKey is null the function generates a random key pair.
         /// </summary>
         /// <param name="privateKey">Private key</param>
-        public KeyPair GenerateKeyPair(byte[] privateKey = null)
+        public static KeyPair GenerateKeyPair(byte[] privateKey = null)
         {
             var keyPair = new KeyPair();
 
