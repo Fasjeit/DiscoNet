@@ -3,6 +3,7 @@
     using System;
 
     using StrobeNet;
+    using StrobeNet.Enums;
 
     public class Hash : ICloneable
     {
@@ -40,7 +41,7 @@
         /// <param name="inputData">Data to write</param>
         public int Write(byte[] inputData)
         {
-            this.strobeState.Operate(false, Strobe.Operation.Ad, inputData, 0, this.streaming);
+            this.strobeState.Operate(false, Operation.Ad, inputData, 0, this.streaming);
             this.streaming = true;
             return inputData.Length;
         }
@@ -52,7 +53,7 @@
         public byte[] Sum()
         {
             var reader = (Strobe)this.strobeState.Clone();
-            return reader.Operate(false, Strobe.Operation.Prf, null, this.outputLen, false);
+            return reader.Operate(false, Operation.Prf, null, this.outputLen, false);
         }
     }
 }
