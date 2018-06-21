@@ -3,7 +3,7 @@
     using System.Collections;
     using System.Collections.Generic;
 
-    internal enum NoiseHandshakeType
+    public enum NoiseHandshakeType
     {
         /// <summary>
         /// Noise_N is a one-way pattern where a client can send

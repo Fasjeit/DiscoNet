@@ -12,7 +12,7 @@
 
         private const int TagSize = 16;
 
-        private const int MinimumCiphertextSize = NonceSize + TagSize;
+        private const int MinimumCiphertextSize = Symmetric.NonceSize + Symmetric.TagSize;
 
         /// <summary>
         /// Hash allows you to hash an input of any length and obtain an output
@@ -66,7 +66,7 @@
             var hash = new Strobe("DiscoMAC", 128);
             hash.Ad(false, key);
             hash.Ad(false, plaintext);
-            return plaintext.Concat(hash.SendMac(false, TagSize)).ToArray();
+            return plaintext.Concat(hash.SendMac(false, Symmetric.TagSize)).ToArray();
         }
 
         /// <summary>
@@ -79,26 +79,28 @@
                 throw new Exception("disco: using a key smaller than 128-bit (16 bytes) has security consequences");
             }
 
-            if (plaintextAndTag.Length < TagSize)
+            if (plaintextAndTag.Length < Symmetric.TagSize)
             {
                 throw new Exception("disco: plaintext does not contain an integrity tag");
             }
 
-            var offset = plaintextAndTag.Length - TagSize;
+            var offset = plaintextAndTag.Length - Symmetric.TagSize;
             var plainText = plaintextAndTag.Take(offset).ToArray();
 
             // Geting the tag
             var hash = new Strobe("DiscoMAC", 128);
             hash.Ad(false, key);
             hash.Ad(false, plainText);
-            var tag = hash.SendMac(false, TagSize);
+            var tag = hash.SendMac(false, Symmetric.TagSize);
 
             // verifying the tag
             for (var i = 0; i < 16; i++)
+            {
                 if (tag[i] != plaintextAndTag[offset + i])
                 {
                     throw new Exception("disco: the plaintext has been modified");
                 }
+            }
 
             return plainText;
         }
@@ -120,15 +122,15 @@
 
             // Generate 192-bit nonce
             var random = new RNGCryptoServiceProvider();
-            var nonce = new byte[NonceSize];
-            random.GetBytes(nonce, 0, NonceSize);
+            var nonce = new byte[Symmetric.NonceSize];
+            random.GetBytes(nonce, 0, Symmetric.NonceSize);
 
             // Absorb the nonce
             ae.Ad(false, nonce);
 
             // nonce + send_ENC(plaintext) + send_MAC(16)
             var ciphertext = nonce.Concat(ae.SendEncUnauthenticated(false, plaintext));
-            ciphertext = ciphertext.Concat(ae.SendMac(false, TagSize));
+            ciphertext = ciphertext.Concat(ae.SendMac(false, Symmetric.TagSize));
 
             return ciphertext.ToArray();
         }
@@ -143,7 +145,7 @@
                 throw new Exception("disco: using a key smaller than 128-bit (16 bytes) has security consequences");
             }
 
-            if (ciphertext.Length < MinimumCiphertextSize)
+            if (ciphertext.Length < Symmetric.MinimumCiphertextSize)
             {
                 throw new Exception(
                     "disco: ciphertext is too small, it should contain at a minimum a 192-bit nonce and a 128-bit tag");
@@ -155,15 +157,17 @@
             ae.Ad(false, key);
 
             // Absorb the nonce
-            ae.Ad(false, ciphertext.Take(NonceSize).ToArray());
+            ae.Ad(false, ciphertext.Take(Symmetric.NonceSize).ToArray());
 
-            var plaintextSize = ciphertext.Length - TagSize - NonceSize;
+            var plaintextSize = ciphertext.Length - Symmetric.TagSize - Symmetric.NonceSize;
 
             // Decrypt
-            var plainText = ae.RecvEncUnauthenticated(false, ciphertext.Skip(NonceSize).Take(plaintextSize).ToArray());
+            var plainText = ae.RecvEncUnauthenticated(
+                false,
+                ciphertext.Skip(Symmetric.NonceSize).Take(plaintextSize).ToArray());
 
             // Verify tag
-            var authCkeck = ae.RecvMac(false, ciphertext.Skip(ciphertext.Length - TagSize).ToArray());
+            var authCkeck = ae.RecvMac(false, ciphertext.Skip(ciphertext.Length - Symmetric.TagSize).ToArray());
             if (!authCkeck)
             {
                 throw new Exception("disco: cannot decrypt the payload");

@@ -125,6 +125,20 @@
         }
 
         [Fact]
+        public void TestNonceSize()
+        {
+            var key = "eda8506c1fb0bbcc3f62626fef074bbf2d09a8c7c608f3fa1482c9a625d00f75".ToByteArray();
+
+            var plaitext = Encoding.ASCII.GetBytes("hello, how are you?");
+
+            var ciphertext = Symmetric.Encrypt(key, plaitext);
+            if (ciphertext.Length != 19 + 16 + 24)
+            {
+                throw new Exception("Length of this ciphertext should be 19B(PT) + 16B(TAG) + 24B(NONCE)");
+            }
+        }
+        
+        [Fact]
         public void TestEncryptDecrypt()
         {
             var key = "eda8506c1fb0bbcc3f62626fef074bbf2d09a8c7c608f3fa1482c9a625d00f75".ToByteArray();
