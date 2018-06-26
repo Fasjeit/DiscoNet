@@ -8,7 +8,8 @@
 
         public bool IsClient { get; set; }
 
-        Config config;
-        HandshakeState
+        public Config config { get; set; }
+
+        //HandshakeState
     }
 }

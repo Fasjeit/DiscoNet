@@ -21,9 +21,33 @@
             this.listener = new TcpListener(IPAddress.Parse(address), port);
         }
 
+
+        /// <summary>
+        /// Server returns a new Disco server side connection
+        /// using net.Conn as the underlying transport.
+        /// The configuration config must be non-nil and must include
+        /// at least one certificate or else set GetCertificate.
+        /// </summary>
+        /// <param name="connection"></param>
+        /// <param name="config"></param>
+        /// <returns></returns>
         private Connection Server(Socket connection, Config config)
         {
-            return new 
+            return new Connection() { SocketConnection = connection, config = config, };
+        }
+
+        /// <summary>
+        ///  Client returns a new Disco client side connection
+        /// using conn as the underlying transport.
+        /// The config cannot be nil: users must set either ServerName or
+        /// InsecureSkipVerify in the config.
+        /// </summary>
+        /// <param name="connection"></param>
+        /// <param name="config"></param>
+        /// <returns></returns>
+        private Connection Client(Socket connection, Config config)
+        {
+            return new Connection() { SocketConnection = connection, config = config, IsClient = true };
         }
 
         public void Accept()
