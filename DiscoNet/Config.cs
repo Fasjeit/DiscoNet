@@ -2,7 +2,10 @@
 {
     using System;
 
-    public abstract class Config
+    using DiscoNet.Noise;
+    using DiscoNet.Noise.Enums;
+
+    public class Config
     {
         // The following constants represent the details of this implementation of the Noise specification.
 
@@ -36,7 +39,7 @@
         /// <summary>
         /// the type of Noise protocol that the client and the server will go through
         /// </summary>
-        public NoiseHandshakeType HandshakePattern { get; set; }
+        internal NoiseHandshakeType HandshakePattern { get; set; }
 
         /// <summary>
         /// The current peer's keyPair

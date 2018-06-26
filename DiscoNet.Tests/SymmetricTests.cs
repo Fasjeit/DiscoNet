@@ -4,6 +4,8 @@
     using System.Linq;
     using System.Text;
 
+    using DiscoNet.Noise;
+
     using Xunit;
 
     using StrobeNet.Extensions;

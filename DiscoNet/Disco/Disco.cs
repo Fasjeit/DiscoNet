@@ -6,7 +6,7 @@ namespace DiscoNet
 {
     using StrobeNet;
 
-    class Disco
+    class DiscoOoooo
     {
     }
 

@@ -1,4 +1,4 @@
-﻿namespace DiscoNet
+﻿namespace DiscoNet.Noise
 {
     using System;
 

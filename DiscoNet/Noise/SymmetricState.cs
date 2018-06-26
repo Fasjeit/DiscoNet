@@ -1,15 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace DiscoNet
+﻿namespace DiscoNet.Noise
 {
-    using StrobeNet;
+    using System;
     using System.Linq;
+
+    using StrobeNet;
 
     public class SymmetricState
     {
-        private Strobe strobeState;
+        private readonly Strobe strobeState;
 
         private bool isKeyed;
 
@@ -54,7 +52,7 @@ namespace DiscoNet
             }
 
             var ciphertext = this.strobeState.SendEncUnauthenticated(false, plaintext);
-            ciphertext = ciphertext.Concat(strobeState.SendMac(false, 16)).ToArray();
+            ciphertext = ciphertext.Concat(this.strobeState.SendMac(false, 16)).ToArray();
             return ciphertext;
         }
 
