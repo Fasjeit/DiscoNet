@@ -1,9 +1,12 @@
-﻿using System;
-using System.Security.Cryptography;
-using Sodium;
-
-namespace DiscoNet
+﻿namespace DiscoNet.Noise
 {
+    using System;
+    using System.Security.Cryptography;
+
+    using Sodium;
+
+    using KeyPair = DiscoNet.KeyPair;
+
     // The following code defines the X25519, chacha20poly1305, SHA-256 suite.
 
     public class Asymmetric
@@ -52,7 +55,7 @@ namespace DiscoNet
         /// <param name="keyPair"></param>
         /// <param name="publicKey"></param>
         /// <returns></returns>
-        public byte[] Dh(KeyPair keyPair, byte[] publicKey)
+        public static byte[] Dh(KeyPair keyPair, byte[] publicKey)
         {
             //#Q_ source - shared [32]byte ???
             return ScalarMult.Mult(keyPair.PrivateKey, publicKey);

@@ -39,7 +39,7 @@
         /// <summary>
         /// the type of Noise protocol that the client and the server will go through
         /// </summary>
-        internal NoiseHandshakeType HandshakePattern { get; set; }
+        public NoiseHandshakeType HandshakePattern { get; set; }
 
         /// <summary>
         /// The current peer's keyPair

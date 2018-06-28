@@ -38,5 +38,21 @@
         private bool isHalfDuplex { get; set; }
 
         private Mutex halfDuplexLock { get; set; }
+
+        public int Write(byte[] data)
+        {
+            return 42;
+        }
+
+        public int Read(byte[] data)
+        {
+            return 42;
+        }
+
+        public void HandShake()
+        {
+        }
+
+
     }
 }

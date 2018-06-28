@@ -1,6 +1,6 @@
 ﻿namespace DiscoNet.Noise.Enums
 {
-    internal enum NoiseHandshakeType
+    public enum NoiseHandshakeType
     {
         /// <summary>
         /// Noise_N is a one-way pattern where a client can send
