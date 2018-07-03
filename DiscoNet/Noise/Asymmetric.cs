@@ -17,7 +17,7 @@
         /// <remarks>
         /// For security reasons, dhLen must be 32 or greater.
         /// </remarks>
-        const int DhLen = 32;
+        public const int DhLen = 32;
 
         // 4.1. DH functions
 

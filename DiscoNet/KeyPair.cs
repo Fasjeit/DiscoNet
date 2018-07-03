@@ -11,5 +11,11 @@
         {
             return BitConverter.ToString(this.PublicKey).Replace("-", string.Empty);
         }
+
+        ~KeyPair()
+        {
+            Array.Clear(this.PrivateKey, 0, this.PrivateKey.Length);
+        }
+
     }
 }

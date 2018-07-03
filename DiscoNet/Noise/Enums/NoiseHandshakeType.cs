@@ -2,6 +2,8 @@
 {
     public enum NoiseHandshakeType
     {
+        Unknown,
+
         /// <summary>
         /// Noise_N is a one-way pattern where a client can send
         /// data to a server with a known static key. The server

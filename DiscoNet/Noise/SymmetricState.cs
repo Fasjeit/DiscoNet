@@ -2,6 +2,7 @@
 {
     using System;
     using System.Linq;
+    using System.Text;
 
     using StrobeNet;
 
@@ -9,7 +10,7 @@
     {
         private readonly Strobe strobeState;
 
-        private bool isKeyed;
+        public bool IsKeyed { get; private set; }
 
         public SymmetricState(string protocolName)
         {
@@ -19,7 +20,7 @@
         public void MixKey(byte[] inputKeyMaterial)
         {
             this.strobeState.Ad(false, inputKeyMaterial);
-            this.isKeyed = true;
+            this.IsKeyed = true;
         }
 
         public void MixHash(byte[] data)
@@ -45,7 +46,7 @@
         /// <returns></returns>
         public byte[] EncryptAndHash(byte[] plaintext)
         {
-            if (!this.isKeyed)
+            if (!this.IsKeyed)
             {
                 // no keys, so we don't encrypt
                 return plaintext;
@@ -58,7 +59,7 @@
 
         public byte[] DecryptAndHash(byte[] cipherText)
         {
-            if (!this.isKeyed)
+            if (!this.IsKeyed)
             {
                 // no keys, so nothing to decrypt
                 return cipherText;
@@ -79,6 +80,19 @@
             }
 
             return plaintext;
+        }
+
+        public (Strobe initiatorState, Strobe responderState) Split()
+        {
+            var initiatorState = (Strobe)this.strobeState.Clone();
+            initiatorState.Ad(true, Encoding.ASCII.GetBytes("initiator"));
+            initiatorState.Ratchet(32);
+
+            var responderState = this.strobeState;
+            responderState.Ad(true, Encoding.ASCII.GetBytes("responder"));
+            responderState.Ratchet(32);
+
+            return (initiatorState, responderState);
         }
     }
 }
