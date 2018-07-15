@@ -6,7 +6,7 @@
 
     using StrobeNet;
 
-    internal class HandshakeState
+    public class HandshakeState : IDisposable
     {
         /// <summary>
         /// SymmetricState object
@@ -60,10 +60,11 @@
         /// </summary>
         public KeyPair DebugEphemeral { get; set; }
 
-        public (Strobe initiatorState, Strobe responderState) WriteMessage(byte[] payload, ref byte[] messageBuffer)
+        public (Strobe initiatorState, Strobe responderState) WriteMessage(byte[] payload, out byte[] messageBuffer)
         {
             Strobe initiatorState = null;
             Strobe responderState = null;
+            messageBuffer = new byte[] { };
 
             // is it our turn to write?
             if (!this.ShouldWrite)
@@ -96,7 +97,7 @@
 
                         messageBuffer = messageBuffer.Concat(this.E.PublicKey).ToArray();
                         this.SymmetricState.MixHash(this.E.PublicKey);
-                        if (this.Psk.Length > 0)
+                        if (this.Psk?.Length > 0)
                         {
                             this.SymmetricState.MixKey(this.E.PublicKey);
                         }
@@ -181,10 +182,11 @@
 
         // ReadMessage takes a byte sequence containing a Noise handshake message,
         // and a payload_buffer to write the message's plaintext payload into.
-        public (Strobe initiatorState, Strobe responderState) ReadMessage(byte[] message, ref byte[] payloadBuffer)
+        public (Strobe initiatorState, Strobe responderState) ReadMessage(byte[] message, out byte[] payloadBuffer)
         {
             Strobe initiatorState = null;
             Strobe responderState = null;
+            payloadBuffer = new byte[] { };
 
             // is it our turn to read?
             if (this.ShouldWrite)
@@ -310,12 +312,17 @@
             return (initiatorState, responderState);
         }
 
+        public void Dispose()
+        {
+            this.S?.Dispose();
+            this.Rs?.Dispose();
+            this.E?.Dispose();
+            this.Re?.Dispose();
+        }
+
         ~HandshakeState()
         {
-            Array.Clear(this.S.PrivateKey, 0, this.S.PrivateKey.Length);
-            Array.Clear(this.Rs.PrivateKey, 0, this.Rs.PrivateKey.Length);
-            Array.Clear(this.E.PrivateKey, 0, this.E.PrivateKey.Length);
-            Array.Clear(this.Re.PrivateKey, 0, this.Re.PrivateKey.Length);
+            this.Dispose();
         }
     }
 }

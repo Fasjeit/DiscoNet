@@ -28,7 +28,7 @@
             };
 
             // get a libdisco.listener
-            var listener = new Listener("127.0.0.1:0", 1800, serverConfig);
+            var listener = new Listener("127.0.0.1:0", serverConfig, 1800);
 
             throw new NotSupportedException();
         }

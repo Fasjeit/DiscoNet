@@ -24,7 +24,7 @@
         /// <summary>
         /// Max max message len
         /// </summary>
-        const int NoiseMessageLength = 65535 - 2; // 2-byte length
+        public const int NoiseMessageLength = 65535 - 2; // 2-byte length
 
         /// <summary>
         /// Noise max tag len
@@ -49,19 +49,19 @@
         /// <summary>
         /// The other peer's public key
         /// </summary>
-        public byte[] RemoteKey;
+        public byte[] RemoteKey = new byte[] { };
 
         /// <summary>
         /// Any messages that the client and the server previously exchanged in clear
         /// </summary>
-        public byte[] Prologue;
+        public byte[] Prologue = new byte[] { };
 
         /// <summary>
         /// If the chosen handshake pattern requires the current peer to send a static
         /// public key as part of the handshake, this proof over the key is mandatory
         /// in order for the other peer to verify the current peer's key
         /// </summary>
-        public byte[] StaticPublicKeyProof;
+        public byte[] StaticPublicKeyProof = new byte[] { };
 
 
         /// <summary>

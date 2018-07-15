@@ -2,7 +2,7 @@
 {
     using System;
 
-    public class KeyPair
+    public class KeyPair : IDisposable
     {
         public byte[] PrivateKey { get; set; } = new byte[32];
         public byte[] PublicKey { get; set; } = new byte[32];
@@ -12,9 +12,14 @@
             return BitConverter.ToString(this.PublicKey).Replace("-", string.Empty);
         }
 
-        ~KeyPair()
+        public void Dispose()
         {
             Array.Clear(this.PrivateKey, 0, this.PrivateKey.Length);
+        }
+
+        ~KeyPair()
+        {
+            this.Dispose();
         }
 
     }

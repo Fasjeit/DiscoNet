@@ -1,4 +1,4 @@
-﻿namespace DiscoNet
+﻿namespace DiscoNet.Net
 {
     using System;
     using System.Net;
@@ -6,9 +6,13 @@
 
     using DiscoNet.Noise;
     using DiscoNet.Noise.Enums;
+    using DiscoNet.Disco;
 
-    internal class Apis
+    public class Apis
     {
+        const int MaxConnections = 1;
+
+
         /// <summary>
         /// Server returns a new Disco server side connection
         /// using net.Conn as the underlying transport.
@@ -18,7 +22,7 @@
         /// <param name="connection"></param>
         /// <param name="config"></param>
         /// <returns></returns>
-        private Connection Server(Socket connection, Config config)
+        private Connection Server(TcpClient connection, Config config)
         {
             return new Connection() { SocketConnection = connection, config = config, };
         }
@@ -32,28 +36,77 @@
         /// <param name="connection"></param>
         /// <param name="config"></param>
         /// <returns></returns>
-        private Connection Client(Socket connection, Config config)
+        private static Connection Client(TcpClient connection, Config config)
         {
             return new Connection() { SocketConnection = connection, config = config, IsClient = true };
         }
 
-        public bool Dial(string netwrk, string address, Config config)
-        {
-            throw new NotImplementedException();
-        }
-
-        internal Connection DialWithDialer(Socket dialer, string network, string addr, Config config)
+        public static Connection DialWithDialer(string network, string addr, int port, Config config)
         {
             if (config == null)
             {
                 throw new NullReferenceException(nameof(config));
             }
 
-            //var rawConn = dialer.Connect(network, addr);
+            Apis.CheckRequirments(false, config);
 
-            //var conn = Client(rawConn, config);
-            //conn.HandshakeState = 
-            throw new NotImplementedException();
+            //var ipAddress = IPAddress.Parse(addr);
+            //IPEndPoint localEndPoint = new IPEndPoint(ipAddress, port);
+
+            //var rawConn = new TcpListener(ipAddress, port);
+            //rawConn.Start();
+
+            var tcpClient = new TcpClient(addr, port);
+
+            var connection = Client(tcpClient, config);
+
+            // Do the handshake
+            connection.HandShake();
+
+            return connection;
+        }
+
+        internal static void CheckRequirments(bool isClient, Config config)
+        {
+            var ht = config.HandshakePattern;
+            if (ht == NoiseHandshakeType.NoiseNX ||
+                ht == NoiseHandshakeType.NoiseKX ||
+                ht == NoiseHandshakeType.NoiseXX ||
+                ht == NoiseHandshakeType.NoiseIX)
+            {
+                if (isClient && config.PublicKeyVerifier == null)
+                {
+                    throw new Exception("Disco: no public key verifier set in Config");
+                }
+                if (!isClient && config.StaticPublicKeyProof == null)
+                {
+                    throw new Exception("Disco: no public key proof set in Config");
+                }
+            }
+
+            if (ht == NoiseHandshakeType.NoiseXN ||
+                ht == NoiseHandshakeType.NoiseXK ||
+                ht == NoiseHandshakeType.NoiseXX ||
+                ht == NoiseHandshakeType.NoiseX ||
+                ht == NoiseHandshakeType.NoiseIN ||
+                ht == NoiseHandshakeType.NoiseIK ||
+                ht == NoiseHandshakeType.NoiseIX)
+            {
+                if (isClient && config.StaticPublicKeyProof == null)
+                {
+                    throw new Exception("Disco: no public key proof set in Config");
+                }
+
+                if (!isClient && config.PublicKeyVerifier == null)
+                {
+                    throw new Exception("Disco: no public key verifier set in Config");
+                }
+            }
+
+            if (ht == NoiseHandshakeType.NoiseNNpsk2 && config.PreSharedKey.Length != 32)
+            {
+                throw new Exception("noise: a 32-byte pre-shared key needs to be passed as noise.Config");
+            }
         }
     }
 }

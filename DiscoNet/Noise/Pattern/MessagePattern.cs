@@ -5,9 +5,9 @@
 
     using DiscoNet.Noise.Enums;
 
-    internal class MessagePattern : IEnumerable<Tokens>
+    public class MessagePattern : IEnumerable<Tokens>
     {
-        public List<Tokens> Tokens { get; set; }
+        public List<Tokens> Tokens { get; set; } = new List<Tokens>();
 
         public IEnumerator<Tokens> GetEnumerator()
         {

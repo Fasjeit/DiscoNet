@@ -10,7 +10,7 @@ namespace DiscoNet
 
     using StrobeNet;
 
-    class DiscoOoooo
+    public class DiscoOoooo
     {
 
         // This allows you to initialize a peer.
@@ -36,7 +36,11 @@ namespace DiscoNet
                 Initiator = initiator, 
                 ShouldWrite = initiator,
             };
-            handshakeState.SymmetricState.MixHash(prologue);
+
+            if (prologue != null)
+            {
+                handshakeState.SymmetricState.MixHash(prologue);
+            }
 
             if (s != null)
             {

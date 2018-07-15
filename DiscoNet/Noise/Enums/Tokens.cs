@@ -1,6 +1,6 @@
 ﻿namespace DiscoNet.Noise.Enums
 {
-    internal enum Tokens
+    public enum Tokens
     {
         TokenE,
 
