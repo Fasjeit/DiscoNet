@@ -49,7 +49,7 @@
         /// <summary>
         /// The other peer's public key
         /// </summary>
-        public byte[] RemoteKey = new byte[] { };
+        public byte[] RemoteKey;
 
         /// <summary>
         /// Any messages that the client and the server previously exchanged in clear

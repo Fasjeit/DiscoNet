@@ -5,6 +5,7 @@
     using System.Text;
     using System.Threading.Tasks;
     using DiscoNet.Disco;
+    using DiscoNet.Net;
     using DiscoNet.Noise;
     using DiscoNet.Noise.Enums;
     using Xunit;
@@ -14,41 +15,56 @@
         [Fact]
         public void TestNoiseKk()
         {
-            RunTwoWayTest(NoiseHandshakeType.NoiseKK);
-        }
-
-        [Fact]
-        public void TestNoiseNk()
-        {
-            RunTwoWayTest(NoiseHandshakeType.NoiseNK);
-        }
-
-        [Fact]
-        public void TestNoiseXx()
-        {
-            RunTwoWayTest(NoiseHandshakeType.NoiseXX);
-        }
-
-        [Fact]
-        public void TestNoiseN()
-        {
-            //RunTwoWayTest(NoiseHandshakeType.NoiseN);
-        }
-
-        private void RunTwoWayTest(NoiseHandshakeType pattern)
-        {
             // init
             var clientConfig = new Config()
             {
                 KeyPair = Asymmetric.GenerateKeyPair(),
-                HandshakePattern = pattern
+                HandshakePattern = NoiseHandshakeType.NoiseKK
             };
 
             var serverConfig = new Config()
             {
                 KeyPair = Asymmetric.GenerateKeyPair(),
-                HandshakePattern = pattern
+                HandshakePattern = NoiseHandshakeType.NoiseKK
             };
+
+            RunTwoWayTest(clientConfig, serverConfig);
+        }
+
+        [Fact]
+        public void TestNoiseNk()
+        {
+            // init
+            var clientConfig = new Config()
+            {
+                KeyPair = Asymmetric.GenerateKeyPair(),
+                HandshakePattern = NoiseHandshakeType.NoiseNK
+            };
+
+            var serverConfig = new Config()
+            {
+                KeyPair = Asymmetric.GenerateKeyPair(),
+                HandshakePattern = NoiseHandshakeType.NoiseNK
+            };
+
+            RunTwoWayTest(clientConfig, serverConfig);
+        }
+
+        [Fact]
+        public void TestNoiseXx()
+        {
+            throw new NotImplementedException();
+        }
+
+        [Fact]
+        public void TestNoiseN()
+        {
+            throw new NotImplementedException();
+        }
+
+        private void RunTwoWayTest(Config clientConfig, Config serverConfig)
+        {
+
 
             // set up remote keys
             serverConfig.RemoteKey = clientConfig.KeyPair.PublicKey;
@@ -57,25 +73,27 @@
             var address = "127.0.0.1";
 
             // get a Noise.listener
-            var listener = new Listener(address, serverConfig, 1800);
+           
+                // run the server and Accept one connection
 
-            // run the server and Accept one connection
-
-            Task.Factory.StartNew(() =>
-            {
-                var serverSocket = listener.Accept();
-                var buf = new byte[100];
-                var n = serverSocket.Read(buf);
-                if (!buf.Take(n).SequenceEqual(Encoding.ASCII.GetBytes("hello")))
+                Task.Factory.StartNew(() =>
                 {
-                    throw new System.Exception("client message failed");
-                }
+                    using (var listener = Apis.Listen(address, serverConfig, 1800))
+                    {
+                        var serverSocket = listener.Accept();
+                        var buf = new byte[100];
+                        var n = serverSocket.Read(buf);
+                        if (!buf.Take(n).SequenceEqual(Encoding.ASCII.GetBytes("hello")))
+                        {
+                            throw new Exception("client message failed");
+                        }
 
-                serverSocket.Write(Encoding.ASCII.GetBytes("ca va?"));
-            });
+                        serverSocket.Write(Encoding.ASCII.GetBytes("ca va?"));
+                    }
+                });
 
             // Run the client
-            var clientSocket = Listener.DialWithDialer("tcp", address, 1800, clientConfig);
+            var clientSocket = Apis.Connect("tcp", address, 1800, clientConfig);
 
             clientSocket.Write(Encoding.ASCII.GetBytes("hello"));
 

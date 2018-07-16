@@ -289,6 +289,10 @@
                         {
                             (c1, c2) = handshakeState.WriteMessage(this.config.StaticPublicKeyProof, out bufToWrite);
                         }
+                        else
+                        {
+                            (c1, c2) = handshakeState.WriteMessage(new byte[] { }, out bufToWrite);
+                        }                        
 
                         // header (length)
                         var length = new byte[] { (byte)(bufToWrite.Length >> 8), (byte)(bufToWrite.Length % 256) };

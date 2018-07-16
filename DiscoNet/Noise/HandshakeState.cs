@@ -239,7 +239,7 @@
                         }
 
                         var decrypted = this.SymmetricState.DecryptAndHash(
-                            message.Skip(offset).Take(offset + Asymmetric.DhLen + tagLen).ToArray());
+                            message.Skip(offset).Take(Asymmetric.DhLen + tagLen).ToArray());
 
                         // if we already know the remote static, compare
                         this.Rs.PublicKey = decrypted;
