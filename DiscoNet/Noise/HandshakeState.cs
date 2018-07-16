@@ -16,22 +16,22 @@
         /// <summary>
         /// The local static key pair
         /// </summary>
-        public KeyPair S { get; set; }
+        public KeyPair S { get; set; } = new KeyPair();
 
         /// <summary>
         /// The local ephemeral key pair
         /// </summary>
-        public KeyPair E { get; set; }
+        public KeyPair E { get; set; } = new KeyPair();
 
         /// <summary>
         /// The remote party's static public key
         /// </summary>
-        public KeyPair Rs { get; set; }
+        public KeyPair Rs { get; set; } = new KeyPair();
 
         /// <summary>
         /// The remote party's ephemeral public key
         /// </summary>
-        public KeyPair Re { get; set; }
+        public KeyPair Re { get; set; } = new KeyPair();
 
         /// <summary>
         /// Indicating the initiator or responder role.
@@ -92,6 +92,7 @@
                         }
                         else
                         {
+                            //#Q_return randomness #E
                             this.E = Asymmetric.GenerateKeyPair();
                         }
 
@@ -175,7 +176,7 @@
             }
 
             // change the direction
-            this.ShouldWrite = true;
+            this.ShouldWrite = false;
 
             return (initiatorState, responderState);
         }
@@ -217,7 +218,7 @@
                         this.Re.PublicKey = message.Skip(offset).Take(Asymmetric.DhLen).ToArray();
                         offset += Asymmetric.DhLen;
                         this.SymmetricState.MixHash(this.Re.PublicKey);
-                        if (this.Psk.Length > 0)
+                        if (this.Psk?.Length > 0)
                         {
                             this.SymmetricState.MixKey(this.Re.PublicKey);
                         }
@@ -247,7 +248,7 @@
                     }
                     case Enums.Tokens.TokenEe:
                     {
-                        this.SymmetricState.MixKey(Asymmetric.Dh(this.E, this.Rs.PublicKey));
+                        this.SymmetricState.MixKey(Asymmetric.Dh(this.E, this.Re.PublicKey));
                         break;
                     }
                     case Enums.Tokens.TokenEs:

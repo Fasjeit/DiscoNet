@@ -14,22 +14,45 @@
         [Fact]
         public void TestNoiseKk()
         {
+            RunTwoWayTest(NoiseHandshakeType.NoiseKK);
+        }
+
+        [Fact]
+        public void TestNoiseNk()
+        {
+            RunTwoWayTest(NoiseHandshakeType.NoiseNK);
+        }
+
+        [Fact]
+        public void TestNoiseXx()
+        {
+            RunTwoWayTest(NoiseHandshakeType.NoiseXX);
+        }
+
+        [Fact]
+        public void TestNoiseN()
+        {
+            //RunTwoWayTest(NoiseHandshakeType.NoiseN);
+        }
+
+        private void RunTwoWayTest(NoiseHandshakeType pattern)
+        {
             // init
-            var clinetConfig = new Config()
+            var clientConfig = new Config()
             {
                 KeyPair = Asymmetric.GenerateKeyPair(),
-                HandshakePattern = NoiseHandshakeType.NoiseKK
+                HandshakePattern = pattern
             };
 
             var serverConfig = new Config()
             {
                 KeyPair = Asymmetric.GenerateKeyPair(),
-                HandshakePattern = NoiseHandshakeType.NoiseKK
+                HandshakePattern = pattern
             };
 
             // set up remote keys
-            serverConfig.RemoteKey = clinetConfig.KeyPair.PublicKey;
-            clinetConfig.RemoteKey = serverConfig.KeyPair.PrivateKey;
+            serverConfig.RemoteKey = clientConfig.KeyPair.PublicKey;
+            clientConfig.RemoteKey = serverConfig.KeyPair.PublicKey;
 
             var address = "127.0.0.1";
 
@@ -42,24 +65,24 @@
             {
                 var serverSocket = listener.Accept();
                 var buf = new byte[100];
-                var n = serverSocket.Client.Receive(buf);
-                if (!buf.Skip(buf.Length - n).SequenceEqual(Encoding.ASCII.GetBytes("hello")))
+                var n = serverSocket.Read(buf);
+                if (!buf.Take(n).SequenceEqual(Encoding.ASCII.GetBytes("hello")))
                 {
                     throw new System.Exception("client message failed");
                 }
 
-                serverSocket.Client.Send(Encoding.ASCII.GetBytes("ca va?"));
+                serverSocket.Write(Encoding.ASCII.GetBytes("ca va?"));
             });
 
             // Run the client
-            var clientSocket = DiscoNet.Net.Apis.DialWithDialer("tcp", address, 1800, clinetConfig);
+            var clientSocket = Listener.DialWithDialer("tcp", address, 1800, clientConfig);
 
             clientSocket.Write(Encoding.ASCII.GetBytes("hello"));
 
             var bufClient = new byte[100];
-            clientSocket.Read(out bufClient);
+            var readByes = clientSocket.Read(bufClient);
 
-            if (!bufClient.SequenceEqual(Encoding.ASCII.GetBytes("ca va?")))
+            if (!bufClient.Take(readByes).SequenceEqual(Encoding.ASCII.GetBytes("ca va?")))
             {
                 throw new Exception();
             }

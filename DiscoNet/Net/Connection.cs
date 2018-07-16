@@ -1,13 +1,14 @@
 ﻿namespace DiscoNet
 {
     using System;
+    using System.IO;
     using System.Linq;
     using System.Net.Sockets;
     using System.Text;
     using System.Threading;
 
     using DiscoNet.Noise;
-
+    using DiscoNet.Noise.Enums;
     using StrobeNet;
 
     /// <summary>
@@ -30,6 +31,10 @@
 
         private Mutex handshakeMutex { get; set; } = new Mutex();
 
+        private Mutex inLock { get; set; } = new Mutex();
+
+        private Mutex outLock { get; set; } = new Mutex(); 
+
         // Authentication thingies
         private bool isRemoteAuthenticated { get; set; }
 
@@ -38,59 +43,164 @@
 
         private Strobe strobeOut { get; set; }
 
-        private byte[] inputBuffer { get; set; }
+        private Byte[] inputBuffer { get; set; } = new byte[] { };
 
         // half duplex
         private bool isHalfDuplex { get; set; }
 
-        private Mutex halfDuplexLock { get; set; }
+        private Mutex halfDuplexLock { get; set; } = new Mutex();
 
         // Write writes data to the connection.
         public int Write(byte[] data)
         {
-            return 50;
+            // If this is a one-way pattern, do some checks
+            var handshakePattern = this.config.HandshakePattern;
+            if (this.IsClient && (handshakePattern == NoiseHandshakeType.NoiseN || handshakePattern == NoiseHandshakeType.NoiseK || handshakePattern == NoiseHandshakeType.NoiseX))
+            {
+                throw new Exception("disco: a client should not read on one - way patterns");
+            }
+
+            // Make sure to go through the handshake first
+            this.HandShake();
+
+            Mutex mutex;
+
+            // Lock the write socket
+            if (this.isHalfDuplex)
+            {
+                mutex = this.halfDuplexLock;
+            }
+            else
+            {
+                mutex = this.outLock;
+            }
+            mutex.WaitOne();
+            try
+            {
+                var totalBytes = 0;
+
+                // process the data in a loop
+                while (data.Length > 0)
+                {
+                    var dataLen = data.Length > Config.NoiseMaxPlaintextSize ? Config.NoiseMaxPlaintextSize : data.Length;
+
+                    // Encrypt
+                    var ciphertext = this.strobeOut.SendEncUnauthenticated(false, data.Take(dataLen).ToArray());
+                    ciphertext = ciphertext.Concat(this.strobeOut.SendMac(false, 16)).ToArray();
+
+                    // header (length)
+                    var length = new byte[] { (byte)(ciphertext.Length >> 8), (byte)(ciphertext.Length % 256) };
+
+                    // Send data
+                    this.SocketConnection.Client.Send(length.Concat(ciphertext).ToArray());
+
+                    // prepare next loop iteration
+                    totalBytes += dataLen;
+                    data = data.Skip(dataLen).ToArray();
+                }
+
+                return totalBytes;
+            }
+            finally
+            {
+                mutex.ReleaseMutex();
+            }
         }
 
-        public int Read(out byte[] data)
+        public int Read(byte[] data)
         {
-            //            // read noise message from socket
-            //            var noiseMessage = this.ReadFromUntil(this.SocketConnection, length);
+            if (data == null || data.Length == 0)
+            {
+                return 0;
+            }
 
-            //            // decrypt
-            //            if (length < 16)
-            //            {
-            //                throw new Exception("disco: the received payload is shorter 16 bytes");
-            //            }
+            // Make sure to go through the handshake first
+            this.HandShake();
 
-            //            /* // append to the input buffer
-            //c.inputBuffer = append(c.inputBuffer, plaintext...)
+            // If this is a one-way pattern, do some checks
+            var handshakePattern = this.config.HandshakePattern;
+            if (this.IsClient && (handshakePattern == NoiseHandshakeType.NoiseN || handshakePattern == NoiseHandshakeType.NoiseK || handshakePattern == NoiseHandshakeType.NoiseX))
+            {
+                throw new Exception("disco: a client should not read on one - way patterns");
+            }
+            // Lock the read socket
+            Mutex mutex;
+            if (this.isHalfDuplex)
+            {
+                mutex = this.halfDuplexLock;
+            }
+            else
+            {
+                mutex = this.inLock;
+            }
+            mutex.WaitOne();
+            try
+            {
+                // read whatever there is to read in the buffer
+                var readSoFar = 0;
+                if (this.inputBuffer.Length > 0)
+                {
+                    var toRead = this.inputBuffer.Length > data.Length ? data.Length : (int)this.inputBuffer.Length ;
+                    this.inputBuffer.CopyTo(data, readSoFar);
+                    if (this.inputBuffer.Length > data.Length)
+                    {
+                        this.inputBuffer = this.inputBuffer.Skip(data.Length).ToArray();
+                        return data.Length;
+                    }
+                    readSoFar += toRead;
+                    this.inputBuffer = new byte[] { };
+                }
+                // read header from socket
+                var bufHeader = this.ReadFromUntil(this.SocketConnection, 2);
+                var length = ((int)(bufHeader[0]) << 8) | (int)(bufHeader[1]);
 
-            //// read whatever we can read
-            //rest := len(b) - readSoFar
-            //copy(b[readSoFar:], c.inputBuffer)
-            //if len(c.inputBuffer) >= rest {
-            //c.inputBuffer = c.inputBuffer[rest:]
-            //return len(b), nil
-            //}
+                if (length > Config.NoiseMessageLength)
+                {
+                    throw new Exception("disco: Disco message received exceeds DiscoMessageLength");
+                }
 
-            //// we haven't filled the buffer
-            //readSoFar += len(c.inputBuffer)
-            //c.inputBuffer = c.inputBuffer[:0]
-            //return readSoFar, nil
-            //*/
-            //            var plaintextSize = noiseMessage.Length - 16;
-            //            var plaintext = this.strobeIn.RecvEncUnauthenticated(false, noiseMessage.Take(plaintextSize).ToArray());
-            //            var macCheckResult = this.strobeIn.RecvMac(false, noiseMessage.Skip(plaintextSize).ToArray());
-            //            if (!macCheckResult)
-            //            {
-            //                throw new Exception("disco: cannot decrypt the payload");
-            //            }
+                // read noise message from socket
+                var noiseMessage = this.ReadFromUntil(this.SocketConnection, length);
 
-            //            // append to the input buffer
-            //            this.inputBuffer = this.inputBuffer.Concat(plaintext).ToArray();
-            //            // read whatever we can read
-            data= Encoding.ASCII.GetBytes("hello");
-            return 50;
+                // decrypt
+                if (length < 16)
+                {
+                    throw new Exception("disco: the received payload is shorter 16 bytes");
+                }
+
+                var plaintextLength = noiseMessage.Length - 16;
+                var plaintext = this.strobeIn.RecvEncUnauthenticated(false, noiseMessage.Take(plaintextLength).ToArray());
+                var ok = this.strobeIn.RecvMac(false, noiseMessage.Skip(plaintextLength).ToArray());
+
+                if (!ok)
+                {
+                    throw new Exception("disco: cannot decrypt the payload");
+                }
+
+                // append to the input buffer
+                this.inputBuffer = this.inputBuffer.Concat(plaintext).ToArray();
+
+                // read whatever we can read
+                var rest = data.Length - readSoFar;
+                var restToRead = this.inputBuffer.Length > rest ? rest :(int)this.inputBuffer.Length ;
+                this.inputBuffer.CopyTo(data, readSoFar);
+                if (this.inputBuffer.Length > restToRead)
+                {
+                    this.inputBuffer = this.inputBuffer.Skip(readSoFar).ToArray();
+                    return data.Length;
+                }
+
+                // we haven't filled the buffer
+                readSoFar += restToRead;
+                this.inputBuffer = new byte[] { };
+
+                return readSoFar;
+            }
+
+            finally
+            {
+                mutex.ReleaseMutex();
+            }
         }
 
         private byte[] ReadFromUntil(TcpClient s, int n)
@@ -202,7 +312,7 @@
 
                         (c1, c2) = handshakeState.ReadMessage(noiseMessage, out receivedPayload);
                     }
-                } while (c1 != null);
+                } while (c1 == null);
 
                 // Has the other peer been authenticated so far?
                 if (!this.isRemoteAuthenticated && this.config.PublicKeyVerifier != null)

@@ -123,6 +123,8 @@
             // Generate 192-bit nonce
             var random = new RNGCryptoServiceProvider();
             var nonce = new byte[Symmetric.NonceSize];
+
+            //#Q_ return randomness!
             random.GetBytes(nonce, 0, Symmetric.NonceSize);
 
             // Absorb the nonce

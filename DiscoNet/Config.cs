@@ -34,7 +34,7 @@
         /// <summary>
         /// Noise max plaintext size
         /// </summary>
-        const int NoiseMaxPlaintextSize = NoiseMessageLength - NoiseTagLength;
+        public const int NoiseMaxPlaintextSize = NoiseMessageLength - NoiseTagLength;
 
         /// <summary>
         /// the type of Noise protocol that the client and the server will go through

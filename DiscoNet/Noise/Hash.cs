@@ -1,7 +1,7 @@
 ﻿namespace DiscoNet.Noise
 {
     using System;
-
+    using DiscoNet.Noise.Enums;
     using StrobeNet;
     using StrobeNet.Enums;
 
