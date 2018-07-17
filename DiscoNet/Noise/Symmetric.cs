@@ -124,8 +124,9 @@
             var random = new RNGCryptoServiceProvider();
             var nonce = new byte[Symmetric.NonceSize];
 
-            //#Q_ return randomness!
+# if !DEBUG_DETERMINISTIC
             random.GetBytes(nonce, 0, Symmetric.NonceSize);
+#endif
 
             // Absorb the nonce
             ae.Ad(false, nonce);

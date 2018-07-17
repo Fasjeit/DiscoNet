@@ -57,7 +57,6 @@
         /// <returns></returns>
         public static byte[] Dh(KeyPair keyPair, byte[] publicKey)
         {
-            //#Q_ source - shared [32]byte ???
             return ScalarMult.Mult(keyPair.PrivateKey, publicKey);
         }
     }

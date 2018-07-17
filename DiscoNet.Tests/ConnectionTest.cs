@@ -21,7 +21,6 @@
         {
             var clientConfig = new Config()
             {
-                //#Q_ return random
                 KeyPair = Asymmetric.GenerateKeyPair(),
                 HandshakePattern = NoiseHandshakeType.NoiseXX,
                 StaticPublicKeyProof = new byte[] { },
@@ -30,7 +29,6 @@
 
             var serverConfig = new Config()
             {
-                //#Q_ return random
                 KeyPair = Asymmetric.GenerateKeyPair(),
                 HandshakePattern = NoiseHandshakeType.NoiseXX,
                 StaticPublicKeyProof = new byte[] { },

@@ -92,8 +92,11 @@
                         }
                         else
                         {
-                            //#Q_return randomness #E
+#if DEBUG_DETERMINISTIC
+                            this.E = Asymmetric.GenerateKeyPair(new byte[32]);
+#else
                             this.E = Asymmetric.GenerateKeyPair();
+#endif
                         }
 
                         messageBuffer = messageBuffer.Concat(this.E.PublicKey).ToArray();
