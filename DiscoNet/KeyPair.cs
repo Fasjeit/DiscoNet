@@ -1,6 +1,8 @@
 ﻿namespace DiscoNet
 {
     using System;
+    using System.Linq;
+    using StrobeNet.Extensions;
 
     public class KeyPair : IDisposable
     {
@@ -9,7 +11,22 @@
 
         public string ExportPublicKey()
         {
-            return BitConverter.ToString(this.PublicKey).Replace("-", string.Empty);
+            return this.PublicKey.ToHexString();
+        }
+
+        internal string ExportPrivateKey()
+        {
+            return this.PrivateKey.ToHexString();
+        }
+
+        public void ImportPublicKey(string hex)
+        {
+            this.PublicKey = hex.ToByteArray();
+        }
+
+        internal void ImportPrivateKey(string hex)
+        {
+            this.PrivateKey = hex.ToByteArray();
         }
 
         public void Dispose()
@@ -21,6 +38,5 @@
         {
             this.Dispose();
         }
-
     }
 }

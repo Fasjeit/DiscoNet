@@ -30,7 +30,7 @@
                 HandshakePattern = NoiseHandshakeType.NoiseKK
             };
 
-            RunTwoWayTest(clientConfig, serverConfig);
+            RunTwoWayTest(clientConfig, serverConfig, 1800);
         }
 
         [Fact]
@@ -49,7 +49,7 @@
                 HandshakePattern = NoiseHandshakeType.NoiseNK
             };
 
-            RunTwoWayTest(clientConfig, serverConfig, 1800);
+            RunTwoWayTest(clientConfig, serverConfig, 1801);
         }
 
         [Fact]
@@ -67,7 +67,7 @@
                 KeyPair = clienPair,
                 HandshakePattern = NoiseHandshakeType.NoiseXX,
                 PublicKeyVerifier = Verifier,
-                StaticPublicKeyProof = Apis.CreateStaticPublicKeyProof(rootKey, clienPair.PublicKey)
+                StaticPublicKeyProof = Apis.CreateStaticPublicKeyProof(rootKey.PrivateKey, clienPair.PublicKey)
             };
 
             var serverConfig = new Config()
@@ -75,10 +75,10 @@
                 KeyPair = serverPair,
                 HandshakePattern = NoiseHandshakeType.NoiseXX,
                 PublicKeyVerifier = Verifier,
-                StaticPublicKeyProof = Apis.CreateStaticPublicKeyProof(rootKey, serverPair.PublicKey)
+                StaticPublicKeyProof = Apis.CreateStaticPublicKeyProof(rootKey.PrivateKey, serverPair.PublicKey)
             };
 
-            RunTwoWayTest(clientConfig, serverConfig, 18002);
+            RunTwoWayTest(clientConfig, serverConfig, 1802);
         }
 
         [Fact]
@@ -110,7 +110,7 @@
 
             Task.Factory.StartNew(() =>
             {
-                using (var listener = Apis.Listen(address, serverConfig, 1800))
+                using (var listener = Apis.Listen(address, serverConfig, port))
                 {
                     var serverSocket = listener.Accept();
                     var buf = new byte[100];
@@ -141,7 +141,7 @@
             });
 
             // Run the client
-            var clientSocket = Apis.Connect("tcp", address, 1800, clientConfig);
+            var clientSocket = Apis.Connect("tcp", address, port, clientConfig);
 
             clientSocket.Write(Encoding.ASCII.GetBytes("hello"));                 
         }
@@ -160,7 +160,7 @@
 
                 Task.Factory.StartNew(() =>
                 {
-                    using (var listener = Apis.Listen(address, serverConfig, 1800))
+                    using (var listener = Apis.Listen(address, serverConfig, port))
                     {
                         var serverSocket = listener.Accept();
                         var buf = new byte[100];
@@ -175,7 +175,7 @@
                 });
 
             // Run the client
-            var clientSocket = Apis.Connect("tcp", address, 1800, clientConfig);
+            var clientSocket = Apis.Connect("tcp", address, port, clientConfig);
 
             clientSocket.Write(Encoding.ASCII.GetBytes("hello"));
 

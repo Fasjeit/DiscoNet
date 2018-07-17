@@ -35,7 +35,7 @@
                 PublicKeyVerifier = Verifier,
             };
 
-            await RunConnectionTest(clientConfig, serverConfig);
+            await RunConnectionTest(clientConfig, serverConfig, 1810);
         }
 
         [Fact]
@@ -60,16 +60,16 @@
                 HalfDuplex = true,
             };
 
-            await RunConnectionTest(clientConfig, serverConfig);
+            await RunConnectionTest(clientConfig, serverConfig, 1811);
         }
         
-        private async Task RunConnectionTest(Config clientConfig, Config serverConfig)
+        private async Task RunConnectionTest(Config clientConfig, Config serverConfig, int port = 1810)
         {
             var address = "127.0.0.1";
 
             var server = Task.Factory.StartNew(() =>
             {
-                using (var listener = Apis.Listen(address, serverConfig, 1801))
+                using (var listener = Apis.Listen(address, serverConfig, port))
                 {
                     var serverSocket = listener.Accept();
                     for (int i = 0; i < IterationCount; i++)
@@ -85,7 +85,7 @@
             });
 
             // Run the client
-            var clientSocket = Apis.Connect("tcp", address, 1801, clientConfig);
+            var clientSocket = Apis.Connect("tcp", address, port, clientConfig);
 
             for (int i = 0; i < IterationCount; i++)
             {

@@ -7,7 +7,9 @@
     using DiscoNet.Noise;
     using DiscoNet.Noise.Enums;
     using DiscoNet.Disco;
-
+    using System.IO;
+    using System.Linq;
+    using StrobeNet.Extensions;
     public static class Apis
     {
         //#Q_
@@ -120,13 +122,13 @@
         // StaticPublicKeyProof sometimes required in a libdisco.Config
         // for peers that are sending their static public key at some
         // point during the handshake
-        public static byte[] CreateStaticPublicKeyProof(Sodium.KeyPair keyPair, byte[] publicKey)
+        public static byte[] CreateStaticPublicKeyProof(byte[] sodiumPrivateKey, byte[] publicKey)
         {
             if (publicKey.Length != 32)
             {
                 throw new Exception("disco: length of public key passed is incorrect (should be 32)");
             }
-            return Sodium.PublicKeyAuth.SignDetached(publicKey, keyPair.PrivateKey);
+            return Sodium.PublicKeyAuth.SignDetached(publicKey, sodiumPrivateKey);
         }
 
         // CreatePublicKeyVerifier can be used to create the callback
@@ -143,6 +145,67 @@
                 }
                 return Sodium.PublicKeyAuth.VerifyDetached(proof, publicKey, rootPublicKey);
             };
+        }
+
+        // GenerateAndSaveDiscoKeyPair generates a disco key pair (X25519 key pair)
+        // and saves it to a file in hexadecimal form. You can use ExportPublicKey() to
+        // export the public key part.
+        public static KeyPair GenerateAndSaveDiscoKeyPair(string fileName)
+        {
+            var keyPair = Asymmetric.GenerateKeyPair();
+
+            File.WriteAllText(fileName, keyPair.ExportPublicKey() + keyPair.ExportPrivateKey());
+
+            return keyPair;
+        }
+
+        // LoadDiscoKeyPair reads and parses a public/private key pair from a pair
+        // of files.
+        public static KeyPair LoadDiscoKeyPair(string fileName)
+        {
+            var hex = File.ReadAllText(fileName);
+            if (hex.Length != 128)
+            {
+                throw new Exception("Disco: Disco key pair file is not correctly formated");
+            }
+            var keyPair = new KeyPair();
+            keyPair.ImportPublicKey(hex.Substring(0, 64));
+            keyPair.ImportPrivateKey(hex.Substring(64, 64));
+
+            return keyPair;
+        }
+
+        // GenerateAndSaveDiscoRootKeyPair generates an ed25519 root key pair and save the private and public parts in different files.
+        public static void GenerateAndSaveDiscoRootKeyPair(string discoRootPrivateKeyFile, string discoRootPublicKeyFile)
+        {
+            var keyPair = Sodium.PublicKeyAuth.GenerateKeyPair();
+
+            File.WriteAllText(discoRootPrivateKeyFile, keyPair.PrivateKey.ToHexString());
+            File.WriteAllText(discoRootPublicKeyFile, keyPair.PublicKey.ToHexString());
+        }
+
+        // LoadDiscoRootPublicKey reads and parses a public Root key from a
+        // file. The file contains an 32-byte ed25519 public key in hexadecimal
+        public static byte[] LoadDiscoRootPublicKey(string discoRootPublicKeyFile)
+        {
+            var hex = File.ReadAllText(discoRootPublicKeyFile);
+            if (hex.Length != 64)
+            {
+                throw new Exception("Disco: Disco root public key file is not correctly formated");
+            }
+            return hex.ToByteArray();
+        }
+
+        // LoadDiscoRootPrivateKey reads and parses a private Root key from a
+        // file. The file contains an 32-byte ed25519 private key in hexadecimal
+        public static byte[] LoadDiscoRootPrivateKey(string discoRootPrivaeKeyFile)
+        {
+            var hex = File.ReadAllText(discoRootPrivaeKeyFile);
+            if (hex.Length != 128)
+            {
+                throw new Exception("Disco: Disco root private key file is not correctly formated");
+            }
+            return hex.ToByteArray();
         }
     }
 }
