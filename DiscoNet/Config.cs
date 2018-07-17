@@ -72,9 +72,9 @@
         /// <param name="publicKey"></param>
         /// <param name="proof"></param>
         /// <returns></returns>
-        public delegate bool PublicKeyVerifierDeligate(object publicKey, byte[] proof);
+        public delegate bool PublicKeyVerifierDeligate(byte[] publicKey, byte[] proof);
 
-        public PublicKeyVerifierDeligate PublicKeyVerifier;
+        public PublicKeyVerifierDeligate PublicKeyVerifier { get; set; }
 
         /// <summary>
         /// A pre-shared key for handshake patterns including a `psk` token

@@ -115,5 +115,34 @@
             listener.Start();
             return listener;
         }
+
+        // CreateStaticPublicKeyProof can be used to create the proof
+        // StaticPublicKeyProof sometimes required in a libdisco.Config
+        // for peers that are sending their static public key at some
+        // point during the handshake
+        public static byte[] CreateStaticPublicKeyProof(Sodium.KeyPair keyPair, byte[] publicKey)
+        {
+            if (publicKey.Length != 32)
+            {
+                throw new Exception("disco: length of public key passed is incorrect (should be 32)");
+            }
+            return Sodium.PublicKeyAuth.SignDetached(publicKey, keyPair.PrivateKey);
+        }
+
+        // CreatePublicKeyVerifier can be used to create the callback
+        // function PublicKeyVerifier sometimes required in a libdisco.Config
+        // for peers that are receiving a static public key at some
+        // point during the handshake
+        public static Config.PublicKeyVerifierDeligate CreatePublicKeyVerifier(byte[] rootPublicKey)
+        {
+            return (publicKey, proof) =>
+            {
+                if (publicKey.Length != 32)
+                {
+                    return false;
+                }
+                return Sodium.PublicKeyAuth.VerifyDetached(proof, publicKey, rootPublicKey);
+            };
+        }
     }
 }

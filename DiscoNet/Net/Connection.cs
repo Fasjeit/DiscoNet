@@ -55,9 +55,9 @@
         {
             // If this is a one-way pattern, do some checks
             var handshakePattern = this.config.HandshakePattern;
-            if (this.IsClient && (handshakePattern == NoiseHandshakeType.NoiseN || handshakePattern == NoiseHandshakeType.NoiseK || handshakePattern == NoiseHandshakeType.NoiseX))
+            if (!this.IsClient && (handshakePattern == NoiseHandshakeType.NoiseN || handshakePattern == NoiseHandshakeType.NoiseK || handshakePattern == NoiseHandshakeType.NoiseX))
             {
-                throw new Exception("disco: a client should not read on one - way patterns");
+                throw new Exception("disco: a server should not write on one-way patterns");
             }
 
             // Make sure to go through the handshake first

@@ -12,6 +12,8 @@
 
     public class PatternsTest
     {
+
+
         [Fact]
         public void TestNoiseKk()
         {
@@ -47,25 +49,105 @@
                 HandshakePattern = NoiseHandshakeType.NoiseNK
             };
 
-            RunTwoWayTest(clientConfig, serverConfig);
+            RunTwoWayTest(clientConfig, serverConfig, 1800);
         }
 
         [Fact]
         public void TestNoiseXx()
         {
-            throw new NotImplementedException();
+            Sodium.KeyPair rootKey = Sodium.PublicKeyAuth.GenerateKeyPair();
+            Config.PublicKeyVerifierDeligate Verifier = Apis.CreatePublicKeyVerifier(rootKey.PublicKey);
+
+            var clienPair = Asymmetric.GenerateKeyPair();
+            var serverPair = Asymmetric.GenerateKeyPair();
+
+            // init
+            var clientConfig = new Config()
+            {
+                KeyPair = clienPair,
+                HandshakePattern = NoiseHandshakeType.NoiseXX,
+                PublicKeyVerifier = Verifier,
+                StaticPublicKeyProof = Apis.CreateStaticPublicKeyProof(rootKey, clienPair.PublicKey)
+            };
+
+            var serverConfig = new Config()
+            {
+                KeyPair = serverPair,
+                HandshakePattern = NoiseHandshakeType.NoiseXX,
+                PublicKeyVerifier = Verifier,
+                StaticPublicKeyProof = Apis.CreateStaticPublicKeyProof(rootKey, serverPair.PublicKey)
+            };
+
+            RunTwoWayTest(clientConfig, serverConfig, 18002);
         }
 
         [Fact]
         public void TestNoiseN()
         {
-            throw new NotImplementedException();
+            // init
+            var clientConfig = new Config()
+            {
+                KeyPair = Asymmetric.GenerateKeyPair(),
+                HandshakePattern = NoiseHandshakeType.NoiseN
+            };
+
+            var serverConfig = new Config()
+            {
+                KeyPair = Asymmetric.GenerateKeyPair(),
+                HandshakePattern = NoiseHandshakeType.NoiseN
+            };
+
+            RunOneWayTest(clientConfig, serverConfig, 1803);
         }
 
-        private void RunTwoWayTest(Config clientConfig, Config serverConfig)
+        private void RunOneWayTest(Config clientConfig, Config serverConfig, int port = 1800)
         {
+            // set up remote keys
+            serverConfig.RemoteKey = clientConfig.KeyPair.PublicKey;
+            clientConfig.RemoteKey = serverConfig.KeyPair.PublicKey;
 
+            var address = "127.0.0.1";
 
+            Task.Factory.StartNew(() =>
+            {
+                using (var listener = Apis.Listen(address, serverConfig, 1800))
+                {
+                    var serverSocket = listener.Accept();
+                    var buf = new byte[100];
+                    var n = serverSocket.Read(buf);
+                    if (!buf.Take(n).SequenceEqual(Encoding.ASCII.GetBytes("hello")))
+                    {
+                        throw new Exception("client message failed");
+                    }
+
+                    // Expect error in here
+                    try
+                    {
+                        serverSocket.Write(Encoding.ASCII.GetBytes("ca va?"));
+                    }
+                    catch (Exception ex)
+                    {
+                        if (ex.Message != "disco: a server should not write on one-way patterns")
+                        {
+                            throw new Exception($"Unexpected Server Exception: {ex.ToString()}");
+                        }
+                        else
+                        {
+                            return;
+                        }
+                    }
+                    throw new Exception("Server should not write in one way pattern");
+                }
+            });
+
+            // Run the client
+            var clientSocket = Apis.Connect("tcp", address, 1800, clientConfig);
+
+            clientSocket.Write(Encoding.ASCII.GetBytes("hello"));                 
+        }
+
+        private void RunTwoWayTest(Config clientConfig, Config serverConfig, int port = 1800)
+        {
             // set up remote keys
             serverConfig.RemoteKey = clientConfig.KeyPair.PublicKey;
             clientConfig.RemoteKey = serverConfig.KeyPair.PublicKey;

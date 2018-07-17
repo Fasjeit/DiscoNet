@@ -37,6 +37,36 @@
                 PublicKeyVerifier = Verifier,
             };
 
+            await RunConnectionTest(clientConfig, serverConfig);
+        }
+
+        [Fact]
+        public async Task TestHalfDuplex()
+        {
+            // init
+            var clientConfig = new Config()
+            {
+                KeyPair = Asymmetric.GenerateKeyPair(),
+                HandshakePattern = NoiseHandshakeType.NoiseXX,
+                PublicKeyVerifier = Verifier,
+                StaticPublicKeyProof = new byte[] { },
+                HalfDuplex = true,
+            };
+
+            var serverConfig = new Config()
+            {
+                KeyPair = Asymmetric.GenerateKeyPair(),
+                HandshakePattern = NoiseHandshakeType.NoiseXX,
+                PublicKeyVerifier = Verifier,
+                StaticPublicKeyProof = new byte[] { },
+                HalfDuplex = true,
+            };
+
+            await RunConnectionTest(clientConfig, serverConfig);
+        }
+        
+        private async Task RunConnectionTest(Config clientConfig, Config serverConfig)
+        {
             var address = "127.0.0.1";
 
             var server = Task.Factory.StartNew(() =>
@@ -63,7 +93,7 @@
             {
                 await Task.Factory.StartNew(() =>
                 {
-                    clientSocket.Write(Encoding.ASCII.GetBytes("hello " + i%10));
+                    clientSocket.Write(Encoding.ASCII.GetBytes("hello " + i % 10));
                 });
             }
             await server;
