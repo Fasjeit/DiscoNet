@@ -145,14 +145,27 @@
         {
             var key = "eda8506c1fb0bbcc3f62626fef074bbf2d09a8c7c608f3fa1482c9a625d00f75".ToByteArray();
 
-            var plaitext = Encoding.ASCII.GetBytes("hello, how are you?");
+            var plaintexs = new string[] {
+                "",
+                "a",
+                "ab",
+                "abc",
+                "abcd",
+                "short",
+                "hello, how are you?",
+                "this is very short",
+                "this is very long though, like, very very long, should we test very very long things here?" };
 
-            var ciphertext = Symmetric.Encrypt(key, plaitext);
-            var decrypted = Symmetric.Decrypt(key, ciphertext);
-
-            if (!plaitext.SequenceEqual(decrypted))
+            foreach (var plaintextString in plaintexs)
             {
-                throw new Exception("Decrypt did not work");
+                var plaintex = Encoding.ASCII.GetBytes(plaintextString);
+                var ciphertext = Symmetric.Encrypt(key, plaintex);
+                var decrypted = Symmetric.Decrypt(key, ciphertext);
+
+                if (!plaintex.SequenceEqual(decrypted))
+                {
+                    throw new Exception("Decrypt did not work");
+                }
             }
         }
     }

@@ -94,12 +94,9 @@
             var tag = hash.SendMac(false, Symmetric.TagSize);
 
             // verifying the tag
-            for (var i = 0; i < 16; i++)
+            if (!hash.RecvMac(false, tag))
             {
-                if (tag[i] != plaintextAndTag[offset + i])
-                {
-                    throw new Exception("disco: the plaintext has been modified");
-                }
+                throw new Exception("disco: the plaintext has been modified");
             }
 
             return plainText;

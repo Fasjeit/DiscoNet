@@ -6,7 +6,7 @@
     using System.Net.Sockets;
     using System.Text;
     using System.Threading;
-
+    using DiscoNet.Net;
     using DiscoNet.Noise;
     using DiscoNet.Noise.Enums;
     using StrobeNet;
@@ -263,7 +263,7 @@
                     Array.Copy(this.config.RemoteKey, remoteKeyPair.PublicKey, this.config.RemoteKey.Length);
                 }
 
-                var handshakeState = DiscoOoooo.Initialize(
+                var handshakeState = Apis.InitializeDisco(
                     this.config.HandshakePattern,
                     this.IsClient,
                     this.config.Prologue,
