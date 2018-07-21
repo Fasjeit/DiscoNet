@@ -25,7 +25,7 @@
         /// can only receive data and cannot reply back. The server
         /// authenticates the client via a key transmitted as part
         /// of the handshake.
-        //// </summary>
+        /// </summary>
         NoiseX,
 
         /// <summary>

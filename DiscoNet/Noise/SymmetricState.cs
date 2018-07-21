@@ -6,34 +6,43 @@
 
     using StrobeNet;
 
+    /// <summary>
+    /// Noise symmetric state
+    /// </summary>
     public class SymmetricState
     {
+        /// <summary>
+        /// Cuuretn strobe state
+        /// </summary>
         private readonly Strobe strobeState;
 
+        /// <summary>
+        /// Is state keyed
+        /// </summary>
         public bool IsKeyed { get; private set; }
 
-        public SymmetricState(string protocolName)
+        internal SymmetricState(string protocolName)
         {
             this.strobeState = new Strobe(protocolName, 128);
         }
 
-        public void MixKey(byte[] inputKeyMaterial)
+        internal void MixKey(byte[] inputKeyMaterial)
         {
             this.strobeState.Ad(false, inputKeyMaterial);
             this.IsKeyed = true;
         }
 
-        public void MixHash(byte[] data)
+        internal void MixHash(byte[] data)
         {
             this.strobeState.Ad(false, data);
         }
 
-        public void MixKeyAndHash(byte[] inputKeyMaterial)
+        internal void MixKeyAndHash(byte[] inputKeyMaterial)
         {
             this.strobeState.Ad(false, inputKeyMaterial);
         }
 
-        public byte[] GetHandshakeHash()
+        internal byte[] GetHandshakeHash()
         {
             return this.strobeState.Prf(32);
         }
@@ -44,7 +53,7 @@
         /// </summary>
         /// <param name="plaintext"></param>
         /// <returns></returns>
-        public byte[] EncryptAndHash(byte[] plaintext)
+        internal byte[] EncryptAndHash(byte[] plaintext)
         {
             if (!this.IsKeyed)
             {
@@ -57,7 +66,7 @@
             return ciphertext;
         }
 
-        public byte[] DecryptAndHash(byte[] cipherText)
+        internal byte[] DecryptAndHash(byte[] cipherText)
         {
             if (!this.IsKeyed)
             {
@@ -82,7 +91,7 @@
             return plaintext;
         }
 
-        public (Strobe initiatorState, Strobe responderState) Split()
+        internal (Strobe initiatorState, Strobe responderState) Split()
         {
             var initiatorState = (Strobe)this.strobeState.Clone();
             initiatorState.Ad(true, Encoding.ASCII.GetBytes("initiator"));

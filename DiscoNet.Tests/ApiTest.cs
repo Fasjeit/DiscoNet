@@ -1,11 +1,13 @@
-﻿using DiscoNet.Net;
-using Xunit;
-using System.Linq;
-using System;
-using System.IO;
-
-namespace DiscoNet.Tests
+﻿namespace DiscoNet.Tests
 {
+    using System;
+    using System.IO;
+    using System.Linq;
+
+    using DiscoNet.Net;
+
+    using Xunit;
+
     public class ApiTest
     {
         [Fact]
@@ -24,7 +26,8 @@ namespace DiscoNet.Tests
                 var keyPairTemp = Apis.LoadDiscoKeyPair(discoKeyPairFile);
 
                 // compare
-                if (!keyPairTemp.PrivateKey.SequenceEqual(keyPair.PrivateKey) || !keyPairTemp.PublicKey.SequenceEqual(keyPair.PublicKey))
+                if (!keyPairTemp.PrivateKey.SequenceEqual(keyPair.PrivateKey)
+                    || !keyPairTemp.PublicKey.SequenceEqual(keyPair.PublicKey))
                 {
                     throw new Exception("Disco key pair generated and loaded are different");
                 }

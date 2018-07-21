@@ -6,6 +6,9 @@
 
     using StrobeNet;
 
+    /// <summary>
+    /// Symmectic suite
+    /// </summary>
     public static class Symmetric
     {
         private const int NonceSize = 192 / 8;
@@ -86,12 +89,12 @@
 
             var offset = plaintextAndTag.Length - Symmetric.TagSize;
             var plainText = plaintextAndTag.Take(offset).ToArray();
+            var tag = plaintextAndTag.Skip(offset).ToArray();
 
             // Geting the tag
             var hash = new Strobe("DiscoMAC", 128);
             hash.Ad(false, key);
             hash.Ad(false, plainText);
-            var tag = hash.SendMac(false, Symmetric.TagSize);
 
             // verifying the tag
             if (!hash.RecvMac(false, tag))

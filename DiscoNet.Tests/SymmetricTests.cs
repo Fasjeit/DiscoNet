@@ -6,9 +6,9 @@
 
     using DiscoNet.Noise;
 
-    using Xunit;
-
     using StrobeNet.Extensions;
+
+    using Xunit;
 
     public class SymmetricTests
     {
@@ -83,9 +83,9 @@
             var input = Encoding.ASCII.GetBytes("hi, how are you?");
 
             if (!string.Equals(
-                Symmetric.DeriveKeys(input, 64).ToHexString(),
-                "d6350bb9b83884774fb9b0881680fc656be1071fff75d3fa94519d50a10b92644e3cc1cae166a60167d7bf00137018345bb8057be4b09f937b0e12066d5dc3df",
-                StringComparison.InvariantCultureIgnoreCase))
+                    Symmetric.DeriveKeys(input, 64).ToHexString(),
+                    "d6350bb9b83884774fb9b0881680fc656be1071fff75d3fa94519d50a10b92644e3cc1cae166a60167d7bf00137018345bb8057be4b09f937b0e12066d5dc3df",
+                    StringComparison.InvariantCultureIgnoreCase))
             {
                 throw new Exception("DeriveKeys does not produce a correct output");
             }
@@ -139,22 +139,17 @@
                 throw new Exception("Length of this ciphertext should be 19B(PT) + 16B(TAG) + 24B(NONCE)");
             }
         }
-        
+
         [Fact]
         public void TestEncryptDecrypt()
         {
             var key = "eda8506c1fb0bbcc3f62626fef074bbf2d09a8c7c608f3fa1482c9a625d00f75".ToByteArray();
 
-            var plaintexs = new string[] {
-                "",
-                "a",
-                "ab",
-                "abc",
-                "abcd",
-                "short",
-                "hello, how are you?",
-                "this is very short",
-                "this is very long though, like, very very long, should we test very very long things here?" };
+            var plaintexs = new[]
+            {
+                "", "a", "ab", "abc", "abcd", "short", "hello, how are you?", "this is very short",
+                "this is very long though, like, very very long, should we test very very long things here?"
+            };
 
             foreach (var plaintextString in plaintexs)
             {

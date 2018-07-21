@@ -1,10 +1,13 @@
 ﻿namespace DiscoNet.Noise
 {
     using System;
-    using DiscoNet.Noise.Enums;
+
     using StrobeNet;
     using StrobeNet.Enums;
 
+    /// <summary>
+    /// Strobe hash object
+    /// </summary>
     public class Hash : ICloneable
     {
         private readonly int outputLen;
@@ -13,6 +16,10 @@
 
         private Strobe strobeState;
 
+        /// <summary>
+        /// Output (exrac) data from strobe state
+        /// </summary>
+        /// <param name="outputLength"></param>
         public Hash(int outputLength)
         {
             if (outputLength < 32)

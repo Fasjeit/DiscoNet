@@ -6,13 +6,13 @@
 
         TokenS,
 
-        TokenEs,
+        TokenES,
 
-        TokenSe,
+        TokenSE,
 
-        TokenSs,
+        TokenSS,
 
-        TokenEe,
+        TokenEE,
 
         TokenPsk
     }

@@ -2,65 +2,84 @@
 {
     using System;
     using System.Linq;
+
+    using DiscoNet.Noise.Enums;
     using DiscoNet.Noise.Pattern;
 
     using StrobeNet;
 
+    /// <summary>
+    /// Noise handshake state
+    /// </summary>
     public class HandshakeState : IDisposable
     {
         /// <summary>
         /// SymmetricState object
         /// </summary>
-        public SymmetricState SymmetricState { get; set; }
+        public SymmetricState SymmetricState { get; internal set; }
 
         /// <summary>
         /// The local static key pair
         /// </summary>
-        public KeyPair S { get; set; } = new KeyPair();
+        public KeyPair S { get; internal set; }
 
         /// <summary>
         /// The local ephemeral key pair
         /// </summary>
-        public KeyPair E { get; set; } = new KeyPair();
+        public KeyPair E { get; internal set; }
 
         /// <summary>
         /// The remote party's static public key
         /// </summary>
-        public KeyPair Rs { get; set; } = new KeyPair();
+        public KeyPair Rs { get; internal set; }
 
         /// <summary>
         /// The remote party's ephemeral public key
         /// </summary>
-        public KeyPair Re { get; set; } = new KeyPair();
+        public KeyPair Re { get; internal set; }
 
         /// <summary>
         /// Indicating the initiator or responder role.
         /// </summary>
-        public bool Initiator { get; set; }
+        public bool Initiator { get; internal set; }
 
         /// <summary>
         /// A sequence of message pattern. Each message pattern is a sequence
         /// of tokens from the set ("e", "s", "ee", "es", "se", "ss")
         /// </summary>
-        public MessagePattern[] MessagePatterns { get; set; }
+        public MessagePattern[] MessagePatterns { get; internal set; }
 
         /// <summary>
         /// indicating if the role of the peer is to WriteMessage
         /// or ReadMessage
         /// </summary>
-        public bool ShouldWrite { get; set; }
+        public bool ShouldWrite { get; internal set; }
 
         /// <summary>
         /// Pre-shared key
         /// </summary>
-        public byte[] Psk { get; set; }
+        public byte[] Psk { get; internal set; }
 
         /// <summary>
         /// For test vectors
         /// </summary>
-        public KeyPair DebugEphemeral { get; set; }
+        internal KeyPair DebugEphemeral { get; set; }
 
-        public (Strobe initiatorState, Strobe responderState) WriteMessage(byte[] payload, out byte[] messageBuffer)
+        public void Dispose()
+        {
+            this.S?.Dispose();
+            this.Rs?.Dispose();
+            this.E?.Dispose();
+            this.Re?.Dispose();
+        }
+
+        /// <summary>
+        /// Write payload with handhsake message using current state
+        /// </summary>
+        /// <param name="payload">payload to write</param>
+        /// <param name="messageBuffer">output message buffer</param>
+        /// <returns></returns>
+        internal (Strobe initiatorState, Strobe responderState) WriteMessage(byte[] payload, out byte[] messageBuffer)
         {
             Strobe initiatorState = null;
             Strobe responderState = null;
@@ -83,7 +102,7 @@
             {
                 switch (pattern)
                 {
-                    case Enums.Tokens.TokenE:
+                    case Tokens.TokenE:
                     {
                         // debug
                         if (this.DebugEphemeral != null)
@@ -105,20 +124,21 @@
                         {
                             this.SymmetricState.MixKey(this.E.PublicKey);
                         }
+
                         break;
                     }
-                    case Enums.Tokens.TokenS:
+                    case Tokens.TokenS:
                     {
                         var encrypted = this.SymmetricState.EncryptAndHash(this.S.PublicKey);
                         messageBuffer = messageBuffer.Concat(encrypted).ToArray();
                         break;
                     }
-                    case Enums.Tokens.TokenEe:
+                    case Tokens.TokenEE:
                     {
                         this.SymmetricState.MixKey(Asymmetric.Dh(this.E, this.Re.PublicKey));
                         break;
                     }
-                    case Enums.Tokens.TokenEs:
+                    case Tokens.TokenES:
                     {
                         if (this.Initiator)
                         {
@@ -131,7 +151,7 @@
 
                         break;
                     }
-                    case Enums.Tokens.TokenSe:
+                    case Tokens.TokenSE:
                     {
                         if (this.Initiator)
                         {
@@ -144,12 +164,12 @@
 
                         break;
                     }
-                    case Enums.Tokens.TokenSs:
+                    case Tokens.TokenSS:
                     {
                         this.SymmetricState.MixKey(Asymmetric.Dh(this.S, this.Rs.PublicKey));
                         break;
                     }
-                    case Enums.Tokens.TokenPsk:
+                    case Tokens.TokenPsk:
                     {
                         this.SymmetricState.MixHash(this.Psk);
                         break;
@@ -184,8 +204,12 @@
             return (initiatorState, responderState);
         }
 
-        // ReadMessage takes a byte sequence containing a Noise handshake message,
-        // and a payload_buffer to write the message's plaintext payload into.
+        /// <summary>
+        /// Read handshake message and output payload
+        /// </summary>
+        /// <param name="message">Noisemessage</param>
+        /// <param name="payloadBuffer">payload buffer</param>
+        /// <returns></returns>
         public (Strobe initiatorState, Strobe responderState) ReadMessage(byte[] message, out byte[] payloadBuffer)
         {
             Strobe initiatorState = null;
@@ -211,14 +235,14 @@
             {
                 switch (pattern)
                 {
-                    case Enums.Tokens.TokenE:
+                    case Tokens.TokenE:
                     {
                         if (message.Length - offset < Asymmetric.DhLen)
                         {
                             throw new Exception("disco: the received ephemeral key is to short");
                         }
 
-                        this.Re.PublicKey = message.Skip(offset).Take(Asymmetric.DhLen).ToArray();
+                        this.Re = new KeyPair { PublicKey = message.Skip(offset).Take(Asymmetric.DhLen).ToArray() };
                         offset += Asymmetric.DhLen;
                         this.SymmetricState.MixHash(this.Re.PublicKey);
                         if (this.Psk?.Length > 0)
@@ -228,7 +252,7 @@
 
                         break;
                     }
-                    case Enums.Tokens.TokenS:
+                    case Tokens.TokenS:
                     {
                         var tagLen = 0;
                         if (this.SymmetricState.IsKeyed)
@@ -245,16 +269,16 @@
                             message.Skip(offset).Take(Asymmetric.DhLen + tagLen).ToArray());
 
                         // if we already know the remote static, compare
-                        this.Rs.PublicKey = decrypted;
+                        this.Rs = new KeyPair { PublicKey = decrypted };
                         offset += Asymmetric.DhLen + tagLen;
                         break;
                     }
-                    case Enums.Tokens.TokenEe:
+                    case Tokens.TokenEE:
                     {
                         this.SymmetricState.MixKey(Asymmetric.Dh(this.E, this.Re.PublicKey));
                         break;
                     }
-                    case Enums.Tokens.TokenEs:
+                    case Tokens.TokenES:
                     {
                         if (this.Initiator)
                         {
@@ -267,7 +291,7 @@
 
                         break;
                     }
-                    case Enums.Tokens.TokenSe:
+                    case Tokens.TokenSE:
                     {
                         if (this.Initiator)
                         {
@@ -280,12 +304,12 @@
 
                         break;
                     }
-                    case Enums.Tokens.TokenSs:
+                    case Tokens.TokenSS:
                     {
                         this.SymmetricState.MixKey(Asymmetric.Dh(this.S, this.Rs.PublicKey));
                         break;
                     }
-                    case Enums.Tokens.TokenPsk:
+                    case Tokens.TokenPsk:
                     {
                         this.SymmetricState.MixKeyAndHash(this.Psk);
                         break;
@@ -314,14 +338,6 @@
             this.ShouldWrite = true;
 
             return (initiatorState, responderState);
-        }
-
-        public void Dispose()
-        {
-            this.S?.Dispose();
-            this.Rs?.Dispose();
-            this.E?.Dispose();
-            this.Re?.Dispose();
         }
 
         ~HandshakeState()

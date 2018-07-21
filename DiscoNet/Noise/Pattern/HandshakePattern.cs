@@ -7,34 +7,8 @@
 
     internal class HandshakePattern
     {
-        private static Dictionary<NoiseHandshakeType, HandshakePattern> PatternDictionary =
+        private static readonly Dictionary<NoiseHandshakeType, HandshakePattern> PatternDictionary =
             new Dictionary<NoiseHandshakeType, HandshakePattern>();
-
-        internal string Name { get; set; }
-
-        internal MessagePattern[] PreMessagePatterns { get; set; }
-
-        internal MessagePattern[] MessagePatterns { get; set; }
-
-        private HandshakePattern(NoiseHandshakeType pattern)
-        {
-            if (HandshakePattern.PatternDictionary.ContainsKey(pattern))
-            {
-                throw new ArgumentException("pattern of the same type is already exits!");
-            }
-
-            HandshakePattern.PatternDictionary.Add(pattern, this);
-        }
-
-        internal static HandshakePattern GetPattern(NoiseHandshakeType noiseType)
-        {
-            if (!HandshakePattern.PatternDictionary.TryGetValue(noiseType, out var result))
-            {
-                throw new ArgumentException("pattern of the same type is not exits!");
-            }
-
-            return result;
-        }
 
         // 7.2. One-way patterns
 
@@ -51,7 +25,7 @@
             MessagePatterns = new[]
             {
                 // →
-                new MessagePattern { Tokens.TokenE, Tokens.TokenEs }
+                new MessagePattern { Tokens.TokenE, Tokens.TokenES }
             }
         };
 
@@ -79,9 +53,9 @@
                 {
                     // →
                     Tokens.TokenE,
-                    Tokens.TokenEs,
+                    Tokens.TokenES,
                     Tokens.TokenS,
-                    Tokens.TokenSs
+                    Tokens.TokenSS
                 }
             }
         };
@@ -101,13 +75,13 @@
             MessagePatterns = new[]
             {
                 // →
-                new MessagePattern { Tokens.TokenE, Tokens.TokenEs, Tokens.TokenSs },
+                new MessagePattern { Tokens.TokenE, Tokens.TokenES, Tokens.TokenSS },
                 // ←
-                new MessagePattern { Tokens.TokenE, Tokens.TokenEe, Tokens.TokenSe }
+                new MessagePattern { Tokens.TokenE, Tokens.TokenEE, Tokens.TokenSE }
             }
         };
 
-        private static HandshakePattern NoiseNx = new HandshakePattern(NoiseHandshakeType.NoiseNX)
+        private static HandshakePattern NoiseNX = new HandshakePattern(NoiseHandshakeType.NoiseNX)
         {
             Name = "NX",
             PreMessagePatterns = new[]
@@ -122,11 +96,11 @@
                 // →
                 new MessagePattern { Tokens.TokenE },
                 // ←
-                new MessagePattern { Tokens.TokenE, Tokens.TokenEe, Tokens.TokenS, Tokens.TokenEs }
+                new MessagePattern { Tokens.TokenE, Tokens.TokenEE, Tokens.TokenS, Tokens.TokenES }
             }
         };
 
-        private static HandshakePattern NoiseNk = new HandshakePattern(NoiseHandshakeType.NoiseNK)
+        private static HandshakePattern NoiseNK = new HandshakePattern(NoiseHandshakeType.NoiseNK)
         {
             Name = "NK",
             PreMessagePatterns = new[]
@@ -139,13 +113,13 @@
             MessagePatterns = new[]
             {
                 // →
-                new MessagePattern { Tokens.TokenE, Tokens.TokenEs },
+                new MessagePattern { Tokens.TokenE, Tokens.TokenES },
                 // ←
-                new MessagePattern { Tokens.TokenE, Tokens.TokenEs }
+                new MessagePattern { Tokens.TokenE, Tokens.TokenES }
             }
         };
 
-        private static HandshakePattern NoiseXx = new HandshakePattern(NoiseHandshakeType.NoiseXX)
+        private static HandshakePattern NoiseXX = new HandshakePattern(NoiseHandshakeType.NoiseXX)
         {
             Name = "XX",
             PreMessagePatterns = new[]
@@ -160,9 +134,9 @@
                 // →
                 new MessagePattern { Tokens.TokenE },
                 // ←
-                new MessagePattern { Tokens.TokenE, Tokens.TokenEe, Tokens.TokenS, Tokens.TokenEs },
+                new MessagePattern { Tokens.TokenE, Tokens.TokenEE, Tokens.TokenS, Tokens.TokenES },
                 // →
-                new MessagePattern { Tokens.TokenS, Tokens.TokenSe }
+                new MessagePattern { Tokens.TokenS, Tokens.TokenSE }
             }
         };
 
@@ -174,7 +148,7 @@
 		      <- e, ee, se, s, es
 	    */
 
-        private static HandshakePattern NoiseKx = new HandshakePattern(NoiseHandshakeType.NoiseKX)
+        private static HandshakePattern NoiseKX = new HandshakePattern(NoiseHandshakeType.NoiseKX)
         {
             Name = "KX",
             PreMessagePatterns = new[]
@@ -189,7 +163,7 @@
                 // →
                 new MessagePattern { Tokens.TokenE },
                 // ←
-                new MessagePattern { Tokens.TokenE, Tokens.TokenEe, Tokens.TokenSe, Tokens.TokenS, Tokens.TokenEs }
+                new MessagePattern { Tokens.TokenE, Tokens.TokenEE, Tokens.TokenSE, Tokens.TokenS, Tokens.TokenES }
             }
         };
 
@@ -202,7 +176,7 @@
 		  -> s, se
 	    */
 
-        private static HandshakePattern NoiseXk = new HandshakePattern(NoiseHandshakeType.NoiseXK)
+        private static HandshakePattern NoiseXK = new HandshakePattern(NoiseHandshakeType.NoiseXK)
         {
             Name = "XK",
             PreMessagePatterns = new[]
@@ -215,11 +189,11 @@
             MessagePatterns = new[]
             {
                 // →
-                new MessagePattern { Tokens.TokenE, Tokens.TokenEs },
+                new MessagePattern { Tokens.TokenE, Tokens.TokenES },
                 // ←
-                new MessagePattern { Tokens.TokenE, Tokens.TokenEe },
+                new MessagePattern { Tokens.TokenE, Tokens.TokenEE },
                 // →
-                new MessagePattern { Tokens.TokenS, Tokens.TokenSe }
+                new MessagePattern { Tokens.TokenS, Tokens.TokenSE }
             }
         };
 
@@ -231,7 +205,7 @@
 		<- e, ee, se
 	    */
 
-        private static HandshakePattern NoiseIk = new HandshakePattern(NoiseHandshakeType.NoiseIK)
+        private static HandshakePattern NoiseIK = new HandshakePattern(NoiseHandshakeType.NoiseIK)
         {
             Name = "IK",
             PreMessagePatterns = new[]
@@ -244,9 +218,9 @@
             MessagePatterns = new[]
             {
                 // →
-                new MessagePattern { Tokens.TokenE, Tokens.TokenEs, Tokens.TokenS, Tokens.TokenSs },
+                new MessagePattern { Tokens.TokenE, Tokens.TokenES, Tokens.TokenS, Tokens.TokenSS },
                 // ←
-                new MessagePattern { Tokens.TokenE, Tokens.TokenEe, Tokens.TokenSe }
+                new MessagePattern { Tokens.TokenE, Tokens.TokenEE, Tokens.TokenSE }
             }
         };
 
@@ -256,7 +230,7 @@
 		 <- e, ee, se, s, es
 	    */
 
-        private static HandshakePattern NoiseIx = new HandshakePattern(NoiseHandshakeType.NoiseIX)
+        private static HandshakePattern NoiseIX = new HandshakePattern(NoiseHandshakeType.NoiseIX)
         {
             Name = "IX",
             PreMessagePatterns = new[]
@@ -271,7 +245,7 @@
                 // →
                 new MessagePattern { Tokens.TokenE, Tokens.TokenS },
                 // ←
-                new MessagePattern { Tokens.TokenE, Tokens.TokenEe, Tokens.TokenS, Tokens.TokenSe }
+                new MessagePattern { Tokens.TokenE, Tokens.TokenEE, Tokens.TokenS, Tokens.TokenSE }
             }
         };
 
@@ -281,7 +255,7 @@
 		  <- e, ee, psk
 	    */
 
-        private static HandshakePattern NoiseNnPsk2 = new HandshakePattern(NoiseHandshakeType.NoiseNNpsk2)
+        private static HandshakePattern NoiseNNPsk2 = new HandshakePattern(NoiseHandshakeType.NoiseNNpsk2)
         {
             Name = "NNpsk2",
             PreMessagePatterns = new[]
@@ -296,8 +270,34 @@
                 // →
                 new MessagePattern { Tokens.TokenE },
                 // ←
-                new MessagePattern { Tokens.TokenE, Tokens.TokenEe, Tokens.TokenPsk }
+                new MessagePattern { Tokens.TokenE, Tokens.TokenEE, Tokens.TokenPsk }
             }
         };
+
+        internal string Name { get; private set; }
+
+        internal MessagePattern[] PreMessagePatterns { get; private set; }
+
+        internal MessagePattern[] MessagePatterns { get; private set; }
+
+        private HandshakePattern(NoiseHandshakeType pattern)
+        {
+            if (HandshakePattern.PatternDictionary.ContainsKey(pattern))
+            {
+                throw new ArgumentException("pattern of the same type is already exits!");
+            }
+
+            HandshakePattern.PatternDictionary.Add(pattern, this);
+        }
+
+        internal static HandshakePattern GetPattern(NoiseHandshakeType noiseType)
+        {
+            if (!HandshakePattern.PatternDictionary.TryGetValue(noiseType, out var result))
+            {
+                throw new ArgumentException("pattern of the same type is not exits!");
+            }
+
+            return result;
+        }
     }
 }

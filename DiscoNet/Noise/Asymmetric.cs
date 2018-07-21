@@ -7,8 +7,9 @@
 
     using KeyPair = DiscoNet.KeyPair;
 
-    // The following code defines the X25519, chacha20poly1305, SHA-256 suite.
-
+    /// <summary>
+    /// Asymmetric suite
+    /// </summary>
     public class Asymmetric
     {
         /// <summary>
@@ -22,13 +23,15 @@
         // 4.1. DH functions
 
         /// <summary>
-        /// GenerateKeypair creates a X25519 static keyPair out of a private key. 
-        /// If privateKey is null the function generates a random key pair.
+        /// Create a X25519 static keyPair out of a private key.
         /// </summary>
-        /// <param name="privateKey">Private key</param>
+        /// <param name="privateKey">Private key, if null - generates a random key pair</param>
         public static KeyPair GenerateKeyPair(byte[] privateKey = null)
         {
-            var keyPair = new KeyPair();
+            var keyPair = new KeyPair() {
+                PublicKey = new byte[32],
+                PrivateKey = new byte[32]
+            };
 
             if (privateKey == null)
             {
@@ -41,6 +44,7 @@
                 {
                     throw new Exception("disco: expecting 32 byte key array");
                 }
+
                 privateKey.CopyTo(keyPair.PrivateKey, 0);
             }
 
@@ -48,12 +52,12 @@
 
             return keyPair;
         }
-        
+
         /// <summary>
         /// Perform DH on public key
         /// </summary>
-        /// <param name="keyPair"></param>
-        /// <param name="publicKey"></param>
+        /// <param name="keyPair">Containing private key</param>
+        /// <param name="publicKey">Remoe party's public key</param>
         /// <returns></returns>
         public static byte[] Dh(KeyPair keyPair, byte[] publicKey)
         {

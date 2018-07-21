@@ -1,13 +1,25 @@
 ﻿namespace DiscoNet
 {
     using System;
-    using System.Linq;
+
     using StrobeNet.Extensions;
 
+    /// <summary>
+    /// Asymmectic x25519 keypair
+    /// </summary>
     public class KeyPair : IDisposable
     {
-        public byte[] PrivateKey { get; set; } = new byte[32];
-        public byte[] PublicKey { get; set; } = new byte[32];
+        public byte[] PrivateKey { get; set; }
+
+        public byte[] PublicKey { get; set; }
+
+        public void Dispose()
+        {
+            if (this.PrivateKey != null)
+            {
+                Array.Clear(this.PrivateKey, 0, this.PrivateKey.Length);
+            }
+        }
 
         public string ExportPublicKey()
         {
@@ -27,11 +39,6 @@
         internal void ImportPrivateKey(string hex)
         {
             this.PrivateKey = hex.ToByteArray();
-        }
-
-        public void Dispose()
-        {
-            Array.Clear(this.PrivateKey, 0, this.PrivateKey.Length);
         }
 
         ~KeyPair()

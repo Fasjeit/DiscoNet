@@ -4,10 +4,11 @@
     using System.Linq;
     using System.Text;
     using System.Threading.Tasks;
-    using DiscoNet.Disco;
+
     using DiscoNet.Net;
     using DiscoNet.Noise;
     using DiscoNet.Noise.Enums;
+
     using Xunit;
 
     public class ConnectionTest
@@ -19,81 +20,80 @@
         [Fact]
         public async Task TestSeveralWriteRoutines()
         {
-            var clientConfig = new Config()
+            var clientConfig = new Config
             {
                 KeyPair = Asymmetric.GenerateKeyPair(),
                 HandshakePattern = NoiseHandshakeType.NoiseXX,
                 StaticPublicKeyProof = new byte[] { },
-                PublicKeyVerifier = Verifier,
+                PublicKeyVerifier = ConnectionTest.Verifier
             };
 
-            var serverConfig = new Config()
+            var serverConfig = new Config
             {
                 KeyPair = Asymmetric.GenerateKeyPair(),
                 HandshakePattern = NoiseHandshakeType.NoiseXX,
                 StaticPublicKeyProof = new byte[] { },
-                PublicKeyVerifier = Verifier,
+                PublicKeyVerifier = ConnectionTest.Verifier
             };
 
-            await RunConnectionTest(clientConfig, serverConfig, 1810);
+            await this.RunConnectionTest(clientConfig, serverConfig, 1810);
         }
 
         [Fact]
         public async Task TestHalfDuplex()
         {
             // init
-            var clientConfig = new Config()
+            var clientConfig = new Config
             {
                 KeyPair = Asymmetric.GenerateKeyPair(),
                 HandshakePattern = NoiseHandshakeType.NoiseXX,
-                PublicKeyVerifier = Verifier,
+                PublicKeyVerifier = ConnectionTest.Verifier,
                 StaticPublicKeyProof = new byte[] { },
-                HalfDuplex = true,
+                HalfDuplex = true
             };
 
-            var serverConfig = new Config()
+            var serverConfig = new Config
             {
                 KeyPair = Asymmetric.GenerateKeyPair(),
                 HandshakePattern = NoiseHandshakeType.NoiseXX,
-                PublicKeyVerifier = Verifier,
+                PublicKeyVerifier = ConnectionTest.Verifier,
                 StaticPublicKeyProof = new byte[] { },
-                HalfDuplex = true,
+                HalfDuplex = true
             };
 
-            await RunConnectionTest(clientConfig, serverConfig, 1811);
+            await this.RunConnectionTest(clientConfig, serverConfig, 1811);
         }
-        
+
         private async Task RunConnectionTest(Config clientConfig, Config serverConfig, int port = 1810)
         {
             var address = "127.0.0.1";
 
-            var server = Task.Factory.StartNew(() =>
-            {
-                using (var listener = Apis.Listen(address, serverConfig, port))
-                {
-                    var serverSocket = listener.Accept();
-                    for (int i = 0; i < IterationCount; i++)
+            var server = Task.Factory.StartNew(
+                () =>
                     {
-                        var buf = new byte[100];
-                        var n = serverSocket.Read(buf);
-                        if (!buf.Take(n - 1).SequenceEqual(Encoding.ASCII.GetBytes("hello ")))
+                        using (var listener = Apis.Listen(address, serverConfig, port))
                         {
-                            throw new Exception("received message not as expected");
+                            var serverSocket = listener.Accept();
+                            for (var i = 0; i < ConnectionTest.IterationCount; i++)
+                            {
+                                var buf = new byte[100];
+                                var n = serverSocket.Read(buf);
+                                if (!buf.Take(n - 1).SequenceEqual(Encoding.ASCII.GetBytes("hello ")))
+                                {
+                                    throw new Exception("received message not as expected");
+                                }
+                            }
                         }
-                    }
-                }
-            });
+                    });
 
             // Run the client
-            var clientSocket = Apis.Connect("tcp", address, port, clientConfig);
+            var clientSocket = Apis.Connect(address, port, clientConfig);
 
-            for (int i = 0; i < IterationCount; i++)
+            for (var i = 0; i < ConnectionTest.IterationCount; i++)
             {
-                await Task.Factory.StartNew(() =>
-                {
-                    clientSocket.Write(Encoding.ASCII.GetBytes("hello " + i % 10));
-                });
+                await Task.Factory.StartNew(() => { clientSocket.Write(Encoding.ASCII.GetBytes("hello " + i % 10)); });
             }
+
             await server;
             //var ex = await exception;
             //if (ex != null)

@@ -5,9 +5,20 @@
 
     using DiscoNet.Noise.Enums;
 
+    /// <inheritdoc />
+    /// <summary>
+    /// Noise message pattern
+    /// </summary>
     public class MessagePattern : IEnumerable<Tokens>
     {
-        public List<Tokens> Tokens { get; set; } = new List<Tokens>();
+        /// <summary>
+        /// Tokens, representing the pattern
+        /// </summary>
+        public List<Tokens> Tokens { get; } = new List<Tokens>();
+
+        internal MessagePattern()
+        {
+        }
 
         public IEnumerator<Tokens> GetEnumerator()
         {
@@ -19,7 +30,7 @@
             return this.Tokens.GetEnumerator();
         }
 
-        public void Add(Tokens token)
+        internal void Add(Tokens token)
         {
             this.Tokens.Add(token);
         }
