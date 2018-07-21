@@ -2,6 +2,9 @@
 {
     using DiscoNet.Noise.Enums;
 
+    /// <summary>
+    /// Disco configuration
+    /// </summary>
     public class Config
     {
         /// <summary>
@@ -13,17 +16,18 @@
         /// <param name="proof"></param>
         /// <returns></returns>
         public delegate bool PublicKeyVerifierDeligate(byte[] publicKey, byte[] proof);
+
         // The following constants represent the details of this implementation of the Noise specification.
 
         /// <summary>
         /// Implemented draft version
         /// </summary>
-        private const string DiscoDraftVersion = "3";
+        public const string DiscoDraftVersion = "3";
 
         /// <summary>
         /// Implemented DH funtion
         /// </summary>
-        private const string NoiseDH = "25519";
+        public const string NoiseDH = "25519";
 
         // The following constants are taken directly from the Noise specification.
 
@@ -75,13 +79,16 @@
         /// public key as part of the handshake, this proof over the key is mandatory
         /// in order for the other peer to verify the current peer's key
         /// </summary>
-        public byte[] StaticPublicKeyProof = { };
+        public byte[] StaticPublicKeyProof;
 
         /// <summary>
         /// the type of Noise protocol that the client and the server will go through
         /// </summary>
         public NoiseHandshakeType HandshakePattern { get; set; }
 
+        /// <summary>
+        /// Public key verifier Delegate method 
+        /// </summary>
         public PublicKeyVerifierDeligate PublicKeyVerifier { get; set; }
     }
 }

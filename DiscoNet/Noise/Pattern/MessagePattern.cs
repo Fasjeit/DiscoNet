@@ -20,6 +20,10 @@
         {
         }
 
+        /// <summary>
+        /// Get enumerator
+        /// </summary>
+        /// <returns></returns>
         public IEnumerator<Tokens> GetEnumerator()
         {
             return this.Tokens.GetEnumerator();

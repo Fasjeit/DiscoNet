@@ -14,7 +14,10 @@
 
     using KeyPair = DiscoNet.KeyPair;
 
-    public static class Apis
+    /// <summary>
+    /// Main Disco Api
+    /// </summary>
+    public static class Api
     {
         /// <summary>
         /// Disco peer initialization
@@ -143,7 +146,7 @@
         /// </summary>
         /// <param name="address">Server ip address</param>
         /// <param name="port">server tcp port</param>
-        /// <param name="config">Noise configuration</param>
+        /// <param name="config">Disco configuration</param>
         /// <returns></returns>
         public static Connection Connect(string address, int port, Config config)
         {
@@ -152,11 +155,11 @@
                 throw new NullReferenceException(nameof(config));
             }
 
-            Apis.CheckRequirments(false, config);
+            Api.CheckRequirments(false, config);
 
             var tcpClient = new TcpClient(address, port);
 
-            var connection = Apis.Client(tcpClient, config);
+            var connection = Api.Client(tcpClient, config);
 
             // Do the handshake
             connection.HandShake();
@@ -168,7 +171,7 @@
         /// Listen for Disco client connections
         /// </summary>
         /// <param name="address">ip address for listening</param>
-        /// <param name="config">Noise configuration</param>
+        /// <param name="config">Disco configuration</param>
         /// <param name="port">tcp port for listening</param>
         /// <returns></returns>
         public static Listener Listen(string address, Config config, int port = 1800)
@@ -308,7 +311,7 @@
         /// Get new Disco server side connection
         /// </summary>
         /// <param name="connection">Tcp client for establishing connecion</param>
-        /// <param name="config">Noise configuration</param>
+        /// <param name="config">Disco configuration</param>
         /// <returns></returns>
         internal static Connection Server(TcpClient connection, Config config)
         {
@@ -319,7 +322,7 @@
         /// Get new Disco client side connection
         /// </summary>
         /// <param name="connection">Tcp client for establishing connecion</param>
-        /// <param name="config">Noise configuration</param>
+        /// <param name="config">Disco configuration</param>
         /// <returns></returns>
         internal static Connection Client(TcpClient connection, Config config)
         {
@@ -327,7 +330,7 @@
         }
 
         /// <summary>
-        /// Check Noise configuration requirmens
+        /// Check Disco configuration requirmens
         /// </summary>
         /// <param name="isClient"></param>
         /// <param name="config"></param>

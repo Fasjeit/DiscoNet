@@ -63,8 +63,9 @@
         /// Write data to connection
         /// </summary>
         /// <param name="data">Data to write</param>
+        /// <param name="exeption">Ouput exeption</param>
         /// <returns></returns>
-        public int Write(byte[] data)
+        public int Write(byte[] data, out Exception exeption)
         {
             // If this is a one-way pattern, do some checks
             var handshakePattern = this.config.HandshakePattern;
@@ -76,7 +77,15 @@
             }
 
             // Make sure to go through the handshake first
-            this.HandShake();
+            try
+            {
+                this.HandShake();
+            }
+            catch (Exception ex)
+            {
+                exeption = ex;
+                return 0;
+            }
 
             Mutex mutex;
 
@@ -98,25 +107,34 @@
                 // process the data in a loop
                 while (data.Length > 0)
                 {
-                    var dataLen = data.Length > Config.NoiseMaxPlaintextSize
-                                      ? Config.NoiseMaxPlaintextSize
-                                      : data.Length;
+                    try
+                    {
+                        var dataLen = data.Length > Config.NoiseMaxPlaintextSize
+                                          ? Config.NoiseMaxPlaintextSize
+                                          : data.Length;
 
-                    // Encrypt
-                    var ciphertext = this.strobeOut.SendEncUnauthenticated(false, data.Take(dataLen).ToArray());
-                    ciphertext = ciphertext.Concat(this.strobeOut.SendMac(false, 16)).ToArray();
+                        // Encrypt
+                        var ciphertext = this.strobeOut.SendEncUnauthenticated(false, data.Take(dataLen).ToArray());
+                        ciphertext = ciphertext.Concat(this.strobeOut.SendMac(false, 16)).ToArray();
 
-                    // header (length)
-                    var length = new[] { (byte)(ciphertext.Length >> 8), (byte)(ciphertext.Length % 256) };
+                        // header (length)
+                        var length = new[] { (byte)(ciphertext.Length >> 8), (byte)(ciphertext.Length % 256) };
 
-                    // Send data
-                    this.tcpConnection.Client.Send(length.Concat(ciphertext).ToArray());
+                        // Send data
+                        this.tcpConnection.Client.Send(length.Concat(ciphertext).ToArray());
 
-                    // prepare next loop iteration
-                    totalBytes += dataLen;
-                    data = data.Skip(dataLen).ToArray();
+                        // prepare next loop iteration
+                        totalBytes += dataLen;
+                        data = data.Skip(dataLen).ToArray();
+                    }
+                    catch (Exception ex)
+                    {
+                        exeption = ex;
+                        return totalBytes;
+                    }
                 }
 
+                exeption = null;
                 return totalBytes;
             }
             finally
@@ -129,16 +147,26 @@
         /// Read data from connection
         /// </summary>
         /// <param name="data">Return buffer</param>
+        /// <param name="exeption">output exeption</param>
         /// <returns></returns>
-        public int Read(byte[] data)
+        public int Read(byte[] data, out Exception exeption)
         {
             if (data == null || data.Length == 0)
             {
+                exeption = null;
                 return 0;
             }
 
             // Make sure to go through the handshake first
-            this.HandShake();
+            try
+            {
+                this.HandShake();
+            }
+            catch (Exception ex)
+            {
+                exeption = ex;
+                return 0;
+            }
 
             // If this is a one-way pattern, do some checks
             var handshakePattern = this.config.HandshakePattern;
@@ -172,6 +200,8 @@
                     if (this.inputBuffer.Length > data.Length)
                     {
                         this.inputBuffer = this.inputBuffer.Skip(data.Length).ToArray();
+
+                        exeption = null;
                         return data.Length;
                     }
 
@@ -180,21 +210,41 @@
                 }
 
                 // read header from socket
-                var bufHeader = this.ReadFromUntil(this.tcpConnection, 2);
+                byte[] bufHeader;
+                try
+                {
+                    bufHeader = this.ReadFromUntil(this.tcpConnection, 2);
+                }
+                catch (Exception ex)
+                {
+                    exeption = ex;
+                    return 0;
+                }
+
                 var length = (bufHeader[0] << 8) | bufHeader[1];
 
                 if (length > Config.NoiseMessageLength)
                 {
-                    throw new Exception("disco: Disco message received exceeds DiscoMessageLength");
+                    exeption = new Exception("disco: Disco message received exceeds DiscoMessageLength");
+                    return 2;
                 }
 
+                byte[] noiseMessage;
                 // read noise message from socket
-                var noiseMessage = this.ReadFromUntil(this.tcpConnection, length);
-
+                try
+                {
+                    noiseMessage = this.ReadFromUntil(this.tcpConnection, length);
+                }
+                catch (Exception ex)
+                {
+                    exeption = ex;
+                    return 2;
+                }
                 // decrypt
                 if (length < 16)
                 {
-                    throw new Exception("disco: the received payload is shorter 16 bytes");
+                    exeption = new Exception("disco: the received payload is shorter 16 bytes");
+                    return 2 + length;
                 }
 
                 var plaintextLength = noiseMessage.Length - 16;
@@ -205,7 +255,8 @@
 
                 if (!ok)
                 {
-                    throw new Exception("disco: cannot decrypt the payload");
+                    exeption = new Exception("disco: cannot decrypt the payload");
+                    return 2 + length;
                 }
 
                 // append to the input buffer
@@ -218,6 +269,8 @@
                 if (this.inputBuffer.Length > restToRead)
                 {
                     this.inputBuffer = this.inputBuffer.Skip(readSoFar).ToArray();
+
+                    exeption = null;
                     return data.Length;
                 }
 
@@ -225,6 +278,7 @@
                 readSoFar += restToRead;
                 this.inputBuffer = new byte[] { };
 
+                exeption = null;
                 return readSoFar;
             }
 
@@ -282,7 +336,7 @@
                     Array.Copy(this.config.RemoteKey, remoteKeyPair.PublicKey, this.config.RemoteKey.Length);
                 }
 
-                var handshakeState = Apis.InitializeDisco(
+                var handshakeState = Api.InitializeDisco(
                     this.config.HandshakePattern,
                     this.isClient,
                     this.config.Prologue,
@@ -304,7 +358,7 @@
                         // TODO: is this the best way of sending a proof :/ ?
                         byte[] bufToWrite;
 
-                        if (handshakeState.MessagePatterns.Length <= 2)
+                        if (handshakeState.MessagePatterns.Length <= 2 && this.config.StaticPublicKeyProof != null)
                         {
                             (c1, c2) = handshakeState.WriteMessage(this.config.StaticPublicKeyProof, out bufToWrite);
                         }

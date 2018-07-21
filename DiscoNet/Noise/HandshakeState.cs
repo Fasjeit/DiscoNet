@@ -65,6 +65,9 @@
         /// </summary>
         internal KeyPair DebugEphemeral { get; set; }
 
+        /// <summary>
+        /// Dispose and freeresourses
+        /// </summary>
         public void Dispose()
         {
             this.S?.Dispose();

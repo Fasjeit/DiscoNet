@@ -71,13 +71,13 @@
             var server = Task.Factory.StartNew(
                 () =>
                     {
-                        using (var listener = Apis.Listen(address, serverConfig, port))
+                        using (var listener = Api.Listen(address, serverConfig, port))
                         {
                             var serverSocket = listener.Accept();
                             for (var i = 0; i < ConnectionTest.IterationCount; i++)
                             {
                                 var buf = new byte[100];
-                                var n = serverSocket.Read(buf);
+                                var n = serverSocket.Read(buf, out var exception );
                                 if (!buf.Take(n - 1).SequenceEqual(Encoding.ASCII.GetBytes("hello ")))
                                 {
                                     throw new Exception("received message not as expected");
@@ -87,11 +87,18 @@
                     });
 
             // Run the client
-            var clientSocket = Apis.Connect(address, port, clientConfig);
+            var clientSocket = Api.Connect(address, port, clientConfig);
 
             for (var i = 0; i < ConnectionTest.IterationCount; i++)
             {
-                await Task.Factory.StartNew(() => { clientSocket.Write(Encoding.ASCII.GetBytes("hello " + i % 10)); });
+                await Task.Factory.StartNew(() => 
+                        {
+                            clientSocket.Write(Encoding.ASCII.GetBytes("hello " + i % 10), out var exception);
+                            if (exception != null)
+                            {
+                                throw exception;
+                            }
+                        });
             }
 
             await server;

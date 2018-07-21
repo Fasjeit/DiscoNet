@@ -1,7 +1,13 @@
 ﻿namespace DiscoNet.Noise.Enums
 {
+    /// <summary>
+    /// Types of Noise handhske patterns
+    /// </summary>
     public enum NoiseHandshakeType
     {
+        /// <summary>
+        /// Unknown token
+        /// </summary>
         Unknown,
 
         /// <summary>
@@ -30,7 +36,7 @@
 
         /// <summary>
         /// Noise_KK is a pattern where both the client static key and the
-        ///     server static key are known.
+        /// server static key are known.
         /// </summary>
         NoiseKK,
 

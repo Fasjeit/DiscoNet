@@ -20,10 +20,10 @@
             try
             {
                 // Generate Disco Key pair
-                var keyPair = Apis.GenerateAndSaveDiscoKeyPair(discoKeyPairFile);
+                var keyPair = Api.GenerateAndSaveDiscoKeyPair(discoKeyPairFile);
 
                 // Load Disco Key pair
-                var keyPairTemp = Apis.LoadDiscoKeyPair(discoKeyPairFile);
+                var keyPairTemp = Api.LoadDiscoKeyPair(discoKeyPairFile);
 
                 // compare
                 if (!keyPairTemp.PrivateKey.SequenceEqual(keyPair.PrivateKey)
@@ -33,19 +33,19 @@
                 }
 
                 // generate root key
-                Apis.GenerateAndSaveDiscoRootKeyPair(rootPrivateKeyFile, rootPublicKeyFile);
+                Api.GenerateAndSaveDiscoRootKeyPair(rootPrivateKeyFile, rootPublicKeyFile);
 
                 // load private root key
-                var rootPriv = Apis.LoadDiscoRootPrivateKey(rootPrivateKeyFile);
+                var rootPriv = Api.LoadDiscoRootPrivateKey(rootPrivateKeyFile);
 
                 // load public root key
-                var rootPub = Apis.LoadDiscoRootPublicKey(rootPublicKeyFile);
+                var rootPub = Api.LoadDiscoRootPublicKey(rootPublicKeyFile);
 
                 // create a proof
-                var proof = Apis.CreateStaticPublicKeyProof(rootPriv, keyPair.PublicKey);
+                var proof = Api.CreateStaticPublicKeyProof(rootPriv, keyPair.PublicKey);
 
                 // verify the proof
-                var verifior = Apis.CreatePublicKeyVerifier(rootPub);
+                var verifior = Api.CreatePublicKeyVerifier(rootPub);
                 if (!verifior(keyPair.PublicKey, proof))
                 {
                     throw new Exception("cannot verify proof");

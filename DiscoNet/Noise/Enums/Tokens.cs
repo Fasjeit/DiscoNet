@@ -1,5 +1,8 @@
 ﻿namespace DiscoNet.Noise.Enums
 {
+    /// <summary>
+    /// Noise tokens
+    /// </summary>
     public enum Tokens
     {
         TokenE,

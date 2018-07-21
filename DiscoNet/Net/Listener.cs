@@ -4,6 +4,9 @@
     using System.Net;
     using System.Net.Sockets;
 
+    /// <summary>
+    /// Disco Listener
+    /// </summary>
     public class Listener : IDisposable
     {
         private bool isListening;
@@ -25,7 +28,7 @@
                 throw new ArgumentNullException(nameof(config));
             }
 
-            Apis.CheckRequirments(false, config);
+            Api.CheckRequirments(false, config);
 
             var iPAddress = IPAddress.Parse(address);
 
@@ -50,7 +53,7 @@
             }
 
             var tcpClient = this.tcpListener.AcceptTcpClient();
-            return Apis.Server(tcpClient, this.config);
+            return Api.Server(tcpClient, this.config);
         }
 
         /// <summary>

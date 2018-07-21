@@ -57,7 +57,7 @@
         public void TestNoiseXx()
         {
             var rootKey = PublicKeyAuth.GenerateKeyPair();
-            var Verifier = Apis.CreatePublicKeyVerifier(rootKey.PublicKey);
+            var Verifier = Api.CreatePublicKeyVerifier(rootKey.PublicKey);
 
             var clienPair = Asymmetric.GenerateKeyPair();
             var serverPair = Asymmetric.GenerateKeyPair();
@@ -68,7 +68,7 @@
                 KeyPair = clienPair,
                 HandshakePattern = NoiseHandshakeType.NoiseXX,
                 PublicKeyVerifier = Verifier,
-                StaticPublicKeyProof = Apis.CreateStaticPublicKeyProof(rootKey.PrivateKey, clienPair.PublicKey)
+                StaticPublicKeyProof = Api.CreateStaticPublicKeyProof(rootKey.PrivateKey, clienPair.PublicKey)
             };
 
             var serverConfig = new Config
@@ -76,7 +76,7 @@
                 KeyPair = serverPair,
                 HandshakePattern = NoiseHandshakeType.NoiseXX,
                 PublicKeyVerifier = Verifier,
-                StaticPublicKeyProof = Apis.CreateStaticPublicKeyProof(rootKey.PrivateKey, serverPair.PublicKey)
+                StaticPublicKeyProof = Api.CreateStaticPublicKeyProof(rootKey.PrivateKey, serverPair.PublicKey)
             };
 
             this.RunTwoWayTest(clientConfig, serverConfig, 1802);
@@ -112,11 +112,15 @@
             Task.Factory.StartNew(
                 () =>
                     {
-                        using (var listener = Apis.Listen(address, serverConfig, port))
+                        using (var listener = Api.Listen(address, serverConfig, port))
                         {
                             var serverSocket = listener.Accept();
                             var buf = new byte[100];
-                            var n = serverSocket.Read(buf);
+                            var n = serverSocket.Read(buf, out var exception);
+                            if (exception != null)
+                            {
+                                throw exception;
+                            }
                             if (!buf.Take(n).SequenceEqual(Encoding.ASCII.GetBytes("hello")))
                             {
                                 throw new Exception("client message failed");
@@ -125,7 +129,11 @@
                             // Expect error in here
                             try
                             {
-                                serverSocket.Write(Encoding.ASCII.GetBytes("ca va?"));
+                                serverSocket.Write(Encoding.ASCII.GetBytes("ca va?"), out exception);
+                                if (exception != null)
+                                {
+                                    throw exception;
+                                }
                             }
                             catch (Exception ex)
                             {
@@ -142,9 +150,13 @@
                     });
 
             // Run the client
-            var clientSocket = Apis.Connect(address, port, clientConfig);
+            var clientSocket = Api.Connect(address, port, clientConfig);
 
-            clientSocket.Write(Encoding.ASCII.GetBytes("hello"));
+            clientSocket.Write(Encoding.ASCII.GetBytes("hello"), out var clientException);
+            if (clientException != null)
+            {
+                throw clientException;
+            }
         }
 
         private void RunTwoWayTest(Config clientConfig, Config serverConfig, int port = 1800)
@@ -162,27 +174,42 @@
             Task.Factory.StartNew(
                 () =>
                     {
-                        using (var listener = Apis.Listen(address, serverConfig, port))
+                        using (var listener = Api.Listen(address, serverConfig, port))
                         {
                             var serverSocket = listener.Accept();
                             var buf = new byte[100];
-                            var n = serverSocket.Read(buf);
+                            var n = serverSocket.Read(buf, out var exception);
+                            if (exception != null)
+                            {
+                                throw exception;
+                            }
                             if (!buf.Take(n).SequenceEqual(Encoding.ASCII.GetBytes("hello")))
                             {
                                 throw new Exception("client message failed");
                             }
 
-                            serverSocket.Write(Encoding.ASCII.GetBytes("ca va?"));
+                            serverSocket.Write(Encoding.ASCII.GetBytes("ca va?"), out exception);
+                            if (exception != null)
+                            {
+                                throw exception;
+                            }
                         }
                     });
 
             // Run the client
-            var clientSocket = Apis.Connect(address, port, clientConfig);
+            var clientSocket = Api.Connect(address, port, clientConfig);
 
-            clientSocket.Write(Encoding.ASCII.GetBytes("hello"));
-
+            clientSocket.Write(Encoding.ASCII.GetBytes("hello"), out var clientException);
+            if (clientException != null)
+            {
+                throw clientException;
+            }
             var bufClient = new byte[100];
-            var readByes = clientSocket.Read(bufClient);
+            var readByes = clientSocket.Read(bufClient, out clientException);
+            if (clientException != null)
+            {
+                throw clientException;
+            }
 
             if (!bufClient.Take(readByes).SequenceEqual(Encoding.ASCII.GetBytes("ca va?")))
             {
