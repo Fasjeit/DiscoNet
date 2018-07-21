@@ -23,7 +23,7 @@
 
         internal SymmetricState(string protocolName)
         {
-            this.strobeState = new Strobe(protocolName, 128);
+            this.strobeState = new Strobe(protocolName, Symmetric.SecurityParameter);
         }
 
         internal void MixKey(byte[] inputKeyMaterial)
@@ -44,7 +44,7 @@
 
         internal byte[] GetHandshakeHash()
         {
-            return this.strobeState.Prf(32);
+            return this.strobeState.Prf(Symmetric.HashSize);
         }
 
         /// <summary>
@@ -62,7 +62,7 @@
             }
 
             var ciphertext = this.strobeState.SendEncUnauthenticated(false, plaintext);
-            ciphertext = ciphertext.Concat(this.strobeState.SendMac(false, 16)).ToArray();
+            ciphertext = ciphertext.Concat(this.strobeState.SendMac(false, Symmetric.TagSize)).ToArray();
             return ciphertext;
         }
 
@@ -74,12 +74,12 @@
                 return cipherText;
             }
 
-            if (cipherText.Length < 16)
+            if (cipherText.Length < Symmetric.TagSize)
             {
-                throw new Exception("disco: the received payload is shorter 16 bytes");
+                throw new Exception($"disco: the received payload is shorter then {Symmetric.TagSize} bytes");
             }
 
-            var plaintextLength = cipherText.Length - 16;
+            var plaintextLength = cipherText.Length - Symmetric.TagSize;
             var plaintext = this.strobeState.RecvEncUnauthenticated(false, cipherText.Take(plaintextLength).ToArray());
             var verificationResult = this.strobeState.RecvMac(false, cipherText.Skip(plaintextLength).ToArray());
 
@@ -95,11 +95,11 @@
         {
             var initiatorState = (Strobe)this.strobeState.Clone();
             initiatorState.Ad(true, Encoding.ASCII.GetBytes("initiator"));
-            initiatorState.Ratchet(32);
+            initiatorState.Ratchet(Symmetric.HashSize);
 
             var responderState = this.strobeState;
             responderState.Ad(true, Encoding.ASCII.GetBytes("responder"));
-            responderState.Ratchet(32);
+            responderState.Ratchet(Symmetric.HashSize);
 
             return (initiatorState, responderState);
         }

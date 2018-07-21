@@ -1,5 +1,6 @@
 ﻿namespace DiscoNet
 {
+    using DiscoNet.Noise;
     using DiscoNet.Noise.Enums;
 
     /// <summary>
@@ -39,7 +40,7 @@
         /// <summary>
         /// Noise max tag len
         /// </summary>
-        private const int NoiseTagLength = 16;
+        private const int NoiseTagLength = Symmetric.TagSize;
 
         /// <summary>
         /// Noise max plaintext size
@@ -47,9 +48,9 @@
         public const int NoiseMaxPlaintextSize = Config.NoiseMessageLength - Config.NoiseTagLength;
 
         /// <summary>
+        /// The peers to write and read in turns. 
         /// By default a noise protocol is full-duplex, meaning that both the client
-        /// and the server can write on the channel at the same time. Setting this value
-        /// to true will require the peers to write and read in turns. If this requirement
+        /// and the server can write on the channel at the same time. If this requirement
         /// is not respected by the application, the consequences could be catastrophic
         /// </summary>
         public bool HalfDuplex;
@@ -82,7 +83,7 @@
         public byte[] StaticPublicKeyProof;
 
         /// <summary>
-        /// the type of Noise protocol that the client and the server will go through
+        /// The type of Noise protocol that the client and the server will go through
         /// </summary>
         public NoiseHandshakeType HandshakePattern { get; set; }
 

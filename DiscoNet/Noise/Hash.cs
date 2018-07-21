@@ -17,18 +17,19 @@
         private Strobe strobeState;
 
         /// <summary>
-        /// Output (exrac) data from strobe state
+        /// Output (exract) data from strobe state
         /// </summary>
         /// <param name="outputLength"></param>
         public Hash(int outputLength)
         {
-            if (outputLength < 32)
+            if (outputLength < Symmetric.HashSize)
             {
                 throw new Exception(
-                    "disco: an output length smaller than 256-bit (32 bytes) has security consequences");
+                    $"disco: an output length smaller than {Symmetric.HashSize*8}-bit " + 
+                    $"({Symmetric.HashSize} bytes) has security consequences");
             }
 
-            this.strobeState = new Strobe("DiscoHash", 128);
+            this.strobeState = new Strobe("DiscoHash", Symmetric.SecurityParameter);
             this.outputLen = outputLength;
         }
 

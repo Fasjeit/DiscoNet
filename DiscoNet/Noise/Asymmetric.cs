@@ -29,8 +29,8 @@
         public static KeyPair GenerateKeyPair(byte[] privateKey = null)
         {
             var keyPair = new KeyPair() {
-                PublicKey = new byte[32],
-                PrivateKey = new byte[32]
+                PublicKey = new byte[Asymmetric.DhLen],
+                PrivateKey = new byte[Asymmetric.DhLen]
             };
 
             if (privateKey == null)
@@ -40,9 +40,9 @@
             }
             else
             {
-                if (privateKey.Length != 32)
+                if (privateKey.Length != Asymmetric.DhLen)
                 {
-                    throw new Exception("disco: expecting 32 byte key array");
+                    throw new Exception($"disco: expecting {Asymmetric.DhLen} byte key array");
                 }
 
                 privateKey.CopyTo(keyPair.PrivateKey, 0);

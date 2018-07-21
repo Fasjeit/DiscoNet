@@ -11,11 +11,40 @@
     /// </summary>
     public static class Symmetric
     {
-        private const int NonceSize = 192 / 8;
+        /// <summary>
+        /// Symmetric security parameter, bits
+        /// </summary>
+        public const int SecurityParameter = 128;
 
-        private const int TagSize = 16;
+        /// <summary>
+        /// Nonce size, bytes
+        /// </summary>
+        public const int NonceSize = 192 / 8;
 
-        private const int MinimumCiphertextSize = Symmetric.NonceSize + Symmetric.TagSize;
+        /// <summary>
+        /// Tag size, bytes
+        /// </summary>
+        public const int TagSize = Symmetric.SecurityParameter / 8;
+
+        /// <summary>
+        /// Minimum size of ciphertexts, bytes
+        /// </summary>
+        public const int MinimumCiphertextSize = Symmetric.NonceSize + Symmetric.TagSize;
+
+        /// <summary>
+        /// Hash size, bytes
+        /// </summary>
+        public const int HashSize = Symmetric.SecurityParameter * 2 / 8;
+
+        /// <summary>
+        /// Symmetric key size, bytes
+        /// </summary>
+        public const int KeySize = Symmetric.SecurityParameter / 8;
+
+        /// <summary>
+        /// Pre shared key size, bytes
+        /// </summary>
+        public const int PskKeySize = 32;
 
         /// <summary>
         /// Hash allows you to hash an input of any length and obtain an output
@@ -23,13 +52,14 @@
         /// </summary>
         public static byte[] Hash(byte[] input, int outputLength)
         {
-            if (outputLength < 32)
+            if (outputLength < Symmetric.HashSize)
             {
                 throw new Exception(
-                    "discoNet: an output length smaller than 256-bit (32 bytes) has security consequences");
+                    $"discoNet: an output length smaller than {Symmetric.HashSize*8}-bit " + 
+                    $"({Symmetric.HashSize} bytes) has security consequences");
             }
 
-            var hash = new Strobe("DiscoHash", 128);
+            var hash = new Strobe("DiscoHash", Symmetric.SecurityParameter);
             hash.Ad(false, input);
             return hash.Prf(outputLength);
         }
@@ -42,13 +72,14 @@
         /// <returns></returns>
         public static byte[] DeriveKeys(byte[] keyMaterial, int keyLen)
         {
-            if (keyMaterial.Length < 16)
+            if (keyMaterial.Length < Symmetric.KeySize)
             {
                 throw new Exception(
-                    "disco: deriving keys from a value smaller than 128-bit (16 bytes) has security consequences");
+                    $"disco: deriving keys from a value smaller than {Symmetric.KeySize * 8}-bit "
+                    + $"({Symmetric.KeySize} bytes) has security consequences");
             }
 
-            var hash = new Strobe("DiscoKDF", 128);
+            var hash = new Strobe("DiscoKDF", Symmetric.SecurityParameter);
             hash.Ad(false, keyMaterial);
             return hash.Prf(keyLen);
         }
@@ -61,12 +92,14 @@
         /// <returns></returns>
         public static byte[] ProtectIntegrity(byte[] key, byte[] plaintext)
         {
-            if (key.Length < 16)
+            if (key.Length < Symmetric.KeySize)
             {
-                throw new Exception("disco: using a key smaller than 128-bit (16 bytes) has security consequences");
+                throw new Exception(
+                    $"disco: using a key smaller than {Symmetric.KeySize * 8}-bit "
+                    + $"({Symmetric.KeySize} bytes) has security consequences");
             }
 
-            var hash = new Strobe("DiscoMAC", 128);
+            var hash = new Strobe("DiscoMAC", Symmetric.SecurityParameter);
             hash.Ad(false, key);
             hash.Ad(false, plaintext);
             return plaintext.Concat(hash.SendMac(false, Symmetric.TagSize)).ToArray();
@@ -77,9 +110,11 @@
         /// </summary>
         public static byte[] VerifyIntegrity(byte[] key, byte[] plaintextAndTag)
         {
-            if (key.Length < 16)
+            if (key.Length < Symmetric.KeySize)
             {
-                throw new Exception("disco: using a key smaller than 128-bit (16 bytes) has security consequences");
+                throw new Exception(
+                    $"disco: using a key smaller than {Symmetric.KeySize * 8}-bit "
+                    + $"({Symmetric.KeySize} bytes) has security consequences");
             }
 
             if (plaintextAndTag.Length < Symmetric.TagSize)
@@ -92,7 +127,7 @@
             var tag = plaintextAndTag.Skip(offset).ToArray();
 
             // Geting the tag
-            var hash = new Strobe("DiscoMAC", 128);
+            var hash = new Strobe("DiscoMAC", Symmetric.SecurityParameter);
             hash.Ad(false, key);
             hash.Ad(false, plainText);
 
@@ -110,12 +145,14 @@
         /// </summary>
         public static byte[] Encrypt(byte[] key, byte[] plaintext)
         {
-            if (key.Length < 16)
+            if (key.Length < Symmetric.KeySize)
             {
-                throw new Exception("disco: using a key smaller than 128-bit (16 bytes) has security consequences");
+                throw new Exception(
+                    $"disco: using a key smaller than {Symmetric.KeySize * 8}-bit " + 
+                    $"({Symmetric.KeySize} bytes) has security consequences");
             }
 
-            var ae = new Strobe("DiscoAEAD", 128);
+            var ae = new Strobe("DiscoAEAD", Symmetric.SecurityParameter);
 
             // Absorb the key
             ae.Ad(false, key);
@@ -143,18 +180,21 @@
         /// </summary>
         public static byte[] Decrypt(byte[] key, byte[] ciphertext)
         {
-            if (key.Length < 16)
+            if (key.Length < Symmetric.KeySize)
             {
-                throw new Exception("disco: using a key smaller than 128-bit (16 bytes) has security consequences");
+                throw new Exception(
+                    $"disco: using a key smaller than {Symmetric.KeySize * 8}-bit "
+                    + $"({Symmetric.KeySize} bytes) has security consequences");
             }
 
             if (ciphertext.Length < Symmetric.MinimumCiphertextSize)
             {
                 throw new Exception(
-                    "disco: ciphertext is too small, it should contain at a minimum a 192-bit nonce and a 128-bit tag");
+                    $"disco: ciphertext is too small, it should contain at a " + 
+                    $"minimum a {Symmetric.NonceSize * 8}-bit nonce and a {Symmetric.NonceSize * 8}-bit tag");
             }
 
-            var ae = new Strobe("DiscoAEAD", 128);
+            var ae = new Strobe("DiscoAEAD", Symmetric.SecurityParameter);
 
             // Absorb the key
             ae.Ad(false, key);

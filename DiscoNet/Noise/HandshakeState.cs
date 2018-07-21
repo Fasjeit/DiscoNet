@@ -115,7 +115,7 @@
                         else
                         {
 #if DEBUG_DETERMINISTIC
-                            this.E = Asymmetric.GenerateKeyPair(new byte[32]);
+                            this.E = Asymmetric.GenerateKeyPair(new byte[Asymmetric.DhLen]);
 #else
                             this.E = Asymmetric.GenerateKeyPair();
 #endif
@@ -260,7 +260,7 @@
                         var tagLen = 0;
                         if (this.SymmetricState.IsKeyed)
                         {
-                            tagLen = 16;
+                            tagLen = Symmetric.TagSize;
                         }
 
                         if (message.Length - offset < Asymmetric.DhLen + tagLen)

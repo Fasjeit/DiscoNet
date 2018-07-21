@@ -5,6 +5,7 @@
     using System.Net.Sockets;
     using System.Threading;
 
+    using DiscoNet.Noise;
     using DiscoNet.Noise.Enums;
 
     using StrobeNet;
@@ -115,7 +116,7 @@
 
                         // Encrypt
                         var ciphertext = this.strobeOut.SendEncUnauthenticated(false, data.Take(dataLen).ToArray());
-                        ciphertext = ciphertext.Concat(this.strobeOut.SendMac(false, 16)).ToArray();
+                        ciphertext = ciphertext.Concat(this.strobeOut.SendMac(false, Symmetric.TagSize)).ToArray();
 
                         // header (length)
                         var length = new[] { (byte)(ciphertext.Length >> 8), (byte)(ciphertext.Length % 256) };
@@ -241,13 +242,13 @@
                     return 2;
                 }
                 // decrypt
-                if (length < 16)
+                if (length < Symmetric.TagSize)
                 {
-                    exeption = new Exception("disco: the received payload is shorter 16 bytes");
+                    exeption = new Exception($"disco: the received payload is shorter {Symmetric.TagSize} bytes");
                     return 2 + length;
                 }
 
-                var plaintextLength = noiseMessage.Length - 16;
+                var plaintextLength = noiseMessage.Length - Symmetric.TagSize;
                 var plaintext = this.strobeIn.RecvEncUnauthenticated(
                     false,
                     noiseMessage.Take(plaintextLength).ToArray());
@@ -327,9 +328,9 @@
                 KeyPair remoteKeyPair = null;
                 if (this.config.RemoteKey != null)
                 {
-                    if (this.config.RemoteKey.Length != 32)
+                    if (this.config.RemoteKey.Length != Asymmetric.DhLen)
                     {
-                        throw new Exception("disco: the provided remote key is not 32-byte");
+                        throw new Exception($"disco: the provided remote key is not {Asymmetric.DhLen}-byte");
                     }
 
                     remoteKeyPair = new KeyPair() { PublicKey = new byte[this.config.RemoteKey.Length] };

@@ -194,9 +194,9 @@
         /// <returns></returns>
         public static byte[] CreateStaticPublicKeyProof(byte[] sodiumPrivateKey, byte[] publicKey)
         {
-            if (publicKey.Length != 32)
+            if (publicKey.Length != Asymmetric.DhLen)
             {
-                throw new Exception("disco: length of public key passed is incorrect (should be 32)");
+                throw new Exception($"disco: length of public key passed is incorrect (should be {Asymmetric.DhLen})");
             }
 
             return PublicKeyAuth.SignDetached(publicKey, sodiumPrivateKey);
@@ -216,7 +216,7 @@
         {
             return (publicKey, proof) =>
                 {
-                    if (publicKey.Length != 32)
+                    if (publicKey.Length != Asymmetric.DhLen)
                     {
                         return false;
                     }
@@ -366,9 +366,9 @@
                 }
             }
 
-            if (ht == NoiseHandshakeType.NoiseNNpsk2 && config.PreSharedKey.Length != 32)
+            if (ht == NoiseHandshakeType.NoiseNNpsk2 && config.PreSharedKey.Length != Symmetric.PskKeySize)
             {
-                throw new Exception("noise: a 32-byte pre-shared key needs to be passed as noise.Config");
+                throw new Exception($"noise: a {Symmetric.PskKeySize}-byte pre-shared key needs to be passed as noise Config");
             }
         }
     }

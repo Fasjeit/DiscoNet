@@ -5,7 +5,11 @@ VisualStudioVersion = 15.0.27130.2010
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DiscoNet", "DiscoNet\DiscoNet.csproj", "{F53B639A-9107-4A52-BB11-ABDA3AEB63B7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DiscoNet.Tests", "DiscoNet.Tests\DiscoNet.Tests.csproj", "{17465A5D-FAE4-4336-BE65-42B12FFA5CA2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DiscoNet.Tests", "DiscoNet.Tests\DiscoNet.Tests.csproj", "{17465A5D-FAE4-4336-BE65-42B12FFA5CA2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NoiseK", "Samples\NoiseK\NoiseK.csproj", "{0CEBC246-65D3-493E-95F2-ECEDCE27145F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{000FDFEF-C398-4306-BA24-A5A8D1C10778}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,9 +25,16 @@ Global
 		{17465A5D-FAE4-4336-BE65-42B12FFA5CA2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{17465A5D-FAE4-4336-BE65-42B12FFA5CA2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{17465A5D-FAE4-4336-BE65-42B12FFA5CA2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0CEBC246-65D3-493E-95F2-ECEDCE27145F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0CEBC246-65D3-493E-95F2-ECEDCE27145F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0CEBC246-65D3-493E-95F2-ECEDCE27145F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0CEBC246-65D3-493E-95F2-ECEDCE27145F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{0CEBC246-65D3-493E-95F2-ECEDCE27145F} = {000FDFEF-C398-4306-BA24-A5A8D1C10778}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B522627D-30D7-40F1-A3C7-BCC40D1D06E8}
