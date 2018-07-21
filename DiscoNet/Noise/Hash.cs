@@ -45,12 +45,27 @@
 
         /// <summary>
         /// Write absorbs more data into the hash's state.
+        /// This function is usually called to hash contigous chunks
+        /// of data. For structured data please refer to WriteTuple
         /// </summary>
         /// <param name="inputData">Data to write</param>
         public int Write(byte[] inputData)
         {
             this.strobeState.Operate(false, Operation.Ad, inputData, 0, this.streaming);
             this.streaming = true;
+            return inputData.Length;
+        }
+
+        /// <summary>
+        /// Absorbs more data to hash in a non-ambigious way. This means that data absorbed
+        /// via this function is separated from the data surrounding it. Use this function instead of Write
+        /// to hash structured data.
+        /// </summary>
+        /// <param name="inputData">Data to write</param>
+        /// <returns></returns>
+        public int WriteTuple(byte[] inputData)
+        {
+            this.strobeState.Operate(false, Operation.Ad, inputData, 0, false);
             return inputData.Length;
         }
 

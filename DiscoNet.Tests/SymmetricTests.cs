@@ -163,5 +163,96 @@
                 }
             }
         }
+
+        [Fact]
+        public void TestHashOutputHashOutput()
+        {
+            var message1 = Encoding.ASCII.GetBytes("hello");
+            var message2 = Encoding.ASCII.GetBytes("how are you good sir?");
+            var message3 = Encoding.ASCII.GetBytes("sure thing");
+
+            var h1 = new Hash(32);
+            h1.Write(message1);
+            h1.Write(message2);
+            // this should not affect the state
+            h1.Sum();
+            h1.Write(message3);
+
+            var out1 = h1.Sum();
+
+            var h2 = new Hash(32);
+            h2.Write(message1);
+            h2.Write(message2);
+            h2.Write(message3);
+
+            var out2 = h2.Sum();
+
+            if (!out1.SequenceEqual(out2))
+            {
+                throw new Exception("Sum function affects the hash state");
+            }
+        }
+
+        [Fact]
+        public void TestTupleHash()
+        {
+            var message1 = Encoding.ASCII.GetBytes("the plasma");
+
+            var message2 = Encoding.ASCII.GetBytes("screen is broken, we need to do something about it!");
+
+            var message3 = Encoding.ASCII.GetBytes(
+                "\x00\x01\x02\x03\x04\x05\x00\x01\x02\x03\x04\x05\x00\x01\x02\x03"
+                + "\x04\x05\x00\x01\x02\x03\x04\x05\x00\x01\x02\x03\x04\x05\x00\x01\x02\x03\x04\x05");
+
+            var message4 = Encoding.ASCII.GetBytes(
+                "HAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAH"
+                + "AHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHA"
+                + "HAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAH"
+                + "AHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHA"
+                + "HAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHA"
+                + "HAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHA" 
+                + "HAHAHAHAHAHAHAHAHAHAHAHAHA");
+
+            // trying with NewHash with streaming and without streaming
+            var h1 = new Hash(32);
+
+            h1.Write(message1);
+            h1.Write(message2);
+            h1.Write(message3);
+            var out1 = h1.Sum();
+
+            var h2 = new Hash(32);
+
+            h2.WriteTuple(message1);
+            h2.WriteTuple(message2);
+            h2.WriteTuple(message3);
+            var out2 = h2.Sum();
+
+            if (out1.SequenceEqual(out2))
+            {
+                throw new Exception("Tuple hashing should be different from stream hashing");
+            }
+
+            // trying a hybrid with streaming
+            var h3 = new Hash(32);
+
+            h3.WriteTuple(message1);
+            h3.Write(message2);
+            h3.Write(message3);
+            h3.WriteTuple(message4);
+            var out3 = h3.Sum();
+
+            var h4 = new Hash(32);
+
+            h4.WriteTuple(message1);
+            h4.WriteTuple(message2.Concat(message3).ToArray());
+            h4.WriteTuple(message4);
+            var out4 = h4.Sum();
+
+            if (!out3.SequenceEqual(out4))
+            {
+                throw new Exception("Tuple hashing doesn't work properly with streaming");
+            }
+        }
     }
 }
