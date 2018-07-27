@@ -21,7 +21,7 @@
         /// <param name="address"></param>
         /// <param name="config"></param>
         /// <param name="port"></param>
-        internal Listener(string address, Config config, int port = 1800)
+        internal Listener(IPAddress address, Config config, int port = 1800)
         {
             if (config == null)
             {
@@ -30,10 +30,20 @@
 
             Api.CheckRequirments(false, config);
 
-            var iPAddress = IPAddress.Parse(address);
-
             this.config = config;
-            this.tcpListener = new TcpListener(iPAddress, port);
+            this.tcpListener = new TcpListener(address, port);
+        }
+
+        /// <summary>
+        /// Create disco listener
+        /// </summary>
+        /// <param name="address"></param>
+        /// <param name="config"></param>
+        /// <param name="port"></param>
+        internal Listener(string address, Config config, int port = 1800)
+            : this(IPAddress.Parse(address), config, port)
+        {
+
         }
 
         public void Dispose()

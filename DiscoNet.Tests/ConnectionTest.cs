@@ -2,6 +2,7 @@
 {
     using System;
     using System.Linq;
+    using System.Net;
     using System.Text;
     using System.Threading.Tasks;
 
@@ -66,7 +67,7 @@
 
         private async Task RunConnectionTest(Config clientConfig, Config serverConfig, int port = 1810)
         {
-            var address = "127.0.0.1";
+            var address = IPAddress.Loopback;
 
             var server = Task.Factory.StartNew(
                 () =>
@@ -87,7 +88,7 @@
                     });
 
             // Run the client
-            var clientSocket = Api.Connect(address, port, clientConfig);
+            var clientSocket = Api.Connect(address.ToString(), port, clientConfig);
 
             for (var i = 0; i < ConnectionTest.IterationCount; i++)
             {

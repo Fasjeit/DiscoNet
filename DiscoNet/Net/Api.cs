@@ -2,6 +2,7 @@
 {
     using System;
     using System.IO;
+    using System.Net;
     using System.Net.Sockets;
 
     using DiscoNet.Noise;
@@ -165,6 +166,20 @@
             connection.HandShake();
 
             return connection;
+        }
+
+        /// <summary>
+        /// Listen for Disco client connections
+        /// </summary>
+        /// <param name="address">ip address for listening</param>
+        /// <param name="config">Disco configuration</param>
+        /// <param name="port">tcp port for listening</param>
+        /// <returns></returns>
+        public static Listener Listen(IPAddress address, Config config, int port = 1800)
+        {
+            var listener = new Listener(address, config, port);
+            listener.Start();
+            return listener;
         }
 
         /// <summary>

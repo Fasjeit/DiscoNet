@@ -2,6 +2,7 @@
 {
     using System;
     using System.Linq;
+    using System.Net;
     using System.Text;
     using System.Threading.Tasks;
 
@@ -107,7 +108,7 @@
             serverConfig.RemoteKey = clientConfig.KeyPair.PublicKey;
             clientConfig.RemoteKey = serverConfig.KeyPair.PublicKey;
 
-            var address = "127.0.0.1";
+            var address = IPAddress.Loopback;
 
             Task.Factory.StartNew(
                 () =>
@@ -144,7 +145,7 @@
                     });
 
             // Run the client
-            var clientSocket = Api.Connect(address, port, clientConfig);
+            var clientSocket = Api.Connect(address.ToString(), port, clientConfig);
 
             var cleintData = Encoding.ASCII.GetBytes("hello");
             clientSocket.Write(cleintData, 0, cleintData.Length);
@@ -156,7 +157,7 @@
             serverConfig.RemoteKey = clientConfig.KeyPair.PublicKey;
             clientConfig.RemoteKey = serverConfig.KeyPair.PublicKey;
 
-            var address = "127.0.0.1";
+            var address = IPAddress.Loopback;
 
             // get a Noise.listener
 
@@ -182,7 +183,7 @@
                     });
 
             // Run the client
-            var clientSocket = Api.Connect(address, port, clientConfig);
+            var clientSocket = Api.Connect(address.ToString(), port, clientConfig);
 
             var clienData = Encoding.ASCII.GetBytes("hello");
             clientSocket.Write(clienData, 0, clienData.Length);
