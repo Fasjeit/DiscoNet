@@ -116,11 +116,8 @@
                         {
                             var serverSocket = listener.Accept();
                             var buf = new byte[100];
-                            var n = serverSocket.Read(buf, out var exception);
-                            if (exception != null)
-                            {
-                                throw exception;
-                            }
+                            var n = serverSocket.Read(buf, 0, buf.Length);
+
                             if (!buf.Take(n).SequenceEqual(Encoding.ASCII.GetBytes("hello")))
                             {
                                 throw new Exception("client message failed");
@@ -129,11 +126,8 @@
                             // Expect error in here
                             try
                             {
-                                serverSocket.Write(Encoding.ASCII.GetBytes("ca va?"), out exception);
-                                if (exception != null)
-                                {
-                                    throw exception;
-                                }
+                                var data = Encoding.ASCII.GetBytes("ca va?");
+                                serverSocket.Write(data, 0, data.Length);
                             }
                             catch (Exception ex)
                             {
@@ -152,11 +146,8 @@
             // Run the client
             var clientSocket = Api.Connect(address, port, clientConfig);
 
-            clientSocket.Write(Encoding.ASCII.GetBytes("hello"), out var clientException);
-            if (clientException != null)
-            {
-                throw clientException;
-            }
+            var cleintData = Encoding.ASCII.GetBytes("hello");
+            clientSocket.Write(cleintData, 0, cleintData.Length);
         }
 
         private void RunTwoWayTest(Config clientConfig, Config serverConfig, int port = 1800)
@@ -178,38 +169,26 @@
                         {
                             var serverSocket = listener.Accept();
                             var buf = new byte[100];
-                            var n = serverSocket.Read(buf, out var exception);
-                            if (exception != null)
-                            {
-                                throw exception;
-                            }
+                            var n = serverSocket.Read(buf, 0, buf.Length);
+
                             if (!buf.Take(n).SequenceEqual(Encoding.ASCII.GetBytes("hello")))
                             {
                                 throw new Exception("client message failed");
                             }
 
-                            serverSocket.Write(Encoding.ASCII.GetBytes("ca va?"), out exception);
-                            if (exception != null)
-                            {
-                                throw exception;
-                            }
+                            var data = Encoding.ASCII.GetBytes("ca va?");
+                            serverSocket.Write(data, 0, data.Length);
                         }
                     });
 
             // Run the client
             var clientSocket = Api.Connect(address, port, clientConfig);
 
-            clientSocket.Write(Encoding.ASCII.GetBytes("hello"), out var clientException);
-            if (clientException != null)
-            {
-                throw clientException;
-            }
+            var clienData = Encoding.ASCII.GetBytes("hello");
+            clientSocket.Write(clienData, 0, clienData.Length);
+
             var bufClient = new byte[100];
-            var readByes = clientSocket.Read(bufClient, out clientException);
-            if (clientException != null)
-            {
-                throw clientException;
-            }
+            var readByes = clientSocket.Read(bufClient, 0, bufClient.Length);
 
             if (!bufClient.Take(readByes).SequenceEqual(Encoding.ASCII.GetBytes("ca va?")))
             {

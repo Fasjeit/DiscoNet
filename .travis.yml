@@ -1,0 +1,10 @@
+language: csharp  
+sudo: required  
+dist: trusty
+mono: none
+dotnet: 2.0.3
+solution: ./DiscoNet.sln
+before_script:
+  - dotnet restore ./DiscoNet.sln
+script:    
+  - dotnet test ./DiscoNet.Tests/DiscoNet.Tests.csproj -c Release -f netcoreapp2.0

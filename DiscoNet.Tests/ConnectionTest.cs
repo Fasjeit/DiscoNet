@@ -77,7 +77,7 @@
                             for (var i = 0; i < ConnectionTest.IterationCount; i++)
                             {
                                 var buf = new byte[100];
-                                var n = serverSocket.Read(buf, out var exception );
+                                var n = serverSocket.Read(buf, 0, buf.Length);
                                 if (!buf.Take(n - 1).SequenceEqual(Encoding.ASCII.GetBytes("hello ")))
                                 {
                                     throw new Exception("received message not as expected");
@@ -91,13 +91,11 @@
 
             for (var i = 0; i < ConnectionTest.IterationCount; i++)
             {
-                await Task.Factory.StartNew(() => 
+                await Task.Factory.StartNew(
+                    () =>
                         {
-                            clientSocket.Write(Encoding.ASCII.GetBytes("hello " + i % 10), out var exception);
-                            if (exception != null)
-                            {
-                                throw exception;
-                            }
+                            var data = Encoding.ASCII.GetBytes("hello " + i % 10);
+                            clientSocket.Write(data, 0, data.Length);
                         });
             }
 

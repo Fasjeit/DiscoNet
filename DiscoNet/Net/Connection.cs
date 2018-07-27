@@ -64,10 +64,13 @@
         /// Write data to connection
         /// </summary>
         /// <param name="data">Data to write</param>
-        /// <param name="exeption">Ouput exeption</param>
+        /// <param name="offset">Offset of data to read from</param>
+        /// <param name="count">Number of bytes to write</param>
         /// <returns></returns>
-        public int Write(byte[] data, out Exception exeption)
+        public int Write(byte[] data, int offset, int count)
         {
+            Connection.ValidateParameters(data, offset, count);
+
             // If this is a one-way pattern, do some checks
             var handshakePattern = this.config.HandshakePattern;
             if (!this.isClient && (handshakePattern == NoiseHandshakeType.NoiseN
@@ -78,15 +81,7 @@
             }
 
             // Make sure to go through the handshake first
-            try
-            {
-                this.HandShake();
-            }
-            catch (Exception ex)
-            {
-                exeption = ex;
-                return 0;
-            }
+            this.HandShake();
 
             Mutex mutex;
 
@@ -106,36 +101,27 @@
                 var totalBytes = 0;
 
                 // process the data in a loop
-                while (data.Length > 0)
+                while (count - totalBytes > 0)
                 {
-                    try
-                    {
-                        var dataLen = data.Length > Config.NoiseMaxPlaintextSize
-                                          ? Config.NoiseMaxPlaintextSize
-                                          : data.Length;
+                    var dataLen = count > Config.NoiseMaxPlaintextSize ? Config.NoiseMaxPlaintextSize : count;
 
-                        // Encrypt
-                        var ciphertext = this.strobeOut.SendEncUnauthenticated(false, data.Take(dataLen).ToArray());
-                        ciphertext = ciphertext.Concat(this.strobeOut.SendMac(false, Symmetric.TagSize)).ToArray();
+                    // Encrypt
+                    var ciphertext = this.strobeOut.SendEncUnauthenticated(
+                        false,
+                        data.Skip(offset).Take(dataLen).ToArray());
+                    ciphertext = ciphertext.Concat(this.strobeOut.SendMac(false, Symmetric.TagSize)).ToArray();
 
-                        // header (length)
-                        var length = new[] { (byte)(ciphertext.Length >> 8), (byte)(ciphertext.Length % 256) };
+                    // header (length)
+                    var length = new[] { (byte)(ciphertext.Length >> 8), (byte)(ciphertext.Length % 256) };
 
-                        // Send data
-                        this.tcpConnection.Client.Send(length.Concat(ciphertext).ToArray());
+                    // Send data
+                    this.tcpConnection.Client.Send(length.Concat(ciphertext).ToArray());
 
-                        // prepare next loop iteration
-                        totalBytes += dataLen;
-                        data = data.Skip(dataLen).ToArray();
-                    }
-                    catch (Exception ex)
-                    {
-                        exeption = ex;
-                        return totalBytes;
-                    }
+                    // prepare next loop iteration
+                    totalBytes += dataLen;
+                    offset += dataLen;
                 }
 
-                exeption = null;
                 return totalBytes;
             }
             finally
@@ -148,26 +134,20 @@
         /// Read data from connection
         /// </summary>
         /// <param name="data">Return buffer</param>
-        /// <param name="exeption">output exeption</param>
+        /// <param name="offset">Offset of data to write to</param>
+        /// <param name="count">Number of bytes to read</param>
         /// <returns></returns>
-        public int Read(byte[] data, out Exception exeption)
+        public int Read(byte[] data, int offset, int count)
         {
             if (data == null || data.Length == 0)
             {
-                exeption = null;
                 return 0;
             }
 
+            Connection.ValidateParameters(data, offset, count);
+
             // Make sure to go through the handshake first
-            try
-            {
-                this.HandShake();
-            }
-            catch (Exception ex)
-            {
-                exeption = ex;
-                return 0;
-            }
+            this.HandShake();
 
             // If this is a one-way pattern, do some checks
             var handshakePattern = this.config.HandshakePattern;
@@ -196,14 +176,13 @@
                 var readSoFar = 0;
                 if (this.inputBuffer.Length > 0)
                 {
-                    var toRead = this.inputBuffer.Length > data.Length ? data.Length : this.inputBuffer.Length;
-                    this.inputBuffer.CopyTo(data, readSoFar);
-                    if (this.inputBuffer.Length > data.Length)
+                    var toRead = this.inputBuffer.Length > count ? count : this.inputBuffer.Length;
+                    this.inputBuffer.CopyTo(data, readSoFar + offset);
+                    if (this.inputBuffer.Length > count)
                     {
-                        this.inputBuffer = this.inputBuffer.Skip(data.Length).ToArray();
+                        this.inputBuffer = this.inputBuffer.Skip(count).ToArray();
 
-                        exeption = null;
-                        return data.Length;
+                        return count;
                     }
 
                     readSoFar += toRead;
@@ -211,41 +190,22 @@
                 }
 
                 // read header from socket
-                byte[] bufHeader;
-                try
-                {
-                    bufHeader = this.ReadFromUntil(this.tcpConnection, 2);
-                }
-                catch (Exception ex)
-                {
-                    exeption = ex;
-                    return 0;
-                }
+                var bufHeader = this.ReadFromUntil(this.tcpConnection, 2);
 
                 var length = (bufHeader[0] << 8) | bufHeader[1];
 
                 if (length > Config.NoiseMessageLength)
                 {
-                    exeption = new Exception("disco: Disco message received exceeds DiscoMessageLength");
-                    return 2;
+                    throw new Exception("disco: Disco message received exceeds DiscoMessageLength");
                 }
 
-                byte[] noiseMessage;
                 // read noise message from socket
-                try
-                {
-                    noiseMessage = this.ReadFromUntil(this.tcpConnection, length);
-                }
-                catch (Exception ex)
-                {
-                    exeption = ex;
-                    return 2;
-                }
+                var noiseMessage = this.ReadFromUntil(this.tcpConnection, length);
+
                 // decrypt
                 if (length < Symmetric.TagSize)
                 {
-                    exeption = new Exception($"disco: the received payload is shorter {Symmetric.TagSize} bytes");
-                    return 2 + length;
+                    throw new Exception($"disco: the received payload is shorter {Symmetric.TagSize} bytes");
                 }
 
                 var plaintextLength = noiseMessage.Length - Symmetric.TagSize;
@@ -256,36 +216,64 @@
 
                 if (!ok)
                 {
-                    exeption = new Exception("disco: cannot decrypt the payload");
-                    return 2 + length;
+                    throw new Exception("disco: cannot decrypt the payload");
                 }
 
                 // append to the input buffer
                 this.inputBuffer = this.inputBuffer.Concat(plaintext).ToArray();
 
                 // read whatever we can read
-                var rest = data.Length - readSoFar;
+                var rest = count - readSoFar;
                 var restToRead = this.inputBuffer.Length > rest ? rest : this.inputBuffer.Length;
-                this.inputBuffer.CopyTo(data, readSoFar);
+                this.inputBuffer.CopyTo(data, readSoFar + offset);
                 if (this.inputBuffer.Length > restToRead)
                 {
                     this.inputBuffer = this.inputBuffer.Skip(readSoFar).ToArray();
 
-                    exeption = null;
-                    return data.Length;
+                    return count;
                 }
 
                 // we haven't filled the buffer
                 readSoFar += restToRead;
                 this.inputBuffer = new byte[] { };
 
-                exeption = null;
                 return readSoFar;
             }
 
             finally
             {
                 mutex.ReleaseMutex();
+            }
+        }
+
+        /// <summary>
+        /// Validates user parameteres for all Read/Write methods
+        /// </summary>
+        /// <param name="buffer"></param>
+        /// <param name="offset"></param>
+        /// <param name="count"></param>
+        private static void ValidateParameters(byte[] buffer, int offset, int count)
+        {
+            if (buffer == null)
+            {
+                throw new ArgumentNullException(nameof(buffer));
+            }
+
+            if (offset < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(offset));
+            }
+
+            if (count < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(count));
+            }
+
+            if (count > buffer.Length - offset)
+            {
+                throw new ArgumentOutOfRangeException(
+                    nameof(count),
+                    $"Not enough bytes in buffer to process, expecting at least {count + offset}");
             }
         }
 
@@ -333,7 +321,7 @@
                         throw new Exception($"disco: the provided remote key is not {Asymmetric.DhLen}-byte");
                     }
 
-                    remoteKeyPair = new KeyPair() { PublicKey = new byte[this.config.RemoteKey.Length] };
+                    remoteKeyPair = new KeyPair { PublicKey = new byte[this.config.RemoteKey.Length] };
                     Array.Copy(this.config.RemoteKey, remoteKeyPair.PublicKey, this.config.RemoteKey.Length);
                 }
 
