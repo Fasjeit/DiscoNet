@@ -4,6 +4,7 @@
     using System.Linq;
     using System.Net;
     using System.Text;
+    using System.Threading;
     using System.Threading.Tasks;
 
     using DiscoNet.Net;
@@ -69,11 +70,13 @@
         {
             var address = IPAddress.Loopback;
 
+            bool serverSeUp = false;
             var server = Task.Factory.StartNew(
                 () =>
                     {
                         using (var listener = Api.Listen(address, serverConfig, port))
                         {
+                            serverSeUp = true;
                             var serverSocket = listener.Accept();
                             for (var i = 0; i < ConnectionTest.IterationCount; i++)
                             {
@@ -86,6 +89,11 @@
                             }
                         }
                     });
+
+            while (!serverSeUp)
+            {
+                Thread.Sleep(1000);
+            }
 
             // Run the client
             var clientSocket = Api.Connect(address.ToString(), port, clientConfig);

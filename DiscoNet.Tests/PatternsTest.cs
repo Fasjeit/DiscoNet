@@ -4,6 +4,7 @@
     using System.Linq;
     using System.Net;
     using System.Text;
+    using System.Threading;
     using System.Threading.Tasks;
 
     using DiscoNet.Net;
@@ -110,11 +111,14 @@
 
             var address = IPAddress.Loopback;
 
+            var serverSetUp = false;
+
             Task.Factory.StartNew(
                 () =>
                     {
                         using (var listener = Api.Listen(address, serverConfig, port))
                         {
+                            serverSetUp = true;
                             var serverSocket = listener.Accept();
                             var buf = new byte[100];
                             var n = serverSocket.Read(buf, 0, buf.Length);
@@ -144,6 +148,11 @@
                         }
                     });
 
+            while (!serverSetUp)
+            {
+                Thread.Sleep(1000);
+            }
+
             // Run the client
             var clientSocket = Api.Connect(address.ToString(), port, clientConfig);
 
@@ -159,6 +168,8 @@
 
             var address = IPAddress.Loopback;
 
+            var serverSetUp = false;
+
             // get a Noise.listener
 
             // run the server and Accept one connection
@@ -168,6 +179,7 @@
                     {
                         using (var listener = Api.Listen(address, serverConfig, port))
                         {
+                            serverSetUp = true;
                             var serverSocket = listener.Accept();
                             var buf = new byte[100];
                             var n = serverSocket.Read(buf, 0, buf.Length);
@@ -181,6 +193,11 @@
                             serverSocket.Write(data, 0, data.Length);
                         }
                     });
+
+            while (!serverSetUp)
+            {
+                Thread.Sleep(1000);
+            }
 
             // Run the client
             var clientSocket = Api.Connect(address.ToString(), port, clientConfig);
