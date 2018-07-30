@@ -286,7 +286,7 @@
         private byte[] ReadFromUntil(TcpClient connection, int n)
         {
             var result = new byte[n];
-            connection.Client.Receive(result, 0, n, SocketFlags.Partial);
+            connection.Client.Receive(result, 0, n, SocketFlags.None);
             return result;
         }
 
