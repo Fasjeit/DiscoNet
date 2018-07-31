@@ -15,6 +15,7 @@ Current status - in dev.
 # ToDo
 
 * deal with destructors
+* update depends
 * samples
 * nuget package
 * update wiki
