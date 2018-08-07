@@ -13,7 +13,7 @@
     /// <summary>
     /// Represents a secured connection
     /// </summary>
-    public class Connection
+    public class Connection : IDisposable
     {
         private readonly Config config;
 
@@ -301,6 +301,8 @@
         {
             // Locking the handshakeMutex
             this.handshakeMutex.WaitOne();
+
+            HandshakeState handshakeState = null;
             try
             {
                 Strobe c1;
@@ -325,7 +327,7 @@
                     Array.Copy(this.config.RemoteKey, remoteKeyPair.PublicKey, this.config.RemoteKey.Length);
                 }
 
-                var handshakeState = Api.InitializeDisco(
+                handshakeState = Api.InitializeDisco(
                     this.config.HandshakePattern,
                     this.isClient,
                     this.config.Prologue,
@@ -430,8 +432,22 @@
             }
             finally
             {
+                handshakeState?.Dispose();
                 this.handshakeMutex.ReleaseMutex();
             }
+        }
+
+        /// <summary>
+        /// Dispose connection
+        /// </summary>
+        public void Dispose()
+        {
+            this.halfDuplexLock?.Dispose();
+            this.handshakeMutex?.Dispose();
+            this.inLock?.Dispose();
+            this.outLock?.Dispose();
+            this.tcpConnection?.Close();
+            this.tcpConnection?.Dispose();
         }
     }
 }

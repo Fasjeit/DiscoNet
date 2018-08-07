@@ -15,7 +15,7 @@
 
     public class ConnectionTest
     {
-        private const int IterationCount = 100;
+        private const int IterationCount = 256;
 
         private static readonly Config.PublicKeyVerifierDeligate Verifier = (x, y) => true;
 
@@ -63,12 +63,14 @@
                 HalfDuplex = true
             };
 
-            await this.RunConnectionTest(clientConfig, serverConfig, 1811);
+            await this.RunConnectionTest(clientConfig, serverConfig, 1811, 10);
         }
 
-        private async Task RunConnectionTest(Config clientConfig, Config serverConfig, int port = 1810)
+        private async Task RunConnectionTest(Config clientConfig, Config serverConfig, int port = 1810, int bufSize = 100)
         {
             var address = IPAddress.Loopback;
+
+            var serverBuf = new byte[bufSize];
 
             bool serverSeUp = false;
             var server = Task.Factory.StartNew(
@@ -80,11 +82,22 @@
                             var serverSocket = listener.Accept();
                             for (var i = 0; i < ConnectionTest.IterationCount; i++)
                             {
-                                var buf = new byte[100];
-                                var n = serverSocket.Read(buf, 0, buf.Length);
-                                if (!buf.Take(n - 1).SequenceEqual(Encoding.ASCII.GetBytes("hello ")))
+                                var n = serverSocket.Read(serverBuf, 0, serverBuf.Length);
+
+                                if (n != 6)
+                                {
+                                    throw new Exception("server is supposed to read 6 bytes");
+                                }
+                                if (!serverBuf.Take(n - 1).SequenceEqual(Encoding.ASCII.GetBytes("hello")))
                                 {
                                     throw new Exception("received message not as expected");
+                                }
+
+                                // write the message
+                                var written = serverSocket.Write(serverBuf, 0, n);
+                                if (written != 6)
+                                {
+                                    throw new Exception("server is supposed to write 6 bytes");
                                 }
                             }
                         }
@@ -96,24 +109,45 @@
             }
 
             // Run the client
-            var clientSocket = Api.Connect(address.ToString(), port, clientConfig);
-
-            for (var i = 0; i < ConnectionTest.IterationCount; i++)
+            using (var clientSocket = Api.Connect(address.ToString(), port, clientConfig))
             {
-                await Task.Factory.StartNew(
-                    () =>
-                        {
-                            var data = Encoding.ASCII.GetBytes("hello " + i % 10);
-                            clientSocket.Write(data, 0, data.Length);
-                        });
-            }
+                var cleintBuf = new byte[bufSize];
 
-            await server;
-            //var ex = await exception;
-            //if (ex != null)
-            //{
-            //    throw ex;
-            //}
+                for (var i = 0; i < ConnectionTest.IterationCount; i++)
+                {
+                    await Task.Factory.StartNew(
+                        () =>
+                        {
+                            var data = Encoding.ASCII.GetBytes("hello").Concat(new[] { (byte)i }).ToArray();
+
+                            var n = clientSocket.Write(data, 0, data.Length);
+                            if (n != 6)
+                            {
+                                throw new Exception("client is supposed to write 6 bytes");
+                            }
+
+                            // then read `hello + (i+1)`
+                            var read = clientSocket.Read(cleintBuf, 0, cleintBuf.Length);
+
+                            if (read != 6)
+                            {
+                                throw new Exception("client is supposed to read 6 bytes");
+                            }
+
+                            if (!cleintBuf.Take(read).SequenceEqual(data))
+                            {
+                                throw new Exception("received message not as expected");
+                            }
+                        });
+                }
+
+                await server;
+                //var ex = await exception;
+                //if (ex != null)
+                //{
+                //    throw ex;
+                //}
+            }
         }
     }
 }

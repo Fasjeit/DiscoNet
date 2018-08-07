@@ -46,6 +46,9 @@
 
         }
 
+        /// <summary>
+        /// Dispose connection
+        /// </summary>
         public void Dispose()
         {
             this.tcpListener.Stop();

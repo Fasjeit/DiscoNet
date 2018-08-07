@@ -154,10 +154,11 @@
             }
 
             // Run the client
-            var clientSocket = Api.Connect(address.ToString(), port, clientConfig);
-
-            var cleintData = Encoding.ASCII.GetBytes("hello");
-            clientSocket.Write(cleintData, 0, cleintData.Length);
+            using (var clientSocket = Api.Connect(address.ToString(), port, clientConfig))
+            {
+                var cleintData = Encoding.ASCII.GetBytes("hello");
+                clientSocket.Write(cleintData, 0, cleintData.Length);
+            }
         }
 
         private void RunTwoWayTest(Config clientConfig, Config serverConfig, int port = 1800)
@@ -200,17 +201,19 @@
             }
 
             // Run the client
-            var clientSocket = Api.Connect(address.ToString(), port, clientConfig);
-
-            var clienData = Encoding.ASCII.GetBytes("hello");
-            clientSocket.Write(clienData, 0, clienData.Length);
-
-            var bufClient = new byte[100];
-            var readByes = clientSocket.Read(bufClient, 0, bufClient.Length);
-
-            if (!bufClient.Take(readByes).SequenceEqual(Encoding.ASCII.GetBytes("ca va?")))
+            using (var clientSocket = Api.Connect(address.ToString(), port, clientConfig))
             {
-                throw new Exception();
+
+                var clienData = Encoding.ASCII.GetBytes("hello");
+                clientSocket.Write(clienData, 0, clienData.Length);
+
+                var bufClient = new byte[100];
+                var readByes = clientSocket.Read(bufClient, 0, bufClient.Length);
+
+                if (!bufClient.Take(readByes).SequenceEqual(Encoding.ASCII.GetBytes("ca va?")))
+                {
+                    throw new Exception();
+                }
             }
         }
     }

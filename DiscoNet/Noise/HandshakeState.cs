@@ -74,6 +74,7 @@
             this.Rs?.Dispose();
             this.E?.Dispose();
             this.Re?.Dispose();
+            this.DebugEphemeral?.Dispose();
         }
 
         /// <summary>
