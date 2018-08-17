@@ -344,6 +344,9 @@
             return (initiatorState, responderState);
         }
 
+        /// <summary>
+        /// Destructor
+        /// </summary>
         ~HandshakeState()
         {
             this.Dispose();

@@ -66,6 +66,9 @@
             this.PrivateKey = hex.ToByteArray();
         }
 
+        /// <summary>
+        /// Destructor
+        /// </summary>
         ~KeyPair()
         {
             this.Dispose();

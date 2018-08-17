@@ -61,24 +61,49 @@
         /// </summary>
         NoiseXX,
 
-        // Not documented
+        /// <summary>
+        /// Not documented
+        /// </summary>
         NoiseKX,
 
+        /// <summary>
+        /// Not documented
+        /// </summary>
         NoiseXK,
 
+        /// <summary>
+        /// Not documented
+        /// </summary>
         NoiseIK,
 
+        /// <summary>
+        /// Not documented
+        /// </summary>
         NoiseIX,
 
+        /// <summary>
+        /// Not documented
+        /// </summary>
         NoiseNNpsk2,
 
-        // Not implemented
+        /// <summary>
+        /// Not implemented
+        /// </summary>
         NoiseNN,
 
+        /// <summary>
+        /// Not implemented
+        /// </summary>
         NoiseKN,
 
+        /// <summary>
+        /// Not implemented
+        /// </summary>
         NoiseXN,
 
+        /// <summary>
+        /// Not implemented
+        /// </summary>
         NoiseIN
     }
 }
