@@ -10,4 +10,22 @@
 
 The **specification** can be found online at [www.discocrypto.com](https://www.discocrypto.com/disco.html)
 
+## Install
+
+Install [NuGet packet](https://www.nuget.org/packages/DiscoNet/):
+
+dotnet core
+```
+dotnet add package DiscoNet
+```
+
+.NET Framework
+```
+Install-Package DiscoNet
+```
+
+## Usage
+
+See [Wiki](https://github.com/Fasjeit/DiscoNet/wiki) for documentation.
+
 Current status - in dev.
