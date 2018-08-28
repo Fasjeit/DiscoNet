@@ -1,0 +1,281 @@
+{
+  "homepages": [],
+  "source_base_path": "C:/_self/git/DiscoNet/DiscoNet",
+  "xrefmap": "xrefmap.yml",
+  "files": [
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/DiscoNet.Config.PublicKeyVerifierDeligate.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/DiscoNet.Config.PublicKeyVerifierDeligate.html",
+          "hash": "ndv4DPZp5uTqRTgbk6jXyA=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/DiscoNet.Config.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/DiscoNet.Config.html",
+          "hash": "XNXoEFUohsQQ0483N2Lr4w=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/DiscoNet.KeyPair.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/DiscoNet.KeyPair.html",
+          "hash": "+v2YvptK3KXVIQmqMalXYQ=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/DiscoNet.Net.Api.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/DiscoNet.Net.Api.html",
+          "hash": "DgpN7MvCl+hwSryXjrG8lQ=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/DiscoNet.Net.Connection.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/DiscoNet.Net.Connection.html",
+          "hash": "QsM0VAt5Nguep7Uee2G7mg=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/DiscoNet.Net.Listener.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/DiscoNet.Net.Listener.html",
+          "hash": "7+tHj3dyD5/hyarkFk8uvQ=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/DiscoNet.Net.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/DiscoNet.Net.html",
+          "hash": "BtUUmQji5hFZqtUuvQRlPw=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/DiscoNet.Noise.Asymmetric.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/DiscoNet.Noise.Asymmetric.html",
+          "hash": "1UaAxBEh4Tm6fsgsXIkWHw=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/DiscoNet.Noise.Enums.NoiseHandshakeType.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/DiscoNet.Noise.Enums.NoiseHandshakeType.html",
+          "hash": "0KWNrCMur5l/2qmPL0X2Nw=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/DiscoNet.Noise.Enums.Tokens.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/DiscoNet.Noise.Enums.Tokens.html",
+          "hash": "bDSWPEvel1c6ySqoFk5Qdw=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/DiscoNet.Noise.Enums.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/DiscoNet.Noise.Enums.html",
+          "hash": "vcSUv8ELc/KcSDCpApeP4Q=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/DiscoNet.Noise.HandshakeState.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/DiscoNet.Noise.HandshakeState.html",
+          "hash": "WC0cMIGDOjlCB8XgDS8/YQ=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/DiscoNet.Noise.Hash.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/DiscoNet.Noise.Hash.html",
+          "hash": "ElvbN9h5MK8Mj3Yq8OrSHw=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/DiscoNet.Noise.Pattern.MessagePattern.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/DiscoNet.Noise.Pattern.MessagePattern.html",
+          "hash": "pD8yfxFlzxm8+PLLZD/Z1w=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/DiscoNet.Noise.Pattern.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/DiscoNet.Noise.Pattern.html",
+          "hash": "tqvQT1E3QA48pGXxtwIZ3w=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/DiscoNet.Noise.Symmetric.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/DiscoNet.Noise.Symmetric.html",
+          "hash": "Uni3lVnPFTdAjusa5gJ+ZQ=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/DiscoNet.Noise.SymmetricState.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/DiscoNet.Noise.SymmetricState.html",
+          "hash": "cLXckXwKFVAa0BTB4LZD0A=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/DiscoNet.Noise.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/DiscoNet.Noise.html",
+          "hash": "A/+4FXKn3YxiZoM1zYIOqw=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/DiscoNet.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/DiscoNet.html",
+          "hash": "uw8eTqbT8G9cFifvItjpmA=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Toc",
+      "source_relative_path": "api/toc.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/toc.html",
+          "hash": "E2S61XlIRP3FizavBSQ2jw=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    }
+  ],
+  "incremental_info": [
+    {
+      "status": {
+        "can_incremental": false,
+        "details": "Cannot build incrementally because last build didn't contain version .",
+        "incrementalPhase": "build"
+      },
+      "processors": {
+        "ManagedReferenceDocumentProcessor": {
+          "can_incremental": false,
+          "incrementalPhase": "build"
+        },
+        "TocDocumentProcessor": {
+          "can_incremental": false,
+          "details": "Processor TocDocumentProcessor cannot support incremental build because the processor doesn't implement ISupportIncrementalDocumentProcessor interface.",
+          "incrementalPhase": "build"
+        }
+      }
+    },
+    {
+      "status": {
+        "can_incremental": false,
+        "details": "Cannot support incremental post processing, the reason is: it's disabled.",
+        "incrementalPhase": "postProcessing"
+      },
+      "processors": {}
+    }
+  ],
+  "version_info": {},
+  "groups": [
+    {
+      "xrefmap": "xrefmap.yml"
+    }
+  ]
+}
