@@ -1,0 +1,44 @@
+### YamlMime:TableOfContent
+- uid: DiscoNet
+  name: DiscoNet
+  items:
+  - uid: DiscoNet.Config
+    name: Config
+  - uid: DiscoNet.Config.PublicKeyVerifierDeligate
+    name: Config.PublicKeyVerifierDeligate
+  - uid: DiscoNet.KeyPair
+    name: KeyPair
+- uid: DiscoNet.Net
+  name: DiscoNet.Net
+  items:
+  - uid: DiscoNet.Net.Api
+    name: Api
+  - uid: DiscoNet.Net.Connection
+    name: Connection
+  - uid: DiscoNet.Net.Listener
+    name: Listener
+- uid: DiscoNet.Noise
+  name: DiscoNet.Noise
+  items:
+  - uid: DiscoNet.Noise.Asymmetric
+    name: Asymmetric
+  - uid: DiscoNet.Noise.HandshakeState
+    name: HandshakeState
+  - uid: DiscoNet.Noise.Hash
+    name: Hash
+  - uid: DiscoNet.Noise.Symmetric
+    name: Symmetric
+  - uid: DiscoNet.Noise.SymmetricState
+    name: SymmetricState
+- uid: DiscoNet.Noise.Enums
+  name: DiscoNet.Noise.Enums
+  items:
+  - uid: DiscoNet.Noise.Enums.NoiseHandshakeType
+    name: NoiseHandshakeType
+  - uid: DiscoNet.Noise.Enums.Tokens
+    name: Tokens
+- uid: DiscoNet.Noise.Pattern
+  name: DiscoNet.Noise.Pattern
+  items:
+  - uid: DiscoNet.Noise.Pattern.MessagePattern
+    name: MessagePattern
