@@ -5,13 +5,9 @@ mono: none
 dotnet: 2.0.3
 solution: ./DiscoNet.sln
 before_script:
-  - nuget install docfx.console -ExcludeVersion
-  - export DOCFX_TOOL="mono docfx.console/tools/docfx.exe"
   - dotnet restore ./DiscoNet.sln
 script:    
   - dotnet test ./DiscoNet.Tests/DiscoNet.Tests.csproj -c Release -f netcoreapp2.0
-  - $DOCFX_TOOL metadata docfx.json
-  - $DOCFX_TOOL build docfx.json
 notifications:
   email:
     on_success: never # default: change
