@@ -5,7 +5,7 @@
     using StrobeNet.Extensions;
 
     /// <summary>
-    /// Asymmectic x25519 keypair
+    /// Asymmetric x25519 key pair
     /// </summary>
     public class KeyPair : IDisposable
     {
@@ -20,7 +20,7 @@
         public byte[] PublicKey { get; set; }
 
         /// <summary>
-        /// Dispose object and free resourses
+        /// Dispose object and free resources
         /// </summary>
         public void Dispose()
         {
@@ -33,7 +33,7 @@
         /// <summary>
         /// Export public key as hex string
         /// </summary>
-        /// <returns></returns>
+        /// <returns>String representation of public key</returns>
         public string ExportPublicKey()
         {
             return this.PublicKey.ToHexString();
@@ -42,7 +42,7 @@
         /// <summary>
         /// Export private key as hex string
         /// </summary>
-        /// <returns></returns>
+        /// <returns>String representation of private key</returns>
         internal string ExportPrivateKey()
         {
             return this.PrivateKey.ToHexString();
@@ -51,7 +51,7 @@
         /// <summary>
         /// Import public key from hex string
         /// </summary>
-        /// <param name="hex"></param>
+        /// <param name="hex">String representation of public key</param>
         public void ImportPublicKey(string hex)
         {
             this.PublicKey = hex.ToByteArray();
@@ -60,7 +60,7 @@
         /// <summary>
         /// Import private key as hex string
         /// </summary>
-        /// <param name="hex"></param>
+        /// <param name="hex">String representation of private key</param>
         internal void ImportPrivateKey(string hex)
         {
             this.PrivateKey = hex.ToByteArray();

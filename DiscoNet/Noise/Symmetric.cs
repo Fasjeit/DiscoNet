@@ -7,7 +7,7 @@
     using StrobeNet;
 
     /// <summary>
-    /// Symmectic suite
+    /// Symmetric suite
     /// </summary>
     public static class Symmetric
     {
@@ -50,6 +50,7 @@
         /// Hash allows you to hash an input of any length and obtain an output
         /// of length greater or equal to 256 bits (32 bytes).
         /// </summary>
+        /// <returns>Resulted Hash</returns>
         public static byte[] Hash(byte[] input, int outputLength)
         {
             if (outputLength < Symmetric.HashSize)
@@ -67,9 +68,9 @@
         /// <summary>
         /// Derive key data
         /// </summary>
-        /// <param name="keyMaterial">Derivition material</param>
+        /// <param name="keyMaterial">Derivation material</param>
         /// <param name="keyLen">Length of expected output</param>
-        /// <returns></returns>
+        /// <returns>Derived data</returns>
         public static byte[] DeriveKeys(byte[] keyMaterial, int keyLen)
         {
             if (keyMaterial.Length < Symmetric.KeySize)
@@ -85,11 +86,11 @@
         }
 
         /// <summary>
-        /// Protect integrity of unecrypted text
+        /// Protect integrity of unencrypted text
         /// </summary>
-        /// <param name="key"></param>
-        /// <param name="plaintext"></param>
-        /// <returns></returns>
+        /// <param name="key">Symmetric key for MAC</param>
+        /// <param name="plaintext">Plaintext to protect</param>
+        /// <returns>Plaintext with MAC tag</returns>
         public static byte[] ProtectIntegrity(byte[] key, byte[] plaintext)
         {
             if (key.Length < Symmetric.KeySize)
@@ -108,6 +109,13 @@
         /// <summary>
         /// Retrieve and Verify plaintext from unencrypted message
         /// </summary>
+        /// <param name="key">
+        /// Symmetric MAC key
+        /// </param>
+        /// <param name="plaintextAndTag">
+        /// Plaintext with MAC tag to verify
+        /// </param>
+        /// <returns>Plaintext</returns>
         public static byte[] VerifyIntegrity(byte[] key, byte[] plaintextAndTag)
         {
             if (key.Length < Symmetric.KeySize)
@@ -126,7 +134,7 @@
             var plainText = plaintextAndTag.Take(offset).ToArray();
             var tag = plaintextAndTag.Skip(offset).ToArray();
 
-            // Geting the tag
+            // Getting the tag
             var hash = new Strobe("DiscoMAC", Symmetric.SecurityParameter);
             hash.Ad(false, key);
             hash.Ad(false, plainText);
@@ -143,6 +151,13 @@
         /// <summary>
         /// Encrypt a plaintext message with a key of any size greater than 128 bits (16 bytes).
         /// </summary>
+        /// <param name="key">
+        /// Symmetric key for encryption
+        /// </param>
+        /// <param name="plaintext">
+        /// Plaintext to encrypt
+        /// </param>
+        /// <returns>Encrypted data</returns>
         public static byte[] Encrypt(byte[] key, byte[] plaintext)
         {
             if (key.Length < Symmetric.KeySize)
@@ -178,6 +193,13 @@
         /// <summary>
         /// Decrypt a message and check integrity
         /// </summary>
+        /// <param name="key">
+        /// Symmetric key for encryption
+        /// </param>
+        /// <param name="ciphertext">
+        /// Ciphertext to decrypt
+        /// </param>
+        /// <returns>Decrypted plaintext</returns>
         public static byte[] Decrypt(byte[] key, byte[] ciphertext)
         {
             if (key.Length < Symmetric.KeySize)

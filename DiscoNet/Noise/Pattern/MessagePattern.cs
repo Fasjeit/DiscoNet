@@ -23,7 +23,7 @@
         /// <summary>
         /// Get enumerator
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Token enumerator</returns>
         public IEnumerator<Tokens> GetEnumerator()
         {
             return this.Tokens.GetEnumerator();

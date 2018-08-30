@@ -66,7 +66,7 @@
         /// <param name="data">Data to write</param>
         /// <param name="offset">Offset of data to read from</param>
         /// <param name="count">Number of bytes to write</param>
-        /// <returns></returns>
+        /// <returns>Number of written bytes</returns>
         public int Write(byte[] data, int offset, int count)
         {
             Connection.ValidateParameters(data, offset, count);
@@ -136,7 +136,7 @@
         /// <param name="data">Return buffer</param>
         /// <param name="offset">Offset of data to write to</param>
         /// <param name="count">Number of bytes to read</param>
-        /// <returns></returns>
+        /// <returns>Number of read bytes</returns>
         public int Read(byte[] data, int offset, int count)
         {
             if (data == null || data.Length == 0)
@@ -247,11 +247,11 @@
         }
 
         /// <summary>
-        /// Validates user parameteres for all Read/Write methods
+        /// Validates user parameters for all Read/Write methods
         /// </summary>
-        /// <param name="buffer"></param>
-        /// <param name="offset"></param>
-        /// <param name="count"></param>
+        /// <param name="buffer">Buffer to operate</param>
+        /// <param name="offset">Buffer offset</param>
+        /// <param name="count">Number of bytes to read/write</param>
         private static void ValidateParameters(byte[] buffer, int offset, int count)
         {
             if (buffer == null)
@@ -278,11 +278,11 @@
         }
 
         /// <summary>
-        /// Read delected amount of bytes from connection
+        /// Read detected amount of bytes from connection
         /// </summary>
         /// <param name="connection">Connection to read from</param>
         /// <param name="n">Number of bytes</param>
-        /// <returns></returns>
+        /// <returns>Read bytes</returns>
         private byte[] ReadFromUntil(TcpClient connection, int n)
         {
             var result = new byte[n];

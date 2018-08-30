@@ -12,7 +12,7 @@
     public class SymmetricState
     {
         /// <summary>
-        /// Cuuretn strobe state
+        /// Current strobe state
         /// </summary>
         private readonly Strobe strobeState;
 

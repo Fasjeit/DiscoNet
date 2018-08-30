@@ -23,14 +23,14 @@
         /// <summary>
         /// Disco peer initialization
         /// </summary>
-        /// <param name="handshakeType">Noise handshake patern</param>
+        /// <param name="handshakeType">Noise handshake pattern</param>
         /// <param name="initiator">This party initiates connection</param>
         /// <param name="prologue">Prologue string, some data prior to handshake</param>
         /// <param name="s">local static key</param>
-        /// <param name="e">lecal ephermeral key</param>
+        /// <param name="e">local ephemeral key</param>
         /// <param name="rs">remote static key</param>
         /// <param name="re">remote ephemeral key</param>
-        /// <returns></returns>
+        /// <returns>Initialized Disco handshake state</returns>
         public static HandshakeState InitializeDisco(
             NoiseHandshakeType handshakeType,
             bool initiator,
@@ -157,7 +157,7 @@
         /// <param name="address">Server ip address</param>
         /// <param name="port">server tcp port</param>
         /// <param name="config">Disco configuration</param>
-        /// <returns></returns>
+        /// <returns>Established connection</returns>
         public static Connection Connect(string address, int port, Config config)
         {
             if (config == null)
@@ -165,7 +165,7 @@
                 throw new NullReferenceException(nameof(config));
             }
 
-            Api.CheckRequirments(false, config);
+            Api.CheckRequirements(false, config);
 
             var tcpClient = new TcpClient(address, port);
 
@@ -183,7 +183,7 @@
         /// <param name="address">ip address for listening</param>
         /// <param name="config">Disco configuration</param>
         /// <param name="port">tcp port for listening</param>
-        /// <returns></returns>
+        /// <returns>Disco Listener</returns>
         public static Listener Listen(IPAddress address, Config config, int port = 1800)
         {
             var listener = new Listener(address, config, port);
@@ -197,7 +197,7 @@
         /// <param name="address">ip address for listening</param>
         /// <param name="config">Disco configuration</param>
         /// <param name="port">tcp port for listening</param>
-        /// <returns></returns>
+        /// <returns>Disco Listener</returns>
         public static Listener Listen(string address, Config config, int port = 1800)
         {
             var listener = new Listener(address, config, port);
@@ -215,7 +215,7 @@
         /// </remarks>
         /// <param name="sodiumPrivateKey"></param>
         /// <param name="publicKey"></param>
-        /// <returns></returns>
+        /// <returns>Static proof as byte array</returns>
         public static byte[] CreateStaticPublicKeyProof(byte[] sodiumPrivateKey, byte[] publicKey)
         {
             if (publicKey.Length != Asymmetric.DhLen)
@@ -235,7 +235,7 @@
         /// point during the handshake
         /// </remarks>
         /// <param name="rootPublicKey"></param>
-        /// <returns></returns>
+        /// <returns>Callback delegate</returns>
         public static Config.PublicKeyVerifierDeligate CreatePublicKeyVerifier(byte[] rootPublicKey)
         {
             return (publicKey, proof) =>
@@ -254,7 +254,7 @@
         /// and save it to a file in hexadecimal form.
         /// </summary>
         /// <param name="fileName">Filepath to save key</param>
-        /// <returns></returns>
+        /// <returns>Disco key pair</returns>
         public static KeyPair GenerateAndSaveDiscoKeyPair(string fileName)
         {
             var keyPair = Asymmetric.GenerateKeyPair();
@@ -265,10 +265,10 @@
         }
 
         /// <summary>
-        /// Load Dico keypair from file
+        /// Load Dico key pair from file
         /// </summary>
         /// <param name="fileName"></param>
-        /// <returns></returns>
+        /// <returns>Disco key pair</returns>
         public static KeyPair LoadDiscoKeyPair(string fileName)
         {
             var hex = File.ReadAllText(fileName);
@@ -303,7 +303,7 @@
         /// Load public root key from file
         /// </summary>
         /// <param name="discoRootPublicKeyFile">Path to public key file</param>
-        /// <returns></returns>
+        /// <returns>Disco public key</returns>
         public static byte[] LoadDiscoRootPublicKey(string discoRootPublicKeyFile)
         {
             var hex = File.ReadAllText(discoRootPublicKeyFile);
@@ -319,7 +319,7 @@
         /// Load private root key from file
         /// </summary>
         /// <param name="discoRootPrivaeKeyFile">Path to private key file</param>
-        /// <returns></returns>
+        /// <returns>Disco public key</returns>
         public static byte[] LoadDiscoRootPrivateKey(string discoRootPrivaeKeyFile)
         {
             var hex = File.ReadAllText(discoRootPrivaeKeyFile);
@@ -336,7 +336,7 @@
         /// </summary>
         /// <param name="connection">Tcp client for establishing connecion</param>
         /// <param name="config">Disco configuration</param>
-        /// <returns></returns>
+        /// <returns>Disco connection</returns>
         internal static Connection Server(TcpClient connection, Config config)
         {
             return new Connection(connection, config);
@@ -347,18 +347,18 @@
         /// </summary>
         /// <param name="connection">Tcp client for establishing connecion</param>
         /// <param name="config">Disco configuration</param>
-        /// <returns></returns>
+        /// <returns>Disco connection</returns>
         internal static Connection Client(TcpClient connection, Config config)
         {
             return new Connection(connection, config, true);
         }
 
         /// <summary>
-        /// Check Disco configuration requirmens
+        /// Check Disco configuration requirements
         /// </summary>
-        /// <param name="isClient"></param>
-        /// <param name="config"></param>
-        internal static void CheckRequirments(bool isClient, Config config)
+        /// <param name="isClient">Is client connection</param>
+        /// <param name="config">Disco config</param>
+        internal static void CheckRequirements(bool isClient, Config config)
         {
             var ht = config.HandshakePattern;
             if (ht == NoiseHandshakeType.NoiseNX || ht == NoiseHandshakeType.NoiseKX || ht == NoiseHandshakeType.NoiseXX

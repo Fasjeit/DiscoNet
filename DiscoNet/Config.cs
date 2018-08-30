@@ -13,9 +13,9 @@
         /// static public key as part of the handshake, this callback is mandatory in
         /// order to validate it
         /// </summary>
-        /// <param name="publicKey"></param>
-        /// <param name="proof"></param>
-        /// <returns></returns>
+        /// <param name="publicKey">Public key to verify</param>
+        /// <param name="proof">Public key proof</param>
+        /// <returns>Key verification result</returns>
         public delegate bool PublicKeyVerifierDeligate(byte[] publicKey, byte[] proof);
 
         // The following constants represent the details of this implementation of the Noise specification.
@@ -49,10 +49,12 @@
 
         /// <summary>
         /// The peers to write and read in turns. 
+        /// </summary>
+        /// <remarks>
         /// By default a noise protocol is full-duplex, meaning that both the client
         /// and the server can write on the channel at the same time. If this requirement
         /// is not respected by the application, the consequences could be catastrophic
-        /// </summary>
+        /// </remarks>
         public bool HalfDuplex;
 
         /// <summary>

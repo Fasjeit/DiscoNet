@@ -66,7 +66,7 @@
         internal KeyPair DebugEphemeral { get; set; }
 
         /// <summary>
-        /// Dispose and freeresourses
+        /// Dispose and free resources
         /// </summary>
         public void Dispose()
         {
@@ -78,11 +78,11 @@
         }
 
         /// <summary>
-        /// Write payload with handhsake message using current state
+        /// Write payload with handshake message using current state
         /// </summary>
         /// <param name="payload">payload to write</param>
         /// <param name="messageBuffer">output message buffer</param>
-        /// <returns></returns>
+        /// <returns>Tuple of strobe state for initiator and responder</returns>
         internal (Strobe initiatorState, Strobe responderState) WriteMessage(byte[] payload, out byte[] messageBuffer)
         {
             Strobe initiatorState = null;
@@ -211,9 +211,9 @@
         /// <summary>
         /// Read handshake message and output payload
         /// </summary>
-        /// <param name="message">Noisemessage</param>
+        /// <param name="message">Noise message</param>
         /// <param name="payloadBuffer">payload buffer</param>
-        /// <returns></returns>
+        /// <returns>Tuple of strobe state for initiator and responder</returns>
         public (Strobe initiatorState, Strobe responderState) ReadMessage(byte[] message, out byte[] payloadBuffer)
         {
             Strobe initiatorState = null;

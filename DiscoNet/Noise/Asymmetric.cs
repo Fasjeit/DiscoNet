@@ -26,6 +26,7 @@
         /// Create a X25519 static keyPair out of a private key.
         /// </summary>
         /// <param name="privateKey">Private key, if null - generates a random key pair</param>
+        /// <returns>X25519 key pair</returns>
         public static KeyPair GenerateKeyPair(byte[] privateKey = null)
         {
             var keyPair = new KeyPair() {
@@ -57,8 +58,8 @@
         /// Perform DH on public key
         /// </summary>
         /// <param name="keyPair">Containing private key</param>
-        /// <param name="publicKey">Remoe party's public key</param>
-        /// <returns></returns>
+        /// <param name="publicKey">Remote party's public key</param>
+        /// <returns>DH result</returns>
         public static byte[] Dh(KeyPair keyPair, byte[] publicKey)
         {
             return ScalarMult.Mult(keyPair.PrivateKey, publicKey);

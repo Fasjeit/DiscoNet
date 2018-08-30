@@ -18,9 +18,9 @@
         /// <summary>
         /// Create disco listener
         /// </summary>
-        /// <param name="address"></param>
-        /// <param name="config"></param>
-        /// <param name="port"></param>
+        /// <param name="address">Ip address to listen</param>
+        /// <param name="config">Disco config</param>
+        /// <param name="port">Port to listen</param>
         internal Listener(IPAddress address, Config config, int port = 1800)
         {
             if (config == null)
@@ -28,7 +28,7 @@
                 throw new ArgumentNullException(nameof(config));
             }
 
-            Api.CheckRequirments(false, config);
+            Api.CheckRequirements(false, config);
 
             this.config = config;
             this.tcpListener = new TcpListener(address, port);
@@ -37,9 +37,9 @@
         /// <summary>
         /// Create disco listener
         /// </summary>
-        /// <param name="address"></param>
-        /// <param name="config"></param>
-        /// <param name="port"></param>
+        /// <param name="address">Ip address to listen</param>
+        /// <param name="config">Disco config</param>
+        /// <param name="port">Port to listen</param>
         internal Listener(string address, Config config, int port = 1800)
             : this(IPAddress.Parse(address), config, port)
         {
@@ -51,13 +51,13 @@
         /// </summary>
         public void Dispose()
         {
-            this.tcpListener.Stop();
+            this.Stop();
         }
 
         /// <summary>
         /// Accept disco connection
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Disco connection</returns>
         public Connection Accept()
         {
             if (!this.isListening)
