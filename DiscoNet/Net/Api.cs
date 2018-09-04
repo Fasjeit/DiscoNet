@@ -165,7 +165,7 @@
                 throw new NullReferenceException(nameof(config));
             }
 
-            Api.CheckRequirements(false, config);
+            Api.CheckRequirements(true, config);
 
             var tcpClient = new TcpClient(address, port);
 
