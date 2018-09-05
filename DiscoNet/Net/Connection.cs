@@ -109,7 +109,8 @@
                     var ciphertext = this.strobeOut.SendEncUnauthenticated(
                         false,
                         data.Skip(offset).Take(dataLen).ToArray());
-                    ciphertext = ciphertext.Concat(this.strobeOut.SendMac(false, Symmetric.TagSize)).ToArray();
+                    var mac = this.strobeOut.SendMac(false, Symmetric.TagSize);
+                    ciphertext = ciphertext.Concat(mac).ToArray();
 
                     // header (length)
                     var length = new[] { (byte)(ciphertext.Length >> 8), (byte)(ciphertext.Length % 256) };
@@ -173,20 +174,18 @@
             try
             {
                 // read whatever there is to read in the buffer
-                var readSoFar = 0;
                 if (this.inputBuffer.Length > 0)
                 {
                     var toRead = this.inputBuffer.Length > count ? count : this.inputBuffer.Length;
-                    this.inputBuffer.CopyTo(data, readSoFar + offset);
+                    Array.Copy(this.inputBuffer, 0, data, offset, toRead);
                     if (this.inputBuffer.Length > count)
                     {
                         this.inputBuffer = this.inputBuffer.Skip(count).ToArray();
 
                         return count;
                     }
-
-                    readSoFar += toRead;
                     this.inputBuffer = new byte[] { };
+                    return toRead;
                 }
 
                 // read header from socket
@@ -223,21 +222,20 @@
                 this.inputBuffer = this.inputBuffer.Concat(plaintext).ToArray();
 
                 // read whatever we can read
-                var rest = count - readSoFar;
+                var rest = count;
                 var restToRead = this.inputBuffer.Length > rest ? rest : this.inputBuffer.Length;
-                this.inputBuffer.CopyTo(data, readSoFar + offset);
+                Array.Copy(this.inputBuffer, 0, data, offset, restToRead);
                 if (this.inputBuffer.Length > restToRead)
                 {
-                    this.inputBuffer = this.inputBuffer.Skip(readSoFar).ToArray();
+                    this.inputBuffer = this.inputBuffer.Skip(restToRead).ToArray();
 
                     return count;
                 }
 
                 // we haven't filled the buffer
-                readSoFar += restToRead;
                 this.inputBuffer = new byte[] { };
 
-                return readSoFar;
+                return restToRead;
             }
 
             finally
@@ -285,8 +283,14 @@
         /// <returns>Read bytes</returns>
         private byte[] ReadFromUntil(TcpClient connection, int n)
         {
-            var result = new byte[n];
-            connection.Client.Receive(result, 0, n, SocketFlags.None);
+            byte[] result = new byte[n];
+            int received = 0;
+            do
+            {
+                received += connection.Client.Receive(result, received, n-received, SocketFlags.None);
+            }
+            while (received != n);
+
             return result;
         }
 

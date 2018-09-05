@@ -37,7 +37,9 @@
             if (privateKey == null)
             {
                 var random = new RNGCryptoServiceProvider();
+#if !DEBUG_DETERMINISTIC
                 random.GetBytes(keyPair.PrivateKey, 0, keyPair.PrivateKey.Length);
+#endif
             }
             else
             {
