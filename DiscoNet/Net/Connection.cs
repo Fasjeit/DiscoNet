@@ -104,19 +104,28 @@
                 while (count - totalBytes > 0)
                 {
                     var dataLen = count > Config.NoiseMaxPlaintextSize ? Config.NoiseMaxPlaintextSize : count;
+                    dataLen = dataLen > count - totalBytes ? count - totalBytes : dataLen;
 
                     // Encrypt
+                    var plaintext = new byte[dataLen];
+                    Array.Copy(data, offset, plaintext, 0, dataLen);
                     var ciphertext = this.strobeOut.SendEncUnauthenticated(
                         false,
-                        data.Skip(offset).Take(dataLen).ToArray());
+                        plaintext);
                     var mac = this.strobeOut.SendMac(false, Symmetric.TagSize);
-                    ciphertext = ciphertext.Concat(mac).ToArray();
+                    var ciphertextWithMac = new byte[ciphertext.Length + mac.Length];
+                    Array.Copy(ciphertext, 0, ciphertextWithMac, 0, ciphertext.Length);
+                    Array.Copy(mac, 0, ciphertextWithMac, ciphertext.Length, mac.Length);
 
                     // header (length)
-                    var length = new[] { (byte)(ciphertext.Length >> 8), (byte)(ciphertext.Length % 256) };
+                    var length = new[] { (byte)(ciphertextWithMac.Length >> 8), (byte)(ciphertextWithMac.Length % 256) };
 
                     // Send data
-                    this.tcpConnection.Client.Send(length.Concat(ciphertext).ToArray());
+                    var packet = new byte[length.Length + ciphertextWithMac.Length];
+                    Array.Copy(length, 0, packet, 0, length.Length);
+                    Array.Copy(ciphertextWithMac, 0, packet, length.Length, ciphertextWithMac.Length);
+
+                    this.tcpConnection.Client.Send(packet);
 
                     // prepare next loop iteration
                     totalBytes += dataLen;
@@ -180,7 +189,10 @@
                     Array.Copy(this.inputBuffer, 0, data, offset, toRead);
                     if (this.inputBuffer.Length > count)
                     {
-                        this.inputBuffer = this.inputBuffer.Skip(count).ToArray();
+                        //this.inputBuffer = this.inputBuffer.Skip(count).ToArray();
+                        var newInputBuffer = new byte[this.inputBuffer.Length - count];
+                        Array.Copy(this.inputBuffer, count, newInputBuffer, 0, newInputBuffer.Length);
+                        this.inputBuffer = newInputBuffer;
 
                         return count;
                     }
@@ -208,10 +220,16 @@
                 }
 
                 var plaintextLength = noiseMessage.Length - Symmetric.TagSize;
+                var cipherText = new byte[plaintextLength];
+                Array.Copy(noiseMessage, 0, cipherText, 0, plaintextLength);
                 var plaintext = this.strobeIn.RecvEncUnauthenticated(
                     false,
-                    noiseMessage.Take(plaintextLength).ToArray());
-                var ok = this.strobeIn.RecvMac(false, noiseMessage.Skip(plaintextLength).ToArray());
+                    cipherText);
+
+                var macLen = noiseMessage.Length - plaintextLength;
+                var mac = new byte[macLen];
+                Array.Copy(noiseMessage, plaintextLength, mac, 0, macLen);
+                var ok = this.strobeIn.RecvMac(false, mac);
 
                 if (!ok)
                 {
@@ -219,7 +237,11 @@
                 }
 
                 // append to the input buffer
-                this.inputBuffer = this.inputBuffer.Concat(plaintext).ToArray();
+                var newInputBufferConcat = new byte[this.inputBuffer.Length+ plaintext.Length];
+                Array.Copy(this.inputBuffer, 0, newInputBufferConcat, 0, this.inputBuffer.Length);
+                Array.Copy(plaintext, 0, newInputBufferConcat, this.inputBuffer.Length, plaintext.Length);
+                this.inputBuffer = newInputBufferConcat;
+                //this.inputBuffer = this.inputBuffer.Concat(plaintext).ToArray();
 
                 // read whatever we can read
                 var rest = count;
@@ -227,7 +249,10 @@
                 Array.Copy(this.inputBuffer, 0, data, offset, restToRead);
                 if (this.inputBuffer.Length > restToRead)
                 {
-                    this.inputBuffer = this.inputBuffer.Skip(restToRead).ToArray();
+                    var newBuffer = new byte[this.inputBuffer.Length - restToRead];
+                    Array.Copy(this.inputBuffer, restToRead, newBuffer, 0, newBuffer.Length);
+                    this.inputBuffer = newBuffer;
+                    //this.inputBuffer = this.inputBuffer.Skip(restToRead).ToArray();
 
                     return count;
                 }

@@ -1,24 +1,22 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Text;
 
-namespace Benchmark
+namespace DiscoNet.Tests
 {
-    using System.Linq;
     using System.Net;
     using System.Net.Security;
     using System.Net.Sockets;
     using System.Security.Authentication;
     using System.Security.Cryptography.X509Certificates;
-    using System.Text;
     using System.Threading.Tasks;
 
-    using BenchmarkDotNet.Attributes;
-    using BenchmarkDotNet.Running;
-    using DiscoNet;
     using DiscoNet.Net;
     using DiscoNet.Noise;
     using DiscoNet.Noise.Enums;
 
-    [RPlotExporter, RankColumn]
+    using Xunit;
+
     public class TheEasiestBenchmark
     {
         private SslStream sslClientStream;
@@ -30,9 +28,8 @@ namespace Benchmark
         TcpListener tlsListener;
 
         Connection discoClient;
-        //64, 128, 256, 512, 1024, 4094,
-        [Params(64, 128, 256, 512, 1024, 4094, 1048576)]
-        public int N;
+
+        public int N = 1048576;
 
         private byte[] dataC
         {
@@ -45,16 +42,20 @@ namespace Benchmark
             }
         }
 
-        [Benchmark(Description = "TlsStream")]
+        [Fact]
         public void TlsStream()
         {
+            this.Setup();
             this.RunTestIterationTls();
+            this.cleanUp();
         }
 
-        [Benchmark(Description = "DiscoChannel")]
+        [Fact]
         public void DiscoChannel()
         {
+            this.Setup();
             this.RunDiscoIteration();
+            this.cleanUp();
         }
 
         private void PrepareTlsServer(int port)
@@ -72,7 +73,7 @@ namespace Benchmark
                     var sslStream = new SslStream(this.client.GetStream(), false);
                     sslStream.AuthenticateAsServer(serverCertificate, false, SslProtocols.Tls, true);
 
-                    
+
                     while (true)
                     {
                         try
@@ -95,7 +96,7 @@ namespace Benchmark
                     }
                 });
         }
-      
+
 
         private void PrepareTlsClient(int port)
         {
@@ -106,7 +107,7 @@ namespace Benchmark
                 new RemoteCertificateValidationCallback(ValidateServerCertificate),
                 null);
 
-                this.sslClientStream.AuthenticateAsClient("localhost");
+            this.sslClientStream.AuthenticateAsClient("localhost");
         }
 
         // The following method is invoked by the RemoteCertificateValidationDelegate.
@@ -161,7 +162,7 @@ namespace Benchmark
         {
             // Run the client
             this.discoClient = Api.Connect("127.0.0.1", port, clientConfig);
-            
+
         }
 
         private void PrepareDiscoServer(Config serverConfig, int port)
@@ -207,7 +208,6 @@ namespace Benchmark
             }
         }
 
-        [GlobalCleanup]
         public void cleanUp()
         {
             this.client?.Dispose();
@@ -216,90 +216,11 @@ namespace Benchmark
             this.tlsListener?.Stop();
         }
 
-        [GlobalSetup]
         public void Setup()
         {
             PrepareTlsServer(7775);
             PrepareTlsClient(7775);
             PrepareDisco(7774);
-        }
-    }
-
-
-
-    class Program
-    {
-
-        static void Main(string[] args)
-        {
-            //var a = new TheEasiestBenchmark();
-            //a.Setup();
-
-            //for (int i = 0; i < 100000; i++)
-            //{
-            //    a.DiscoChannel();
-            //    Console.WriteLine(i);
-            //}
-
-            //a.TlsStream();
-            //a.TlsStream();
-            //a.TlsStream();
-            //a.TlsStream();
-            //a.TlsStream();
-            //a.TlsStream();
-            //a.TlsStream();
-            //a.TlsStream();
-            //a.TlsStream();
-            //a.TlsStream();
-            //a.TlsStream();
-            //a.TlsStream();
-            //a.TlsStream();
-            //a.TlsStream();
-            //a.TlsStream();
-            //a.TlsStream();
-            //a.TlsStream();
-            //a.TlsStream();
-            //a.TlsStream();
-            //a.TlsStream();
-            //a.TlsStream();
-            //a.TlsStream();
-            //a.TlsStream();
-            //a.TlsStream();
-
-
-            //a.DiscoChannel();
-            //a.DiscoChannel();
-            //a.DiscoChannel();
-            //a.DiscoChannel();
-
-            //a.DiscoChannel();
-            //a.DiscoChannel();
-            //a.DiscoChannel();
-            //a.DiscoChannel();
-            //a.DiscoChannel();
-            //a.DiscoChannel();
-            //a.DiscoChannel();
-            //a.DiscoChannel();
-
-            //a.DiscoChannel();
-            //a.DiscoChannel();
-            //a.DiscoChannel();
-            //a.DiscoChannel();
-            //a.DiscoChannel();
-            //a.DiscoChannel();
-            //a.DiscoChannel();
-            //a.DiscoChannel();
-
-            //a.DiscoChannel();
-            //a.DiscoChannel();
-            //a.DiscoChannel();
-            //a.DiscoChannel();
-
-
-            //a.cleanUp();
-
-            Console.WriteLine("Hello World!");
-            BenchmarkRunner.Run<TheEasiestBenchmark>();
         }
     }
 }
