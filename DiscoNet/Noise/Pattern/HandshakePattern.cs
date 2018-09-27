@@ -115,7 +115,7 @@
                 // →
                 new MessagePattern { Tokens.TokenE, Tokens.TokenES },
                 // ←
-                new MessagePattern { Tokens.TokenE, Tokens.TokenES }
+                new MessagePattern { Tokens.TokenE, Tokens.TokenEE }
             }
         };
 
