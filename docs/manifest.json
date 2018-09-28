@@ -9,10 +9,10 @@
       "output": {
         ".html": {
           "relative_path": "api/DiscoNet.Config.PublicKeyVerifierDeligate.html",
-          "hash": "clobIBSTAC1SanNq15XkPQ=="
+          "hash": "uqM2mZz6HwSANQQGUrOrgQ=="
         }
       },
-      "is_incremental": false,
+      "is_incremental": true,
       "version": ""
     },
     {
@@ -21,10 +21,10 @@
       "output": {
         ".html": {
           "relative_path": "api/DiscoNet.Config.html",
-          "hash": "UGiI7bHpMcTdvnQsHn1Y+g=="
+          "hash": "frlgw2r3zlhHCB+UItX+pQ=="
         }
       },
-      "is_incremental": false,
+      "is_incremental": true,
       "version": ""
     },
     {
@@ -33,10 +33,10 @@
       "output": {
         ".html": {
           "relative_path": "api/DiscoNet.KeyPair.html",
-          "hash": "N/ZKTdmhxlu57aqEmLlYwg=="
+          "hash": "rYRheKObjDj+ebuiDCY0Bw=="
         }
       },
-      "is_incremental": false,
+      "is_incremental": true,
       "version": ""
     },
     {
@@ -45,10 +45,10 @@
       "output": {
         ".html": {
           "relative_path": "api/DiscoNet.Net.Connection.html",
-          "hash": "V/kMy/ii/UDUB0tsDdDeIw=="
+          "hash": "7Znb3BD4ERtOltEstQkPBg=="
         }
       },
-      "is_incremental": false,
+      "is_incremental": true,
       "version": ""
     },
     {
@@ -57,10 +57,10 @@
       "output": {
         ".html": {
           "relative_path": "api/DiscoNet.Net.DiscoHelper.html",
-          "hash": "plPxhKyLOZFIMoX3HlNpQQ=="
+          "hash": "xEqFB1uQjWKtVEQI6DII+Q=="
         }
       },
-      "is_incremental": false,
+      "is_incremental": true,
       "version": ""
     },
     {
@@ -72,7 +72,7 @@
           "hash": "QBxUNyn+zYDweP1jWW351Q=="
         }
       },
-      "is_incremental": false,
+      "is_incremental": true,
       "version": ""
     },
     {
@@ -81,10 +81,10 @@
       "output": {
         ".html": {
           "relative_path": "api/DiscoNet.Noise.Asymmetric.html",
-          "hash": "gQzbUK6baPJ5lqtbdP4hTw=="
+          "hash": "TxwX4WHmi2OqcP6mnqjYbQ=="
         }
       },
-      "is_incremental": false,
+      "is_incremental": true,
       "version": ""
     },
     {
@@ -93,10 +93,10 @@
       "output": {
         ".html": {
           "relative_path": "api/DiscoNet.Noise.Enums.NoiseHandshakeType.html",
-          "hash": "+UN736+GIbFx3NLfxE0CeA=="
+          "hash": "ueFJBHYxZk5gAZ5ZZiKdJA=="
         }
       },
-      "is_incremental": false,
+      "is_incremental": true,
       "version": ""
     },
     {
@@ -105,10 +105,10 @@
       "output": {
         ".html": {
           "relative_path": "api/DiscoNet.Noise.Enums.Tokens.html",
-          "hash": "XQXaO2IwCG3ytCgucV+kmg=="
+          "hash": "EPl1SsiwQGGGurJOTzA0pQ=="
         }
       },
-      "is_incremental": false,
+      "is_incremental": true,
       "version": ""
     },
     {
@@ -120,7 +120,7 @@
           "hash": "DVh+ToNTt187tNxELQSWuw=="
         }
       },
-      "is_incremental": false,
+      "is_incremental": true,
       "version": ""
     },
     {
@@ -129,10 +129,10 @@
       "output": {
         ".html": {
           "relative_path": "api/DiscoNet.Noise.HandshakeState.html",
-          "hash": "jDTQoIiCBMvDsaqX2YS6RQ=="
+          "hash": "BwNyzM31xeEOFSuAxoGcrw=="
         }
       },
-      "is_incremental": false,
+      "is_incremental": true,
       "version": ""
     },
     {
@@ -141,10 +141,10 @@
       "output": {
         ".html": {
           "relative_path": "api/DiscoNet.Noise.Hash.html",
-          "hash": "ZxwZldmXHBEuRu4mJEtpFw=="
+          "hash": "lxXLASXHFpeazPodGAqxrA=="
         }
       },
-      "is_incremental": false,
+      "is_incremental": true,
       "version": ""
     },
     {
@@ -153,10 +153,10 @@
       "output": {
         ".html": {
           "relative_path": "api/DiscoNet.Noise.Pattern.MessagePattern.html",
-          "hash": "7POs8368yasVg6rCngJm4g=="
+          "hash": "gG1Z6E9unUQ5gyEuEWJVDA=="
         }
       },
-      "is_incremental": false,
+      "is_incremental": true,
       "version": ""
     },
     {
@@ -168,7 +168,7 @@
           "hash": "30/O7SnVf0wXKb9glNwcDQ=="
         }
       },
-      "is_incremental": false,
+      "is_incremental": true,
       "version": ""
     },
     {
@@ -177,10 +177,10 @@
       "output": {
         ".html": {
           "relative_path": "api/DiscoNet.Noise.Symmetric.html",
-          "hash": "woZgSW5FF7QzU5Lc6lbDYw=="
+          "hash": "tVvHhjnvF2G4QENp+Y/7kg=="
         }
       },
-      "is_incremental": false,
+      "is_incremental": true,
       "version": ""
     },
     {
@@ -189,10 +189,10 @@
       "output": {
         ".html": {
           "relative_path": "api/DiscoNet.Noise.SymmetricState.html",
-          "hash": "FjgLgzHVL3B4FbjLHnzgYg=="
+          "hash": "/+JKkMJvHLeW6hIZNhsWyQ=="
         }
       },
-      "is_incremental": false,
+      "is_incremental": true,
       "version": ""
     },
     {
@@ -204,7 +204,7 @@
           "hash": "a9KNT1WH5fVObW2BU6oJMg=="
         }
       },
-      "is_incremental": false,
+      "is_incremental": true,
       "version": ""
     },
     {
@@ -216,7 +216,7 @@
           "hash": "vxU9IDKB6Qy9vdeLu+hD2Q=="
         }
       },
-      "is_incremental": false,
+      "is_incremental": true,
       "version": ""
     },
     {
@@ -228,7 +228,7 @@
           "hash": "r5LyLKZdpBz889Ru5LnZiA=="
         }
       },
-      "is_incremental": false,
+      "is_incremental": true,
       "version": ""
     },
     {
@@ -252,7 +252,7 @@
           "hash": "VZp0H7Aa9THyV71euJsu5A=="
         }
       },
-      "is_incremental": false,
+      "is_incremental": true,
       "version": ""
     },
     {
@@ -271,8 +271,7 @@
   "incremental_info": [
     {
       "status": {
-        "can_incremental": false,
-        "details": "Cannot build incrementally because docfx version changed from 2.38.1.0 to 2.39.2.0.",
+        "can_incremental": true,
         "incrementalPhase": "build"
       },
       "processors": {
@@ -281,20 +280,20 @@
           "details": "Processor TocDocumentProcessor cannot support incremental build because the processor doesn't implement ISupportIncrementalDocumentProcessor interface.",
           "incrementalPhase": "build"
         },
-        "ConceptualDocumentProcessor": {
-          "can_incremental": false,
+        "ManagedReferenceDocumentProcessor": {
+          "can_incremental": true,
           "incrementalPhase": "build"
         },
-        "ManagedReferenceDocumentProcessor": {
-          "can_incremental": false,
+        "ConceptualDocumentProcessor": {
+          "can_incremental": true,
           "incrementalPhase": "build"
         }
       }
     },
     {
       "status": {
-        "can_incremental": false,
-        "details": "Cannot support incremental post processing, the reason is: it's disabled.",
+        "can_incremental": true,
+        "details": "Can support incremental post processing.",
         "incrementalPhase": "postProcessing"
       },
       "processors": {}
