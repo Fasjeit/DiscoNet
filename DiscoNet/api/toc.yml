@@ -11,12 +11,10 @@
 - uid: DiscoNet.Net
   name: DiscoNet.Net
   items:
-  - uid: DiscoNet.Net.Api
-    name: Api
   - uid: DiscoNet.Net.Connection
     name: Connection
-  - uid: DiscoNet.Net.Listener
-    name: Listener
+  - uid: DiscoNet.Net.DiscoHelper
+    name: DiscoHelper
 - uid: DiscoNet.Noise
   name: DiscoNet.Noise
   items:
