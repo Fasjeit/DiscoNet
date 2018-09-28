@@ -40,13 +40,13 @@ namespace DiscoNet.Tests
             }
         }
 
-        [Fact]
-        public void TlsStream()
-        {
-            this.Setup();
-            this.RunTestIterationTls();
-            this.cleanUp();
-        }
+        //[Fact]
+        //public void TlsStream()
+        //{
+        //    this.Setup();
+        //    this.RunTestIterationTls();
+        //    this.cleanUp();
+        //}
 
         [Fact]
         public void DiscoChannel()
@@ -58,7 +58,7 @@ namespace DiscoNet.Tests
 
         private void PrepareTlsServer(int port)
         {
-            this.tlsListener = new TcpListener(IPAddress.Parse("127.0.0.1"), port);
+            this.tlsListener = new TcpListener(IPAddress.Loopback, port);
             this.tlsListener.Start();
 
             var serverCertificate = new X509Certificate2(
@@ -98,7 +98,7 @@ namespace DiscoNet.Tests
 
         private void PrepareTlsClient(int port)
         {
-            TcpClient client = new TcpClient("127.0.0.1", port);
+            TcpClient client = new TcpClient(IPAddress.Loopback.ToString(), port);
             this.sslClientStream = new SslStream(
                 client.GetStream(),
                 false,
@@ -158,7 +158,7 @@ namespace DiscoNet.Tests
 
         private void PrepareDiscoClient(Config clientConfig, int port)
         {
-            var client = new TcpClient("127.0.0.1", port);
+            var client = new TcpClient(IPAddress.Loopback.ToString(), port);
             this.discoClient = new Connection(client.GetStream());
             this.discoClient.AuthenticateAsClient(clientConfig);
 
@@ -166,7 +166,7 @@ namespace DiscoNet.Tests
 
         private void PrepareDiscoServer(Config serverConfig, int port)
         {
-            this.tlsListener = new TcpListener(IPAddress.Parse("127.0.0.1"), port);
+            this.tlsListener = new TcpListener(IPAddress.Loopback, port);
             this.tlsListener.Start();
             Task.Factory.StartNew(
                 () =>
@@ -231,8 +231,8 @@ namespace DiscoNet.Tests
 
         public void Setup()
         {
-            PrepareTlsServer(7775);
-            PrepareTlsClient(7775);
+            //PrepareTlsServer(7775);
+            //PrepareTlsClient(7775);
             PrepareDisco(7774);
         }
     }
