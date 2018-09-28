@@ -2,8 +2,6 @@
 {
     using System;
     using System.IO;
-    using System.Net;
-    using System.Net.Sockets;
 
     using DiscoNet.Noise;
     using DiscoNet.Noise.Enums;
@@ -18,7 +16,7 @@
     /// <summary>
     /// Main Disco Api
     /// </summary>
-    public static class Api
+    public static class DiscoHelper
     {
         /// <summary>
         /// Disco peer initialization
@@ -152,60 +150,6 @@
         }
 
         /// <summary>
-        /// Establish connection to Disco server and perform handshake
-        /// </summary>
-        /// <param name="address">Server ip address</param>
-        /// <param name="port">server tcp port</param>
-        /// <param name="config">Disco configuration</param>
-        /// <returns>Established connection</returns>
-        public static Connection Connect(string address, int port, Config config)
-        {
-            if (config == null)
-            {
-                throw new NullReferenceException(nameof(config));
-            }
-
-            Api.CheckRequirements(true, config);
-
-            var tcpClient = new TcpClient(address, port);
-
-            var connection = Api.Client(tcpClient, config);
-
-            // Do the handshake
-            connection.HandShake();
-
-            return connection;
-        }
-
-        /// <summary>
-        /// Listen for Disco client connections
-        /// </summary>
-        /// <param name="address">ip address for listening</param>
-        /// <param name="config">Disco configuration</param>
-        /// <param name="port">tcp port for listening</param>
-        /// <returns>Disco Listener</returns>
-        public static Listener Listen(IPAddress address, Config config, int port = 1800)
-        {
-            var listener = new Listener(address, config, port);
-            listener.Start();
-            return listener;
-        }
-
-        /// <summary>
-        /// Listen for Disco client connections
-        /// </summary>
-        /// <param name="address">ip address for listening</param>
-        /// <param name="config">Disco configuration</param>
-        /// <param name="port">tcp port for listening</param>
-        /// <returns>Disco Listener</returns>
-        public static Listener Listen(string address, Config config, int port = 1800)
-        {
-            var listener = new Listener(address, config, port);
-            listener.Start();
-            return listener;
-        }
-
-        /// <summary>
         /// Create static proof for disco peer
         /// </summary>
         /// <remarks>
@@ -309,7 +253,7 @@
             var hex = File.ReadAllText(discoRootPublicKeyFile);
             if (hex.Length != 64)
             {
-                throw new Exception("Disco: Disco root public key file is not correctly formated");
+                throw new Exception("Disco: Disco root public key file is not correctly formatted");
             }
 
             return hex.ToByteArray();
@@ -329,71 +273,6 @@
             }
 
             return hex.ToByteArray();
-        }
-
-        /// <summary>
-        /// Get new Disco server side connection
-        /// </summary>
-        /// <param name="connection">Tcp client for establishing connecion</param>
-        /// <param name="config">Disco configuration</param>
-        /// <returns>Disco connection</returns>
-        internal static Connection Server(TcpClient connection, Config config)
-        {
-            return new Connection(connection, config);
-        }
-
-        /// <summary>
-        /// Get new Disco client side connection
-        /// </summary>
-        /// <param name="connection">Tcp client for establishing connecion</param>
-        /// <param name="config">Disco configuration</param>
-        /// <returns>Disco connection</returns>
-        internal static Connection Client(TcpClient connection, Config config)
-        {
-            return new Connection(connection, config, true);
-        }
-
-        /// <summary>
-        /// Check Disco configuration requirements
-        /// </summary>
-        /// <param name="isClient">Is client connection</param>
-        /// <param name="config">Disco config</param>
-        internal static void CheckRequirements(bool isClient, Config config)
-        {
-            var ht = config.HandshakePattern;
-            if (ht == NoiseHandshakeType.NoiseNX || ht == NoiseHandshakeType.NoiseKX || ht == NoiseHandshakeType.NoiseXX
-                || ht == NoiseHandshakeType.NoiseIX)
-            {
-                if (isClient && config.PublicKeyVerifier == null)
-                {
-                    throw new Exception("Disco: no public key verifier set in Config");
-                }
-
-                if (!isClient && config.StaticPublicKeyProof == null)
-                {
-                    throw new Exception("Disco: no public key proof set in Config");
-                }
-            }
-
-            if (ht == NoiseHandshakeType.NoiseXN || ht == NoiseHandshakeType.NoiseXK || ht == NoiseHandshakeType.NoiseXX
-                || ht == NoiseHandshakeType.NoiseX || ht == NoiseHandshakeType.NoiseIN
-                || ht == NoiseHandshakeType.NoiseIK || ht == NoiseHandshakeType.NoiseIX)
-            {
-                if (isClient && config.StaticPublicKeyProof == null)
-                {
-                    throw new Exception("Disco: no public key proof set in Config");
-                }
-
-                if (!isClient && config.PublicKeyVerifier == null)
-                {
-                    throw new Exception("Disco: no public key verifier set in Config");
-                }
-            }
-
-            if (ht == NoiseHandshakeType.NoiseNNpsk2 && config.PreSharedKey.Length != Symmetric.PskKeySize)
-            {
-                throw new Exception($"noise: a {Symmetric.PskKeySize}-byte pre-shared key needs to be passed as noise Config");
-            }
         }
     }
 }

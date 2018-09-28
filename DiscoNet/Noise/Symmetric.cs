@@ -130,9 +130,12 @@
                 throw new Exception("disco: plaintext does not contain an integrity tag");
             }
 
-            var offset = plaintextAndTag.Length - Symmetric.TagSize;
-            var plainText = plaintextAndTag.Take(offset).ToArray();
-            var tag = plaintextAndTag.Skip(offset).ToArray();
+            var plainTextLen = plaintextAndTag.Length - Symmetric.TagSize;
+            var plainText = new byte[plainTextLen];
+            Array.Copy(plaintextAndTag, 0, plainText, 0, plainTextLen);
+
+            var tag = new byte[Symmetric.TagSize];
+            Array.Copy(plaintextAndTag, plainTextLen, tag, 0, Symmetric.TagSize);
 
             // Getting the tag
             var hash = new Strobe("DiscoMAC", Symmetric.SecurityParameter);
@@ -222,17 +225,24 @@
             ae.Ad(false, key);
 
             // Absorb the nonce
-            ae.Ad(false, ciphertext.Take(Symmetric.NonceSize).ToArray());
+            var nonce = new byte[Symmetric.NonceSize];
+            Array.Copy(ciphertext, 0, nonce, 0, Symmetric.NonceSize);
+
+            ae.Ad(false, nonce);
 
             var plaintextSize = ciphertext.Length - Symmetric.TagSize - Symmetric.NonceSize;
 
             // Decrypt
+            var encrypted = new byte[plaintextSize];
+            Array.Copy(ciphertext, Symmetric.NonceSize, encrypted, 0, plaintextSize);
             var plainText = ae.RecvEncUnauthenticated(
                 false,
-                ciphertext.Skip(Symmetric.NonceSize).Take(plaintextSize).ToArray());
+                encrypted.ToArray());
 
             // Verify tag
-            var authCkeck = ae.RecvMac(false, ciphertext.Skip(ciphertext.Length - Symmetric.TagSize).ToArray());
+            var mac = new byte[Symmetric.TagSize];
+            Array.Copy(ciphertext, ciphertext.Length - Symmetric.TagSize, mac, 0, Symmetric.TagSize);
+            var authCkeck = ae.RecvMac(false, mac);
             if (!authCkeck)
             {
                 throw new Exception("disco: cannot decrypt the payload");

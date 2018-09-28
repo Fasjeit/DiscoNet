@@ -3,6 +3,7 @@
     using System;
     using System.Linq;
     using System.Net;
+    using System.Net.Sockets;
     using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
@@ -59,7 +60,7 @@
         public void TestNoiseXx()
         {
             var rootKey = PublicKeyAuth.GenerateKeyPair();
-            var Verifier = Api.CreatePublicKeyVerifier(rootKey.PublicKey);
+            var Verifier = DiscoHelper.CreatePublicKeyVerifier(rootKey.PublicKey);
 
             var clienPair = Asymmetric.GenerateKeyPair();
             var serverPair = Asymmetric.GenerateKeyPair();
@@ -70,7 +71,7 @@
                 KeyPair = clienPair,
                 HandshakePattern = NoiseHandshakeType.NoiseXX,
                 PublicKeyVerifier = Verifier,
-                StaticPublicKeyProof = Api.CreateStaticPublicKeyProof(rootKey.PrivateKey, clienPair.PublicKey)
+                StaticPublicKeyProof = DiscoHelper.CreateStaticPublicKeyProof(rootKey.PrivateKey, clienPair.PublicKey)
             };
 
             var serverConfig = new Config
@@ -78,7 +79,7 @@
                 KeyPair = serverPair,
                 HandshakePattern = NoiseHandshakeType.NoiseXX,
                 PublicKeyVerifier = Verifier,
-                StaticPublicKeyProof = Api.CreateStaticPublicKeyProof(rootKey.PrivateKey, serverPair.PublicKey)
+                StaticPublicKeyProof = DiscoHelper.CreateStaticPublicKeyProof(rootKey.PrivateKey, serverPair.PublicKey)
             };
 
             this.RunTwoWayTest(clientConfig, serverConfig, 1802);
@@ -115,13 +116,18 @@
 
             Task.Factory.StartNew(
                 () =>
+                {
+                    var listener = new TcpListener(address, port);
+                    listener.Start();
+                    serverSetUp = true;
+                    using (var clinet = listener.AcceptTcpClient())
                     {
-                        using (var listener = Api.Listen(address, serverConfig, port))
+                        using (var serverConnection = new Connection(clinet.GetStream()))
                         {
-                            serverSetUp = true;
-                            var serverSocket = listener.Accept();
+
+                            serverConnection.AuthenticateAsServer(serverConfig);
                             var buf = new byte[100];
-                            var n = serverSocket.Read(buf, 0, buf.Length);
+                            var n = serverConnection.Read(buf, 0, buf.Length);
 
                             if (!buf.Take(n).SequenceEqual(Encoding.ASCII.GetBytes("hello")))
                             {
@@ -132,7 +138,7 @@
                             try
                             {
                                 var data = Encoding.ASCII.GetBytes("ca va?");
-                                serverSocket.Write(data, 0, data.Length);
+                                serverConnection.Write(data, 0, data.Length);
                             }
                             catch (Exception ex)
                             {
@@ -146,7 +152,10 @@
 
                             throw new Exception("Server should not write in one way pattern");
                         }
-                    });
+                    }
+
+                    listener.Stop();
+                });
 
             while (!serverSetUp)
             {
@@ -154,10 +163,14 @@
             }
 
             // Run the client
-            using (var clientSocket = Api.Connect(address.ToString(), port, clientConfig))
+            using (var clientSocket = new TcpClient(address.ToString(), port))
             {
-                var cleintData = Encoding.ASCII.GetBytes("hello");
-                clientSocket.Write(cleintData, 0, cleintData.Length);
+                using (var clinetConnection = new Connection(clientSocket.GetStream()))
+                {
+                    clinetConnection.AuthenticateAsClient(clientConfig);
+                    var cleintData = Encoding.ASCII.GetBytes("hello");
+                    clinetConnection.Write(cleintData, 0, cleintData.Length);
+                }
             }
         }
 
@@ -178,21 +191,29 @@
             Task.Factory.StartNew(
                 () =>
                     {
-                        using (var listener = Api.Listen(address, serverConfig, port))
+                        var listener = new TcpListener(address, port);
+                        listener.Start();
+                        serverSetUp = true;
+                        using (var clinet = listener.AcceptTcpClient())
                         {
-                            serverSetUp = true;
-                            var serverSocket = listener.Accept();
-                            var buf = new byte[100];
-                            var n = serverSocket.Read(buf, 0, buf.Length);
-
-                            if (!buf.Take(n).SequenceEqual(Encoding.ASCII.GetBytes("hello")))
+                            using (var serverConnection = new Connection(clinet.GetStream()))
                             {
-                                throw new Exception("client message failed");
-                            }
+                                serverConnection.AuthenticateAsServer(serverConfig);
+                                serverSetUp = true;
+                                var buf = new byte[100];
+                                var n = serverConnection.Read(buf, 0, buf.Length);
 
-                            var data = Encoding.ASCII.GetBytes("ca va?");
-                            serverSocket.Write(data, 0, data.Length);
+                                if (!buf.Take(n).SequenceEqual(Encoding.ASCII.GetBytes("hello")))
+                                {
+                                    throw new Exception("client message failed");
+                                }
+
+                                var data = Encoding.ASCII.GetBytes("ca va?");
+                                serverConnection.Write(data, 0, data.Length);
+                            }
                         }
+
+                        listener.Stop();
                     });
 
             while (!serverSetUp)
@@ -201,18 +222,22 @@
             }
 
             // Run the client
-            using (var clientSocket = Api.Connect(address.ToString(), port, clientConfig))
+            // Run the client
+            using (var clientSocket = new TcpClient(address.ToString(), port))
             {
-
-                var clienData = Encoding.ASCII.GetBytes("hello");
-                clientSocket.Write(clienData, 0, clienData.Length);
-
-                var bufClient = new byte[100];
-                var readByes = clientSocket.Read(bufClient, 0, bufClient.Length);
-
-                if (!bufClient.Take(readByes).SequenceEqual(Encoding.ASCII.GetBytes("ca va?")))
+                using (var clinetConnection = new Connection(clientSocket.GetStream()))
                 {
-                    throw new Exception();
+                    clinetConnection.AuthenticateAsClient(clientConfig);
+                    var clienData = Encoding.ASCII.GetBytes("hello");
+                    clinetConnection.Write(clienData, 0, clienData.Length);
+
+                    var bufClient = new byte[100];
+                    var readByes = clinetConnection.Read(bufClient, 0, bufClient.Length);
+
+                    if (!bufClient.Take(readByes).SequenceEqual(Encoding.ASCII.GetBytes("ca va?")))
+                    {
+                        throw new Exception();
+                    }
                 }
             }
         }

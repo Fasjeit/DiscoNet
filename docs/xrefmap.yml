@@ -195,169 +195,18 @@ references:
   commentId: N:DiscoNet.Net
   fullName: DiscoNet.Net
   nameWithType: DiscoNet.Net
-- uid: DiscoNet.Net.Api
-  name: Api
-  href: api/DiscoNet.Net.Api.html
-  commentId: T:DiscoNet.Net.Api
-  fullName: DiscoNet.Net.Api
-  nameWithType: Api
-- uid: DiscoNet.Net.Api.Connect(System.String,System.Int32,DiscoNet.Config)
-  name: Connect(String, Int32, Config)
-  href: api/DiscoNet.Net.Api.html#DiscoNet_Net_Api_Connect_System_String_System_Int32_DiscoNet_Config_
-  commentId: M:DiscoNet.Net.Api.Connect(System.String,System.Int32,DiscoNet.Config)
-  fullName: DiscoNet.Net.Api.Connect(System.String, System.Int32, DiscoNet.Config)
-  nameWithType: Api.Connect(String, Int32, Config)
-- uid: DiscoNet.Net.Api.Connect*
-  name: Connect
-  href: api/DiscoNet.Net.Api.html#DiscoNet_Net_Api_Connect_
-  commentId: Overload:DiscoNet.Net.Api.Connect
-  isSpec: "True"
-  fullName: DiscoNet.Net.Api.Connect
-  nameWithType: Api.Connect
-- uid: DiscoNet.Net.Api.CreatePublicKeyVerifier(System.Byte[])
-  name: CreatePublicKeyVerifier(Byte[])
-  href: api/DiscoNet.Net.Api.html#DiscoNet_Net_Api_CreatePublicKeyVerifier_System_Byte___
-  commentId: M:DiscoNet.Net.Api.CreatePublicKeyVerifier(System.Byte[])
-  name.vb: CreatePublicKeyVerifier(Byte())
-  fullName: DiscoNet.Net.Api.CreatePublicKeyVerifier(System.Byte[])
-  fullName.vb: DiscoNet.Net.Api.CreatePublicKeyVerifier(System.Byte())
-  nameWithType: Api.CreatePublicKeyVerifier(Byte[])
-  nameWithType.vb: Api.CreatePublicKeyVerifier(Byte())
-- uid: DiscoNet.Net.Api.CreatePublicKeyVerifier*
-  name: CreatePublicKeyVerifier
-  href: api/DiscoNet.Net.Api.html#DiscoNet_Net_Api_CreatePublicKeyVerifier_
-  commentId: Overload:DiscoNet.Net.Api.CreatePublicKeyVerifier
-  isSpec: "True"
-  fullName: DiscoNet.Net.Api.CreatePublicKeyVerifier
-  nameWithType: Api.CreatePublicKeyVerifier
-- uid: DiscoNet.Net.Api.CreateStaticPublicKeyProof(System.Byte[],System.Byte[])
-  name: CreateStaticPublicKeyProof(Byte[], Byte[])
-  href: api/DiscoNet.Net.Api.html#DiscoNet_Net_Api_CreateStaticPublicKeyProof_System_Byte___System_Byte___
-  commentId: M:DiscoNet.Net.Api.CreateStaticPublicKeyProof(System.Byte[],System.Byte[])
-  name.vb: CreateStaticPublicKeyProof(Byte(), Byte())
-  fullName: DiscoNet.Net.Api.CreateStaticPublicKeyProof(System.Byte[], System.Byte[])
-  fullName.vb: DiscoNet.Net.Api.CreateStaticPublicKeyProof(System.Byte(), System.Byte())
-  nameWithType: Api.CreateStaticPublicKeyProof(Byte[], Byte[])
-  nameWithType.vb: Api.CreateStaticPublicKeyProof(Byte(), Byte())
-- uid: DiscoNet.Net.Api.CreateStaticPublicKeyProof*
-  name: CreateStaticPublicKeyProof
-  href: api/DiscoNet.Net.Api.html#DiscoNet_Net_Api_CreateStaticPublicKeyProof_
-  commentId: Overload:DiscoNet.Net.Api.CreateStaticPublicKeyProof
-  isSpec: "True"
-  fullName: DiscoNet.Net.Api.CreateStaticPublicKeyProof
-  nameWithType: Api.CreateStaticPublicKeyProof
-- uid: DiscoNet.Net.Api.GenerateAndSaveDiscoKeyPair(System.String)
-  name: GenerateAndSaveDiscoKeyPair(String)
-  href: api/DiscoNet.Net.Api.html#DiscoNet_Net_Api_GenerateAndSaveDiscoKeyPair_System_String_
-  commentId: M:DiscoNet.Net.Api.GenerateAndSaveDiscoKeyPair(System.String)
-  fullName: DiscoNet.Net.Api.GenerateAndSaveDiscoKeyPair(System.String)
-  nameWithType: Api.GenerateAndSaveDiscoKeyPair(String)
-- uid: DiscoNet.Net.Api.GenerateAndSaveDiscoKeyPair*
-  name: GenerateAndSaveDiscoKeyPair
-  href: api/DiscoNet.Net.Api.html#DiscoNet_Net_Api_GenerateAndSaveDiscoKeyPair_
-  commentId: Overload:DiscoNet.Net.Api.GenerateAndSaveDiscoKeyPair
-  isSpec: "True"
-  fullName: DiscoNet.Net.Api.GenerateAndSaveDiscoKeyPair
-  nameWithType: Api.GenerateAndSaveDiscoKeyPair
-- uid: DiscoNet.Net.Api.GenerateAndSaveDiscoRootKeyPair(System.String,System.String)
-  name: GenerateAndSaveDiscoRootKeyPair(String, String)
-  href: api/DiscoNet.Net.Api.html#DiscoNet_Net_Api_GenerateAndSaveDiscoRootKeyPair_System_String_System_String_
-  commentId: M:DiscoNet.Net.Api.GenerateAndSaveDiscoRootKeyPair(System.String,System.String)
-  fullName: DiscoNet.Net.Api.GenerateAndSaveDiscoRootKeyPair(System.String, System.String)
-  nameWithType: Api.GenerateAndSaveDiscoRootKeyPair(String, String)
-- uid: DiscoNet.Net.Api.GenerateAndSaveDiscoRootKeyPair*
-  name: GenerateAndSaveDiscoRootKeyPair
-  href: api/DiscoNet.Net.Api.html#DiscoNet_Net_Api_GenerateAndSaveDiscoRootKeyPair_
-  commentId: Overload:DiscoNet.Net.Api.GenerateAndSaveDiscoRootKeyPair
-  isSpec: "True"
-  fullName: DiscoNet.Net.Api.GenerateAndSaveDiscoRootKeyPair
-  nameWithType: Api.GenerateAndSaveDiscoRootKeyPair
-- uid: DiscoNet.Net.Api.InitializeDisco(DiscoNet.Noise.Enums.NoiseHandshakeType,System.Boolean,System.Byte[],DiscoNet.KeyPair,DiscoNet.KeyPair,DiscoNet.KeyPair,DiscoNet.KeyPair)
-  name: InitializeDisco(NoiseHandshakeType, Boolean, Byte[], KeyPair, KeyPair, KeyPair, KeyPair)
-  href: api/DiscoNet.Net.Api.html#DiscoNet_Net_Api_InitializeDisco_DiscoNet_Noise_Enums_NoiseHandshakeType_System_Boolean_System_Byte___DiscoNet_KeyPair_DiscoNet_KeyPair_DiscoNet_KeyPair_DiscoNet_KeyPair_
-  commentId: M:DiscoNet.Net.Api.InitializeDisco(DiscoNet.Noise.Enums.NoiseHandshakeType,System.Boolean,System.Byte[],DiscoNet.KeyPair,DiscoNet.KeyPair,DiscoNet.KeyPair,DiscoNet.KeyPair)
-  name.vb: InitializeDisco(NoiseHandshakeType, Boolean, Byte(), KeyPair, KeyPair, KeyPair, KeyPair)
-  fullName: DiscoNet.Net.Api.InitializeDisco(DiscoNet.Noise.Enums.NoiseHandshakeType, System.Boolean, System.Byte[], DiscoNet.KeyPair, DiscoNet.KeyPair, DiscoNet.KeyPair, DiscoNet.KeyPair)
-  fullName.vb: DiscoNet.Net.Api.InitializeDisco(DiscoNet.Noise.Enums.NoiseHandshakeType, System.Boolean, System.Byte(), DiscoNet.KeyPair, DiscoNet.KeyPair, DiscoNet.KeyPair, DiscoNet.KeyPair)
-  nameWithType: Api.InitializeDisco(NoiseHandshakeType, Boolean, Byte[], KeyPair, KeyPair, KeyPair, KeyPair)
-  nameWithType.vb: Api.InitializeDisco(NoiseHandshakeType, Boolean, Byte(), KeyPair, KeyPair, KeyPair, KeyPair)
-- uid: DiscoNet.Net.Api.InitializeDisco*
-  name: InitializeDisco
-  href: api/DiscoNet.Net.Api.html#DiscoNet_Net_Api_InitializeDisco_
-  commentId: Overload:DiscoNet.Net.Api.InitializeDisco
-  isSpec: "True"
-  fullName: DiscoNet.Net.Api.InitializeDisco
-  nameWithType: Api.InitializeDisco
-- uid: DiscoNet.Net.Api.Listen(System.Net.IPAddress,DiscoNet.Config,System.Int32)
-  name: Listen(IPAddress, Config, Int32)
-  href: api/DiscoNet.Net.Api.html#DiscoNet_Net_Api_Listen_System_Net_IPAddress_DiscoNet_Config_System_Int32_
-  commentId: M:DiscoNet.Net.Api.Listen(System.Net.IPAddress,DiscoNet.Config,System.Int32)
-  fullName: DiscoNet.Net.Api.Listen(System.Net.IPAddress, DiscoNet.Config, System.Int32)
-  nameWithType: Api.Listen(IPAddress, Config, Int32)
-- uid: DiscoNet.Net.Api.Listen(System.String,DiscoNet.Config,System.Int32)
-  name: Listen(String, Config, Int32)
-  href: api/DiscoNet.Net.Api.html#DiscoNet_Net_Api_Listen_System_String_DiscoNet_Config_System_Int32_
-  commentId: M:DiscoNet.Net.Api.Listen(System.String,DiscoNet.Config,System.Int32)
-  fullName: DiscoNet.Net.Api.Listen(System.String, DiscoNet.Config, System.Int32)
-  nameWithType: Api.Listen(String, Config, Int32)
-- uid: DiscoNet.Net.Api.Listen*
-  name: Listen
-  href: api/DiscoNet.Net.Api.html#DiscoNet_Net_Api_Listen_
-  commentId: Overload:DiscoNet.Net.Api.Listen
-  isSpec: "True"
-  fullName: DiscoNet.Net.Api.Listen
-  nameWithType: Api.Listen
-- uid: DiscoNet.Net.Api.LoadDiscoKeyPair(System.String)
-  name: LoadDiscoKeyPair(String)
-  href: api/DiscoNet.Net.Api.html#DiscoNet_Net_Api_LoadDiscoKeyPair_System_String_
-  commentId: M:DiscoNet.Net.Api.LoadDiscoKeyPair(System.String)
-  fullName: DiscoNet.Net.Api.LoadDiscoKeyPair(System.String)
-  nameWithType: Api.LoadDiscoKeyPair(String)
-- uid: DiscoNet.Net.Api.LoadDiscoKeyPair*
-  name: LoadDiscoKeyPair
-  href: api/DiscoNet.Net.Api.html#DiscoNet_Net_Api_LoadDiscoKeyPair_
-  commentId: Overload:DiscoNet.Net.Api.LoadDiscoKeyPair
-  isSpec: "True"
-  fullName: DiscoNet.Net.Api.LoadDiscoKeyPair
-  nameWithType: Api.LoadDiscoKeyPair
-- uid: DiscoNet.Net.Api.LoadDiscoRootPrivateKey(System.String)
-  name: LoadDiscoRootPrivateKey(String)
-  href: api/DiscoNet.Net.Api.html#DiscoNet_Net_Api_LoadDiscoRootPrivateKey_System_String_
-  commentId: M:DiscoNet.Net.Api.LoadDiscoRootPrivateKey(System.String)
-  fullName: DiscoNet.Net.Api.LoadDiscoRootPrivateKey(System.String)
-  nameWithType: Api.LoadDiscoRootPrivateKey(String)
-- uid: DiscoNet.Net.Api.LoadDiscoRootPrivateKey*
-  name: LoadDiscoRootPrivateKey
-  href: api/DiscoNet.Net.Api.html#DiscoNet_Net_Api_LoadDiscoRootPrivateKey_
-  commentId: Overload:DiscoNet.Net.Api.LoadDiscoRootPrivateKey
-  isSpec: "True"
-  fullName: DiscoNet.Net.Api.LoadDiscoRootPrivateKey
-  nameWithType: Api.LoadDiscoRootPrivateKey
-- uid: DiscoNet.Net.Api.LoadDiscoRootPublicKey(System.String)
-  name: LoadDiscoRootPublicKey(String)
-  href: api/DiscoNet.Net.Api.html#DiscoNet_Net_Api_LoadDiscoRootPublicKey_System_String_
-  commentId: M:DiscoNet.Net.Api.LoadDiscoRootPublicKey(System.String)
-  fullName: DiscoNet.Net.Api.LoadDiscoRootPublicKey(System.String)
-  nameWithType: Api.LoadDiscoRootPublicKey(String)
-- uid: DiscoNet.Net.Api.LoadDiscoRootPublicKey*
-  name: LoadDiscoRootPublicKey
-  href: api/DiscoNet.Net.Api.html#DiscoNet_Net_Api_LoadDiscoRootPublicKey_
-  commentId: Overload:DiscoNet.Net.Api.LoadDiscoRootPublicKey
-  isSpec: "True"
-  fullName: DiscoNet.Net.Api.LoadDiscoRootPublicKey
-  nameWithType: Api.LoadDiscoRootPublicKey
 - uid: DiscoNet.Net.Connection
   name: Connection
   href: api/DiscoNet.Net.Connection.html
   commentId: T:DiscoNet.Net.Connection
   fullName: DiscoNet.Net.Connection
   nameWithType: Connection
-- uid: DiscoNet.Net.Connection.#ctor(System.Net.Sockets.TcpClient,DiscoNet.Config,System.Boolean)
-  name: Connection(TcpClient, Config, Boolean)
-  href: api/DiscoNet.Net.Connection.html#DiscoNet_Net_Connection__ctor_System_Net_Sockets_TcpClient_DiscoNet_Config_System_Boolean_
-  commentId: M:DiscoNet.Net.Connection.#ctor(System.Net.Sockets.TcpClient,DiscoNet.Config,System.Boolean)
-  fullName: DiscoNet.Net.Connection.Connection(System.Net.Sockets.TcpClient, DiscoNet.Config, System.Boolean)
-  nameWithType: Connection.Connection(TcpClient, Config, Boolean)
+- uid: DiscoNet.Net.Connection.#ctor(System.Net.Sockets.NetworkStream)
+  name: Connection(NetworkStream)
+  href: api/DiscoNet.Net.Connection.html#DiscoNet_Net_Connection__ctor_System_Net_Sockets_NetworkStream_
+  commentId: M:DiscoNet.Net.Connection.#ctor(System.Net.Sockets.NetworkStream)
+  fullName: DiscoNet.Net.Connection.Connection(System.Net.Sockets.NetworkStream)
+  nameWithType: Connection.Connection(NetworkStream)
 - uid: DiscoNet.Net.Connection.#ctor*
   name: Connection
   href: api/DiscoNet.Net.Connection.html#DiscoNet_Net_Connection__ctor_
@@ -365,6 +214,32 @@ references:
   isSpec: "True"
   fullName: DiscoNet.Net.Connection.Connection
   nameWithType: Connection.Connection
+- uid: DiscoNet.Net.Connection.AuthenticateAsClient(DiscoNet.Config)
+  name: AuthenticateAsClient(Config)
+  href: api/DiscoNet.Net.Connection.html#DiscoNet_Net_Connection_AuthenticateAsClient_DiscoNet_Config_
+  commentId: M:DiscoNet.Net.Connection.AuthenticateAsClient(DiscoNet.Config)
+  fullName: DiscoNet.Net.Connection.AuthenticateAsClient(DiscoNet.Config)
+  nameWithType: Connection.AuthenticateAsClient(Config)
+- uid: DiscoNet.Net.Connection.AuthenticateAsClient*
+  name: AuthenticateAsClient
+  href: api/DiscoNet.Net.Connection.html#DiscoNet_Net_Connection_AuthenticateAsClient_
+  commentId: Overload:DiscoNet.Net.Connection.AuthenticateAsClient
+  isSpec: "True"
+  fullName: DiscoNet.Net.Connection.AuthenticateAsClient
+  nameWithType: Connection.AuthenticateAsClient
+- uid: DiscoNet.Net.Connection.AuthenticateAsServer(DiscoNet.Config)
+  name: AuthenticateAsServer(Config)
+  href: api/DiscoNet.Net.Connection.html#DiscoNet_Net_Connection_AuthenticateAsServer_DiscoNet_Config_
+  commentId: M:DiscoNet.Net.Connection.AuthenticateAsServer(DiscoNet.Config)
+  fullName: DiscoNet.Net.Connection.AuthenticateAsServer(DiscoNet.Config)
+  nameWithType: Connection.AuthenticateAsServer(Config)
+- uid: DiscoNet.Net.Connection.AuthenticateAsServer*
+  name: AuthenticateAsServer
+  href: api/DiscoNet.Net.Connection.html#DiscoNet_Net_Connection_AuthenticateAsServer_
+  commentId: Overload:DiscoNet.Net.Connection.AuthenticateAsServer
+  isSpec: "True"
+  fullName: DiscoNet.Net.Connection.AuthenticateAsServer
+  nameWithType: Connection.AuthenticateAsServer
 - uid: DiscoNet.Net.Connection.Dispose
   name: Dispose()
   href: api/DiscoNet.Net.Connection.html#DiscoNet_Net_Connection_Dispose
@@ -410,64 +285,125 @@ references:
   isSpec: "True"
   fullName: DiscoNet.Net.Connection.Write
   nameWithType: Connection.Write
-- uid: DiscoNet.Net.Listener
-  name: Listener
-  href: api/DiscoNet.Net.Listener.html
-  commentId: T:DiscoNet.Net.Listener
-  fullName: DiscoNet.Net.Listener
-  nameWithType: Listener
-- uid: DiscoNet.Net.Listener.Accept
-  name: Accept()
-  href: api/DiscoNet.Net.Listener.html#DiscoNet_Net_Listener_Accept
-  commentId: M:DiscoNet.Net.Listener.Accept
-  fullName: DiscoNet.Net.Listener.Accept()
-  nameWithType: Listener.Accept()
-- uid: DiscoNet.Net.Listener.Accept*
-  name: Accept
-  href: api/DiscoNet.Net.Listener.html#DiscoNet_Net_Listener_Accept_
-  commentId: Overload:DiscoNet.Net.Listener.Accept
+- uid: DiscoNet.Net.DiscoHelper
+  name: DiscoHelper
+  href: api/DiscoNet.Net.DiscoHelper.html
+  commentId: T:DiscoNet.Net.DiscoHelper
+  fullName: DiscoNet.Net.DiscoHelper
+  nameWithType: DiscoHelper
+- uid: DiscoNet.Net.DiscoHelper.CreatePublicKeyVerifier(System.Byte[])
+  name: CreatePublicKeyVerifier(Byte[])
+  href: api/DiscoNet.Net.DiscoHelper.html#DiscoNet_Net_DiscoHelper_CreatePublicKeyVerifier_System_Byte___
+  commentId: M:DiscoNet.Net.DiscoHelper.CreatePublicKeyVerifier(System.Byte[])
+  name.vb: CreatePublicKeyVerifier(Byte())
+  fullName: DiscoNet.Net.DiscoHelper.CreatePublicKeyVerifier(System.Byte[])
+  fullName.vb: DiscoNet.Net.DiscoHelper.CreatePublicKeyVerifier(System.Byte())
+  nameWithType: DiscoHelper.CreatePublicKeyVerifier(Byte[])
+  nameWithType.vb: DiscoHelper.CreatePublicKeyVerifier(Byte())
+- uid: DiscoNet.Net.DiscoHelper.CreatePublicKeyVerifier*
+  name: CreatePublicKeyVerifier
+  href: api/DiscoNet.Net.DiscoHelper.html#DiscoNet_Net_DiscoHelper_CreatePublicKeyVerifier_
+  commentId: Overload:DiscoNet.Net.DiscoHelper.CreatePublicKeyVerifier
   isSpec: "True"
-  fullName: DiscoNet.Net.Listener.Accept
-  nameWithType: Listener.Accept
-- uid: DiscoNet.Net.Listener.Dispose
-  name: Dispose()
-  href: api/DiscoNet.Net.Listener.html#DiscoNet_Net_Listener_Dispose
-  commentId: M:DiscoNet.Net.Listener.Dispose
-  fullName: DiscoNet.Net.Listener.Dispose()
-  nameWithType: Listener.Dispose()
-- uid: DiscoNet.Net.Listener.Dispose*
-  name: Dispose
-  href: api/DiscoNet.Net.Listener.html#DiscoNet_Net_Listener_Dispose_
-  commentId: Overload:DiscoNet.Net.Listener.Dispose
+  fullName: DiscoNet.Net.DiscoHelper.CreatePublicKeyVerifier
+  nameWithType: DiscoHelper.CreatePublicKeyVerifier
+- uid: DiscoNet.Net.DiscoHelper.CreateStaticPublicKeyProof(System.Byte[],System.Byte[])
+  name: CreateStaticPublicKeyProof(Byte[], Byte[])
+  href: api/DiscoNet.Net.DiscoHelper.html#DiscoNet_Net_DiscoHelper_CreateStaticPublicKeyProof_System_Byte___System_Byte___
+  commentId: M:DiscoNet.Net.DiscoHelper.CreateStaticPublicKeyProof(System.Byte[],System.Byte[])
+  name.vb: CreateStaticPublicKeyProof(Byte(), Byte())
+  fullName: DiscoNet.Net.DiscoHelper.CreateStaticPublicKeyProof(System.Byte[], System.Byte[])
+  fullName.vb: DiscoNet.Net.DiscoHelper.CreateStaticPublicKeyProof(System.Byte(), System.Byte())
+  nameWithType: DiscoHelper.CreateStaticPublicKeyProof(Byte[], Byte[])
+  nameWithType.vb: DiscoHelper.CreateStaticPublicKeyProof(Byte(), Byte())
+- uid: DiscoNet.Net.DiscoHelper.CreateStaticPublicKeyProof*
+  name: CreateStaticPublicKeyProof
+  href: api/DiscoNet.Net.DiscoHelper.html#DiscoNet_Net_DiscoHelper_CreateStaticPublicKeyProof_
+  commentId: Overload:DiscoNet.Net.DiscoHelper.CreateStaticPublicKeyProof
   isSpec: "True"
-  fullName: DiscoNet.Net.Listener.Dispose
-  nameWithType: Listener.Dispose
-- uid: DiscoNet.Net.Listener.Start
-  name: Start()
-  href: api/DiscoNet.Net.Listener.html#DiscoNet_Net_Listener_Start
-  commentId: M:DiscoNet.Net.Listener.Start
-  fullName: DiscoNet.Net.Listener.Start()
-  nameWithType: Listener.Start()
-- uid: DiscoNet.Net.Listener.Start*
-  name: Start
-  href: api/DiscoNet.Net.Listener.html#DiscoNet_Net_Listener_Start_
-  commentId: Overload:DiscoNet.Net.Listener.Start
+  fullName: DiscoNet.Net.DiscoHelper.CreateStaticPublicKeyProof
+  nameWithType: DiscoHelper.CreateStaticPublicKeyProof
+- uid: DiscoNet.Net.DiscoHelper.GenerateAndSaveDiscoKeyPair(System.String)
+  name: GenerateAndSaveDiscoKeyPair(String)
+  href: api/DiscoNet.Net.DiscoHelper.html#DiscoNet_Net_DiscoHelper_GenerateAndSaveDiscoKeyPair_System_String_
+  commentId: M:DiscoNet.Net.DiscoHelper.GenerateAndSaveDiscoKeyPair(System.String)
+  fullName: DiscoNet.Net.DiscoHelper.GenerateAndSaveDiscoKeyPair(System.String)
+  nameWithType: DiscoHelper.GenerateAndSaveDiscoKeyPair(String)
+- uid: DiscoNet.Net.DiscoHelper.GenerateAndSaveDiscoKeyPair*
+  name: GenerateAndSaveDiscoKeyPair
+  href: api/DiscoNet.Net.DiscoHelper.html#DiscoNet_Net_DiscoHelper_GenerateAndSaveDiscoKeyPair_
+  commentId: Overload:DiscoNet.Net.DiscoHelper.GenerateAndSaveDiscoKeyPair
   isSpec: "True"
-  fullName: DiscoNet.Net.Listener.Start
-  nameWithType: Listener.Start
-- uid: DiscoNet.Net.Listener.Stop
-  name: Stop()
-  href: api/DiscoNet.Net.Listener.html#DiscoNet_Net_Listener_Stop
-  commentId: M:DiscoNet.Net.Listener.Stop
-  fullName: DiscoNet.Net.Listener.Stop()
-  nameWithType: Listener.Stop()
-- uid: DiscoNet.Net.Listener.Stop*
-  name: Stop
-  href: api/DiscoNet.Net.Listener.html#DiscoNet_Net_Listener_Stop_
-  commentId: Overload:DiscoNet.Net.Listener.Stop
+  fullName: DiscoNet.Net.DiscoHelper.GenerateAndSaveDiscoKeyPair
+  nameWithType: DiscoHelper.GenerateAndSaveDiscoKeyPair
+- uid: DiscoNet.Net.DiscoHelper.GenerateAndSaveDiscoRootKeyPair(System.String,System.String)
+  name: GenerateAndSaveDiscoRootKeyPair(String, String)
+  href: api/DiscoNet.Net.DiscoHelper.html#DiscoNet_Net_DiscoHelper_GenerateAndSaveDiscoRootKeyPair_System_String_System_String_
+  commentId: M:DiscoNet.Net.DiscoHelper.GenerateAndSaveDiscoRootKeyPair(System.String,System.String)
+  fullName: DiscoNet.Net.DiscoHelper.GenerateAndSaveDiscoRootKeyPair(System.String, System.String)
+  nameWithType: DiscoHelper.GenerateAndSaveDiscoRootKeyPair(String, String)
+- uid: DiscoNet.Net.DiscoHelper.GenerateAndSaveDiscoRootKeyPair*
+  name: GenerateAndSaveDiscoRootKeyPair
+  href: api/DiscoNet.Net.DiscoHelper.html#DiscoNet_Net_DiscoHelper_GenerateAndSaveDiscoRootKeyPair_
+  commentId: Overload:DiscoNet.Net.DiscoHelper.GenerateAndSaveDiscoRootKeyPair
   isSpec: "True"
-  fullName: DiscoNet.Net.Listener.Stop
-  nameWithType: Listener.Stop
+  fullName: DiscoNet.Net.DiscoHelper.GenerateAndSaveDiscoRootKeyPair
+  nameWithType: DiscoHelper.GenerateAndSaveDiscoRootKeyPair
+- uid: DiscoNet.Net.DiscoHelper.InitializeDisco(DiscoNet.Noise.Enums.NoiseHandshakeType,System.Boolean,System.Byte[],DiscoNet.KeyPair,DiscoNet.KeyPair,DiscoNet.KeyPair,DiscoNet.KeyPair)
+  name: InitializeDisco(NoiseHandshakeType, Boolean, Byte[], KeyPair, KeyPair, KeyPair, KeyPair)
+  href: api/DiscoNet.Net.DiscoHelper.html#DiscoNet_Net_DiscoHelper_InitializeDisco_DiscoNet_Noise_Enums_NoiseHandshakeType_System_Boolean_System_Byte___DiscoNet_KeyPair_DiscoNet_KeyPair_DiscoNet_KeyPair_DiscoNet_KeyPair_
+  commentId: M:DiscoNet.Net.DiscoHelper.InitializeDisco(DiscoNet.Noise.Enums.NoiseHandshakeType,System.Boolean,System.Byte[],DiscoNet.KeyPair,DiscoNet.KeyPair,DiscoNet.KeyPair,DiscoNet.KeyPair)
+  name.vb: InitializeDisco(NoiseHandshakeType, Boolean, Byte(), KeyPair, KeyPair, KeyPair, KeyPair)
+  fullName: DiscoNet.Net.DiscoHelper.InitializeDisco(DiscoNet.Noise.Enums.NoiseHandshakeType, System.Boolean, System.Byte[], DiscoNet.KeyPair, DiscoNet.KeyPair, DiscoNet.KeyPair, DiscoNet.KeyPair)
+  fullName.vb: DiscoNet.Net.DiscoHelper.InitializeDisco(DiscoNet.Noise.Enums.NoiseHandshakeType, System.Boolean, System.Byte(), DiscoNet.KeyPair, DiscoNet.KeyPair, DiscoNet.KeyPair, DiscoNet.KeyPair)
+  nameWithType: DiscoHelper.InitializeDisco(NoiseHandshakeType, Boolean, Byte[], KeyPair, KeyPair, KeyPair, KeyPair)
+  nameWithType.vb: DiscoHelper.InitializeDisco(NoiseHandshakeType, Boolean, Byte(), KeyPair, KeyPair, KeyPair, KeyPair)
+- uid: DiscoNet.Net.DiscoHelper.InitializeDisco*
+  name: InitializeDisco
+  href: api/DiscoNet.Net.DiscoHelper.html#DiscoNet_Net_DiscoHelper_InitializeDisco_
+  commentId: Overload:DiscoNet.Net.DiscoHelper.InitializeDisco
+  isSpec: "True"
+  fullName: DiscoNet.Net.DiscoHelper.InitializeDisco
+  nameWithType: DiscoHelper.InitializeDisco
+- uid: DiscoNet.Net.DiscoHelper.LoadDiscoKeyPair(System.String)
+  name: LoadDiscoKeyPair(String)
+  href: api/DiscoNet.Net.DiscoHelper.html#DiscoNet_Net_DiscoHelper_LoadDiscoKeyPair_System_String_
+  commentId: M:DiscoNet.Net.DiscoHelper.LoadDiscoKeyPair(System.String)
+  fullName: DiscoNet.Net.DiscoHelper.LoadDiscoKeyPair(System.String)
+  nameWithType: DiscoHelper.LoadDiscoKeyPair(String)
+- uid: DiscoNet.Net.DiscoHelper.LoadDiscoKeyPair*
+  name: LoadDiscoKeyPair
+  href: api/DiscoNet.Net.DiscoHelper.html#DiscoNet_Net_DiscoHelper_LoadDiscoKeyPair_
+  commentId: Overload:DiscoNet.Net.DiscoHelper.LoadDiscoKeyPair
+  isSpec: "True"
+  fullName: DiscoNet.Net.DiscoHelper.LoadDiscoKeyPair
+  nameWithType: DiscoHelper.LoadDiscoKeyPair
+- uid: DiscoNet.Net.DiscoHelper.LoadDiscoRootPrivateKey(System.String)
+  name: LoadDiscoRootPrivateKey(String)
+  href: api/DiscoNet.Net.DiscoHelper.html#DiscoNet_Net_DiscoHelper_LoadDiscoRootPrivateKey_System_String_
+  commentId: M:DiscoNet.Net.DiscoHelper.LoadDiscoRootPrivateKey(System.String)
+  fullName: DiscoNet.Net.DiscoHelper.LoadDiscoRootPrivateKey(System.String)
+  nameWithType: DiscoHelper.LoadDiscoRootPrivateKey(String)
+- uid: DiscoNet.Net.DiscoHelper.LoadDiscoRootPrivateKey*
+  name: LoadDiscoRootPrivateKey
+  href: api/DiscoNet.Net.DiscoHelper.html#DiscoNet_Net_DiscoHelper_LoadDiscoRootPrivateKey_
+  commentId: Overload:DiscoNet.Net.DiscoHelper.LoadDiscoRootPrivateKey
+  isSpec: "True"
+  fullName: DiscoNet.Net.DiscoHelper.LoadDiscoRootPrivateKey
+  nameWithType: DiscoHelper.LoadDiscoRootPrivateKey
+- uid: DiscoNet.Net.DiscoHelper.LoadDiscoRootPublicKey(System.String)
+  name: LoadDiscoRootPublicKey(String)
+  href: api/DiscoNet.Net.DiscoHelper.html#DiscoNet_Net_DiscoHelper_LoadDiscoRootPublicKey_System_String_
+  commentId: M:DiscoNet.Net.DiscoHelper.LoadDiscoRootPublicKey(System.String)
+  fullName: DiscoNet.Net.DiscoHelper.LoadDiscoRootPublicKey(System.String)
+  nameWithType: DiscoHelper.LoadDiscoRootPublicKey(String)
+- uid: DiscoNet.Net.DiscoHelper.LoadDiscoRootPublicKey*
+  name: LoadDiscoRootPublicKey
+  href: api/DiscoNet.Net.DiscoHelper.html#DiscoNet_Net_DiscoHelper_LoadDiscoRootPublicKey_
+  commentId: Overload:DiscoNet.Net.DiscoHelper.LoadDiscoRootPublicKey
+  isSpec: "True"
+  fullName: DiscoNet.Net.DiscoHelper.LoadDiscoRootPublicKey
+  nameWithType: DiscoHelper.LoadDiscoRootPublicKey
 - uid: DiscoNet.Noise
   name: DiscoNet.Noise
   href: api/DiscoNet.Noise.html

@@ -8,7 +8,7 @@
 
     using Xunit;
 
-    public class ApiTest
+    public class DiscoHelperTests
     {
         [Fact]
         public void TestCreationKeys()
@@ -20,10 +20,10 @@
             try
             {
                 // Generate Disco Key pair
-                var keyPair = Api.GenerateAndSaveDiscoKeyPair(discoKeyPairFile);
+                var keyPair = DiscoHelper.GenerateAndSaveDiscoKeyPair(discoKeyPairFile);
 
                 // Load Disco Key pair
-                var keyPairTemp = Api.LoadDiscoKeyPair(discoKeyPairFile);
+                var keyPairTemp = DiscoHelper.LoadDiscoKeyPair(discoKeyPairFile);
 
                 // compare
                 if (!keyPairTemp.PrivateKey.SequenceEqual(keyPair.PrivateKey)
@@ -33,29 +33,29 @@
                 }
 
                 // generate root key
-                Api.GenerateAndSaveDiscoRootKeyPair(rootPrivateKeyFile, rootPublicKeyFile);
+                DiscoHelper.GenerateAndSaveDiscoRootKeyPair(rootPrivateKeyFile, rootPublicKeyFile);
 
                 // load private root key
-                var rootPriv = Api.LoadDiscoRootPrivateKey(rootPrivateKeyFile);
+                var rootPriv = DiscoHelper.LoadDiscoRootPrivateKey(rootPrivateKeyFile);
 
                 // load public root key
-                var rootPub = Api.LoadDiscoRootPublicKey(rootPublicKeyFile);
+                var rootPub = DiscoHelper.LoadDiscoRootPublicKey(rootPublicKeyFile);
 
                 // create a proof
-                var proof = Api.CreateStaticPublicKeyProof(rootPriv, keyPair.PublicKey);
+                var proof = DiscoHelper.CreateStaticPublicKeyProof(rootPriv, keyPair.PublicKey);
 
                 // verify the proof
-                var verifior = Api.CreatePublicKeyVerifier(rootPub);
-                if (!verifior(keyPair.PublicKey, proof))
+                var verifier = DiscoHelper.CreatePublicKeyVerifier(rootPub);
+                if (!verifier(keyPair.PublicKey, proof))
                 {
                     throw new Exception("cannot verify proof");
                 }
             }
             finally
             {
-                ApiTest.CleanUpFile(discoKeyPairFile);
-                ApiTest.CleanUpFile(rootPrivateKeyFile);
-                ApiTest.CleanUpFile(rootPublicKeyFile);
+                DiscoHelperTests.CleanUpFile(discoKeyPairFile);
+                DiscoHelperTests.CleanUpFile(rootPrivateKeyFile);
+                DiscoHelperTests.CleanUpFile(rootPublicKeyFile);
             }
         }
 

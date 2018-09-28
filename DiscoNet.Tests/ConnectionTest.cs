@@ -3,6 +3,7 @@
     using System;
     using System.Linq;
     using System.Net;
+    using System.Net.Sockets;
     using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
@@ -66,7 +67,11 @@
             await this.RunConnectionTest(clientConfig, serverConfig, 1811, 10);
         }
 
-        private async Task RunConnectionTest(Config clientConfig, Config serverConfig, int port = 1810, int bufSize = 100)
+        private async Task RunConnectionTest(
+            Config clientConfig,
+            Config serverConfig,
+            int port = 1810,
+            int bufSize = 100)
         {
             var address = IPAddress.Loopback;
 
@@ -75,33 +80,41 @@
             bool serverSeUp = false;
             var server = Task.Factory.StartNew(
                 () =>
+                {
+                    var listener = new TcpListener(address, port);
+                    listener.Start();
+                    serverSeUp = true;
+                    using (var client = listener.AcceptTcpClient())
                     {
-                        using (var listener = Api.Listen(address, serverConfig, port))
+                        using (var connection = new Connection(client.GetStream()))
                         {
-                            serverSeUp = true;
-                            var serverSocket = listener.Accept();
+                            connection.AuthenticateAsServer(serverConfig);
                             for (var i = 0; i < ConnectionTest.IterationCount; i++)
                             {
-                                var n = serverSocket.Read(serverBuf, 0, serverBuf.Length);
+                                var n = connection.Read(serverBuf, 0, serverBuf.Length);
 
                                 if (n != 6)
                                 {
                                     throw new Exception("server is supposed to read 6 bytes");
                                 }
+
                                 if (!serverBuf.Take(n - 1).SequenceEqual(Encoding.ASCII.GetBytes("hello")))
                                 {
                                     throw new Exception("received message not as expected");
                                 }
 
                                 // write the message
-                                var written = serverSocket.Write(serverBuf, 0, n);
+                                var written = connection.Write(serverBuf, 0, n);
                                 if (written != 6)
                                 {
                                     throw new Exception("server is supposed to write 6 bytes");
                                 }
                             }
                         }
-                    });
+                    }
+
+                    listener.Stop();
+                });
 
             while (!serverSeUp)
             {
@@ -109,44 +122,48 @@
             }
 
             // Run the client
-            using (var clientSocket = Api.Connect(address.ToString(), port, clientConfig))
+            using (var clientSocket = new TcpClient(address.ToString(), port))
             {
-                var cleintBuf = new byte[bufSize];
-
-                for (var i = 0; i < ConnectionTest.IterationCount; i++)
+                using (var clientConnection = new Connection(clientSocket.GetStream()))
                 {
-                    await Task.Factory.StartNew(
-                        () =>
-                        {
-                            var data = Encoding.ASCII.GetBytes("hello").Concat(new[] { (byte)i }).ToArray();
+                    clientConnection.AuthenticateAsClient(clientConfig);
+                    var clientBuf = new byte[bufSize];
 
-                            var n = clientSocket.Write(data, 0, data.Length);
-                            if (n != 6)
+                    for (var i = 0; i < ConnectionTest.IterationCount; i++)
+                    {
+                        await Task.Factory.StartNew(
+                            () =>
                             {
-                                throw new Exception("client is supposed to write 6 bytes");
-                            }
+                                var data = Encoding.ASCII.GetBytes("hello").Concat(new[] { (byte)i }).ToArray();
 
-                            // then read `hello + (i+1)`
-                            var read = clientSocket.Read(cleintBuf, 0, cleintBuf.Length);
+                                var n = clientConnection.Write(data, 0, data.Length);
+                                if (n != 6)
+                                {
+                                    throw new Exception("client is supposed to write 6 bytes");
+                                }
 
-                            if (read != 6)
-                            {
-                                throw new Exception("client is supposed to read 6 bytes");
-                            }
+                                // then read `hello + (i+1)`
+                                var read = clientConnection.Read(clientBuf, 0, clientBuf.Length);
 
-                            if (!cleintBuf.Take(read).SequenceEqual(data))
-                            {
-                                throw new Exception("received message not as expected");
-                            }
-                        });
+                                if (read != 6)
+                                {
+                                    throw new Exception("client is supposed to read 6 bytes");
+                                }
+
+                                if (!clientBuf.Take(read).SequenceEqual(data))
+                                {
+                                    throw new Exception("received message not as expected");
+                                }
+                            });
+                    }
+
+                    await server;
+                    //var ex = await exception;
+                    //if (ex != null)
+                    //{
+                    //    throw ex;
+                    //}
                 }
-
-                await server;
-                //var ex = await exception;
-                //if (ex != null)
-                //{
-                //    throw ex;
-                //}
             }
         }
     }
