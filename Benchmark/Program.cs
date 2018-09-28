@@ -25,13 +25,11 @@ namespace Benchmark
 
         private TcpClient client;
 
-        Listener listener;
-
         TcpListener tlsListener;
 
         Connection discoClient;
-        //64, 128, 256, 512, 1024, 4094,
-        [Params(64, 128, 256, 512, 1024, 4094, 1048576)]
+        //64, 128, 256, 512, 1024, 4094, 1048576
+        [Params(1048576)]
         public int N;
 
         private byte[] dataC
@@ -45,16 +43,16 @@ namespace Benchmark
             }
         }
 
-        [Benchmark(Description = "TlsStream")]
-        public void TlsStream()
-        {
-            this.RunTestIterationTls();
-        }
-
         [Benchmark(Description = "DiscoChannel")]
         public void DiscoChannel()
         {
             this.RunDiscoIteration();
+        }
+
+        [Benchmark(Description = "TlsStream")]
+        public void TlsStream()
+        {
+            this.RunTestIterationTls();
         }
 
         private void PrepareTlsServer(int port)
@@ -68,29 +66,33 @@ namespace Benchmark
             var server = Task.Factory.StartNew(
                 () =>
                 {
-                    this.client = this.tlsListener.AcceptTcpClient();
-                    var sslStream = new SslStream(this.client.GetStream(), false);
-                    sslStream.AuthenticateAsServer(serverCertificate, false, SslProtocols.Tls, true);
-
-                    
-                    while (true)
+                    using (this.client = this.tlsListener.AcceptTcpClient())
                     {
-                        try
+                        using (var sslStream = new SslStream(this.client.GetStream(), false))
                         {
-                            var buf = new byte[100];
-                            byte lastByte = 0;
-                            do
-                            {
-                                var readByes = sslStream.Read(buf, 0, buf.Length);
-                                lastByte = buf[readByes - 1];
-                            } while (lastByte != 255);
+                            sslStream.AuthenticateAsServer(serverCertificate, false, SslProtocols.Tls, true);
 
-                            var data = dataC;
-                            sslStream.Write(data, 0, data.Length);
-                        }
-                        catch (System.IO.IOException)
-                        {
-                            break;
+                            while (true)
+                            {
+                                try
+                                {
+                                    var buf = new byte[100];
+                                    byte lastByte = 0;
+                                    do
+                                    {
+                                        var readByes = sslStream.Read(buf, 0, buf.Length);
+                                        lastByte = buf[readByes - 1];
+                                    }
+                                    while (lastByte != 255);
+
+                                    var data = dataC;
+                                    sslStream.Write(data, 0, data.Length);
+                                }
+                                catch (System.IO.IOException)
+                                {
+                                    break;
+                                }
+                            }
                         }
                     }
                 });
@@ -99,7 +101,7 @@ namespace Benchmark
 
         private void PrepareTlsClient(int port)
         {
-            TcpClient client = new TcpClient("127.0.0.1", port);
+            var client = new TcpClient("127.0.0.1", port);
             this.sslClientStream = new SslStream(
                 client.GetStream(),
                 false,
@@ -159,34 +161,47 @@ namespace Benchmark
 
         private void PrepareDiscoClient(Config clientConfig, int port)
         {
-            // Run the client
-            this.discoClient = Api.Connect("127.0.0.1", port, clientConfig);
-            
+            var client = new TcpClient("127.0.0.1", port);
+            this.discoClient = new Connection(client.GetStream(), clientConfig, true);
+
         }
 
         private void PrepareDiscoServer(Config serverConfig, int port)
         {
+            this.tlsListener = new TcpListener(IPAddress.Parse("127.0.0.1"), port);
+            this.tlsListener.Start();
             Task.Factory.StartNew(
                 () =>
                 {
-                    using (listener = Api.Listen(IPAddress.Parse("127.0.0.1"), serverConfig, port))
+                    using (this.client = this.tlsListener.AcceptTcpClient())
                     {
-                        var serverSocket = listener.Accept();
-                        while (true)
+                        using (var listener = new Connection(this.client.GetStream(), serverConfig, false))
                         {
-                            var buf = new byte[100];
-                            byte lastByte = 0;
-                            var iter = 0;
-                            do
+                            while (true)
                             {
-                                iter++;
-                                var readByes = serverSocket.Read(buf, 0, buf.Length);
-                                lastByte = buf[readByes - 1];
-                            } while (lastByte != 255);
+                                try
+                                {
+                                    var buf = new byte[100];
+                                    byte lastByte = 0;
+                                    var iter = 0;
+                                    do
+                                    {
+                                        iter++;
+                                        var readByes = listener.Read(buf, 0, buf.Length);
+                                        lastByte = buf[readByes - 1];
+                                    }
+                                    while (lastByte != 255);
 
-                            var data = dataC;
-                            serverSocket.Write(data, 0, data.Length);
+                                    var data = dataC;
+                                    listener.Write(data, 0, data.Length);
+                                }
+                                catch (Exception)
+                                {
+                                    break;
+                                }
+                            }
                         }
+                        this.tlsListener.Stop();
                     }
                 });
         }
@@ -212,7 +227,6 @@ namespace Benchmark
         {
             this.client?.Dispose();
             this.sslClientStream?.Dispose();
-            this.listener?.Dispose();
             this.tlsListener?.Stop();
         }
 

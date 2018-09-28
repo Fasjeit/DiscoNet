@@ -1,220 +1,240 @@
-﻿namespace DiscoNet.Tests
-{
-    using System;
-    using System.Linq;
-    using System.Net;
-    using System.Text;
-    using System.Threading;
-    using System.Threading.Tasks;
+﻿//namespace DiscoNet.Tests
+//{
+//    using System;
+//    using System.Linq;
+//    using System.Net;
+//    using System.Net.Sockets;
+//    using System.Text;
+//    using System.Threading;
+//    using System.Threading.Tasks;
 
-    using DiscoNet.Net;
-    using DiscoNet.Noise;
-    using DiscoNet.Noise.Enums;
+//    using DiscoNet.Net;
+//    using DiscoNet.Noise;
+//    using DiscoNet.Noise.Enums;
 
-    using Sodium;
+//    using Sodium;
 
-    using Xunit;
+//    using Xunit;
 
-    public class PatternsTest
-    {
-        [Fact]
-        public void TestNoiseKk()
-        {
-            // init
-            var clientConfig = new Config
-            {
-                KeyPair = Asymmetric.GenerateKeyPair(),
-                HandshakePattern = NoiseHandshakeType.NoiseKK
-            };
+//    public class PatternsTest
+//    {
+//        [Fact]
+//        public void TestNoiseKk()
+//        {
+//            // init
+//            var clientConfig = new Config
+//            {
+//                KeyPair = Asymmetric.GenerateKeyPair(),
+//                HandshakePattern = NoiseHandshakeType.NoiseKK
+//            };
 
-            var serverConfig = new Config
-            {
-                KeyPair = Asymmetric.GenerateKeyPair(),
-                HandshakePattern = NoiseHandshakeType.NoiseKK
-            };
+//            var serverConfig = new Config
+//            {
+//                KeyPair = Asymmetric.GenerateKeyPair(),
+//                HandshakePattern = NoiseHandshakeType.NoiseKK
+//            };
 
-            this.RunTwoWayTest(clientConfig, serverConfig, 1800);
-        }
+//            this.RunTwoWayTest(clientConfig, serverConfig, 1800);
+//        }
 
-        [Fact]
-        public void TestNoiseNk()
-        {
-            // init
-            var clientConfig = new Config
-            {
-                KeyPair = Asymmetric.GenerateKeyPair(),
-                HandshakePattern = NoiseHandshakeType.NoiseNK
-            };
+//        [Fact]
+//        public void TestNoiseNk()
+//        {
+//            // init
+//            var clientConfig = new Config
+//            {
+//                KeyPair = Asymmetric.GenerateKeyPair(),
+//                HandshakePattern = NoiseHandshakeType.NoiseNK
+//            };
 
-            var serverConfig = new Config
-            {
-                KeyPair = Asymmetric.GenerateKeyPair(),
-                HandshakePattern = NoiseHandshakeType.NoiseNK
-            };
+//            var serverConfig = new Config
+//            {
+//                KeyPair = Asymmetric.GenerateKeyPair(),
+//                HandshakePattern = NoiseHandshakeType.NoiseNK
+//            };
 
-            this.RunTwoWayTest(clientConfig, serverConfig, 1801);
-        }
+//            this.RunTwoWayTest(clientConfig, serverConfig, 1801);
+//        }
 
-        [Fact]
-        public void TestNoiseXx()
-        {
-            var rootKey = PublicKeyAuth.GenerateKeyPair();
-            var Verifier = Api.CreatePublicKeyVerifier(rootKey.PublicKey);
+//        [Fact]
+//        public void TestNoiseXx()
+//        {
+//            var rootKey = PublicKeyAuth.GenerateKeyPair();
+//            var Verifier = DiscoHelper.CreatePublicKeyVerifier(rootKey.PublicKey);
 
-            var clienPair = Asymmetric.GenerateKeyPair();
-            var serverPair = Asymmetric.GenerateKeyPair();
+//            var clienPair = Asymmetric.GenerateKeyPair();
+//            var serverPair = Asymmetric.GenerateKeyPair();
 
-            // init
-            var clientConfig = new Config
-            {
-                KeyPair = clienPair,
-                HandshakePattern = NoiseHandshakeType.NoiseXX,
-                PublicKeyVerifier = Verifier,
-                StaticPublicKeyProof = Api.CreateStaticPublicKeyProof(rootKey.PrivateKey, clienPair.PublicKey)
-            };
+//            // init
+//            var clientConfig = new Config
+//            {
+//                KeyPair = clienPair,
+//                HandshakePattern = NoiseHandshakeType.NoiseXX,
+//                PublicKeyVerifier = Verifier,
+//                StaticPublicKeyProof = DiscoHelper.CreateStaticPublicKeyProof(rootKey.PrivateKey, clienPair.PublicKey)
+//            };
 
-            var serverConfig = new Config
-            {
-                KeyPair = serverPair,
-                HandshakePattern = NoiseHandshakeType.NoiseXX,
-                PublicKeyVerifier = Verifier,
-                StaticPublicKeyProof = Api.CreateStaticPublicKeyProof(rootKey.PrivateKey, serverPair.PublicKey)
-            };
+//            var serverConfig = new Config
+//            {
+//                KeyPair = serverPair,
+//                HandshakePattern = NoiseHandshakeType.NoiseXX,
+//                PublicKeyVerifier = Verifier,
+//                StaticPublicKeyProof = DiscoHelper.CreateStaticPublicKeyProof(rootKey.PrivateKey, serverPair.PublicKey)
+//            };
 
-            this.RunTwoWayTest(clientConfig, serverConfig, 1802);
-        }
+//            this.RunTwoWayTest(clientConfig, serverConfig, 1802);
+//        }
 
-        [Fact]
-        public void TestNoiseN()
-        {
-            // init
-            var clientConfig = new Config
-            {
-                KeyPair = Asymmetric.GenerateKeyPair(),
-                HandshakePattern = NoiseHandshakeType.NoiseN
-            };
+//        [Fact]
+//        public void TestNoiseN()
+//        {
+//            // init
+//            var clientConfig = new Config
+//            {
+//                KeyPair = Asymmetric.GenerateKeyPair(),
+//                HandshakePattern = NoiseHandshakeType.NoiseN
+//            };
 
-            var serverConfig = new Config
-            {
-                KeyPair = Asymmetric.GenerateKeyPair(),
-                HandshakePattern = NoiseHandshakeType.NoiseN
-            };
+//            var serverConfig = new Config
+//            {
+//                KeyPair = Asymmetric.GenerateKeyPair(),
+//                HandshakePattern = NoiseHandshakeType.NoiseN
+//            };
 
-            this.RunOneWayTest(clientConfig, serverConfig, 1803);
-        }
+//            this.RunOneWayTest(clientConfig, serverConfig, 1803);
+//        }
 
-        private void RunOneWayTest(Config clientConfig, Config serverConfig, int port = 1800)
-        {
-            // set up remote keys
-            serverConfig.RemoteKey = clientConfig.KeyPair.PublicKey;
-            clientConfig.RemoteKey = serverConfig.KeyPair.PublicKey;
+//        private void RunOneWayTest(Config clientConfig, Config serverConfig, int port = 1800)
+//        {
+//            // set up remote keys
+//            serverConfig.RemoteKey = clientConfig.KeyPair.PublicKey;
+//            clientConfig.RemoteKey = serverConfig.KeyPair.PublicKey;
 
-            var address = IPAddress.Loopback;
+//            var address = IPAddress.Loopback;
 
-            var serverSetUp = false;
+//            var serverSetUp = false;
 
-            Task.Factory.StartNew(
-                () =>
-                    {
-                        using (var listener = Api.Listen(address, serverConfig, port))
-                        {
-                            serverSetUp = true;
-                            var serverSocket = listener.Accept();
-                            var buf = new byte[100];
-                            var n = serverSocket.Read(buf, 0, buf.Length);
+//            Task.Factory.StartNew(
+//                () =>
+//                {
+//                    var listener = new TcpListener(address, port);
+//                    listener.Start();
+//                    serverSetUp = true;
+//                    using (var clinet = listener.AcceptTcpClient())
+//                    {
+//                        using (var serverConnection = new Connection(clinet.GetStream(), serverConfig, false))
+//                        {
+//                            var buf = new byte[100];
+//                            var n = serverConnection.Read(buf, 0, buf.Length);
 
-                            if (!buf.Take(n).SequenceEqual(Encoding.ASCII.GetBytes("hello")))
-                            {
-                                throw new Exception("client message failed");
-                            }
+//                            if (!buf.Take(n).SequenceEqual(Encoding.ASCII.GetBytes("hello")))
+//                            {
+//                                throw new Exception("client message failed");
+//                            }
 
-                            // Expect error in here
-                            try
-                            {
-                                var data = Encoding.ASCII.GetBytes("ca va?");
-                                serverSocket.Write(data, 0, data.Length);
-                            }
-                            catch (Exception ex)
-                            {
-                                if (ex.Message != "disco: a server should not write on one-way patterns")
-                                {
-                                    throw new Exception($"Unexpected Server Exception: {ex}");
-                                }
+//                            // Expect error in here
+//                            try
+//                            {
+//                                var data = Encoding.ASCII.GetBytes("ca va?");
+//                                serverConnection.Write(data, 0, data.Length);
+//                            }
+//                            catch (Exception ex)
+//                            {
+//                                if (ex.Message != "disco: a server should not write on one-way patterns")
+//                                {
+//                                    throw new Exception($"Unexpected Server Exception: {ex}");
+//                                }
 
-                                return;
-                            }
+//                                return;
+//                            }
 
-                            throw new Exception("Server should not write in one way pattern");
-                        }
-                    });
+//                            throw new Exception("Server should not write in one way pattern");
+//                        }
+//                    }
 
-            while (!serverSetUp)
-            {
-                Thread.Sleep(1000);
-            }
+//                    listener.Stop();
+//                });
 
-            // Run the client
-            using (var clientSocket = Api.Connect(address.ToString(), port, clientConfig))
-            {
-                var cleintData = Encoding.ASCII.GetBytes("hello");
-                clientSocket.Write(cleintData, 0, cleintData.Length);
-            }
-        }
+//            while (!serverSetUp)
+//            {
+//                Thread.Sleep(1000);
+//            }
 
-        private void RunTwoWayTest(Config clientConfig, Config serverConfig, int port = 1800)
-        {
-            // set up remote keys
-            serverConfig.RemoteKey = clientConfig.KeyPair.PublicKey;
-            clientConfig.RemoteKey = serverConfig.KeyPair.PublicKey;
+//            // Run the client
+//            using (var clientSocket = new TcpClient(address.ToString(), port))
+//            {
+//                using (var clinetConnection = new Connection(clientSocket.GetStream(), clientConfig, true))
+//                {
+//                    var cleintData = Encoding.ASCII.GetBytes("hello");
+//                    clinetConnection.Write(cleintData, 0, cleintData.Length);
+//                }
+//            }
+//        }
 
-            var address = IPAddress.Loopback;
+//        private void RunTwoWayTest(Config clientConfig, Config serverConfig, int port = 1800)
+//        {
+//            // set up remote keys
+//            serverConfig.RemoteKey = clientConfig.KeyPair.PublicKey;
+//            clientConfig.RemoteKey = serverConfig.KeyPair.PublicKey;
 
-            var serverSetUp = false;
+//            var address = IPAddress.Loopback;
 
-            // get a Noise.listener
+//            var serverSetUp = false;
 
-            // run the server and Accept one connection
+//            // get a Noise.listener
 
-            Task.Factory.StartNew(
-                () =>
-                    {
-                        using (var listener = Api.Listen(address, serverConfig, port))
-                        {
-                            serverSetUp = true;
-                            var serverSocket = listener.Accept();
-                            var buf = new byte[100];
-                            var n = serverSocket.Read(buf, 0, buf.Length);
+//            // run the server and Accept one connection
 
-                            if (!buf.Take(n).SequenceEqual(Encoding.ASCII.GetBytes("hello")))
-                            {
-                                throw new Exception("client message failed");
-                            }
+//            Task.Factory.StartNew(
+//                () =>
+//                    {
+//                    var listener = new TcpListener(address, port);
+//                        listener.Start();
+//                        serverSetUp = true;
+//                        using (var clinet = listener.AcceptTcpClient())
+//                        {
+//                            using (var serverConnection = new Connection(clinet.GetStream(), serverConfig, false))
+//                            {
+//                                serverSetUp = true;
+//                                var buf = new byte[100];
+//                                var n = serverConnection.Read(buf, 0, buf.Length);
 
-                            var data = Encoding.ASCII.GetBytes("ca va?");
-                            serverSocket.Write(data, 0, data.Length);
-                        }
-                    });
+//                                if (!buf.Take(n).SequenceEqual(Encoding.ASCII.GetBytes("hello")))
+//                                {
+//                                    throw new Exception("client message failed");
+//                                }
 
-            while (!serverSetUp)
-            {
-                Thread.Sleep(1000);
-            }
+//                                var data = Encoding.ASCII.GetBytes("ca va?");
+//                                serverConnection.Write(data, 0, data.Length);
+//                            }
+//                        }
 
-            // Run the client
-            using (var clientSocket = Api.Connect(address.ToString(), port, clientConfig))
-            {
+//                        listener.Stop();
+//                    });
 
-                var clienData = Encoding.ASCII.GetBytes("hello");
-                clientSocket.Write(clienData, 0, clienData.Length);
+//            while (!serverSetUp)
+//            {
+//                Thread.Sleep(1000);
+//            }
 
-                var bufClient = new byte[100];
-                var readByes = clientSocket.Read(bufClient, 0, bufClient.Length);
+//            // Run the client
+//            // Run the client
+//            using (var clientSocket = new TcpClient(address.ToString(), port))
+//            {
+//                using (var clinetConnection = new Connection(clientSocket.GetStream(), clientConfig, true))
+//                {
+//                    var clienData = Encoding.ASCII.GetBytes("hello");
+//                    clinetConnection.Write(clienData, 0, clienData.Length);
 
-                if (!bufClient.Take(readByes).SequenceEqual(Encoding.ASCII.GetBytes("ca va?")))
-                {
-                    throw new Exception();
-                }
-            }
-        }
-    }
-}
+//                    var bufClient = new byte[100];
+//                    var readByes = clinetConnection.Read(bufClient, 0, bufClient.Length);
+
+//                    if (!bufClient.Take(readByes).SequenceEqual(Encoding.ASCII.GetBytes("ca va?")))
+//                    {
+//                        throw new Exception();
+//                    }
+//                }
+//            }
+//        }
+//    }
+//}

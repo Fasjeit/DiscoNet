@@ -27,7 +27,7 @@
 
         private readonly Mutex outLock = new Mutex();
 
-        private readonly TcpClient tcpConnection;
+        private readonly NetworkStream connectionStream;
 
         private bool handshakeComplite;
 
@@ -50,12 +50,13 @@
         /// <summary>
         /// Create Disco connection
         /// </summary>
-        /// <param name="tcpConnection">Tcp connection to use</param>
+        /// <param name="connectionStream">connection to use</param>
         /// <param name="config">Noise config</param>
         /// <param name="isClient"></param>
-        public Connection(TcpClient tcpConnection, Config config, bool isClient = false)
+        public Connection(NetworkStream connectionStream, Config config, bool isClient = false)
         {
-            this.tcpConnection = tcpConnection;
+            Connection.CheckRequirements(isClient, config);
+            this.connectionStream = connectionStream;
             this.config = config;
             this.isClient = isClient;
         }
@@ -107,25 +108,30 @@
                     dataLen = dataLen > count - totalBytes ? count - totalBytes : dataLen;
 
                     // Encrypt
-                    var plaintext = new byte[dataLen];
-                    Array.Copy(data, offset, plaintext, 0, dataLen);
-                    var ciphertext = this.strobeOut.SendEncUnauthenticated(
-                        false,
-                        plaintext);
+                    //var plaintext = new byte[dataLen];
+                    //Array.Copy(data, offset, plaintext, 0, dataLen);
+                    var ciphertext = this.strobeOut.SendEncUnauthenticated(false, data, offset, dataLen);
+
+
                     var mac = this.strobeOut.SendMac(false, Symmetric.TagSize);
-                    var ciphertextWithMac = new byte[ciphertext.Length + mac.Length];
-                    Array.Copy(ciphertext, 0, ciphertextWithMac, 0, ciphertext.Length);
-                    Array.Copy(mac, 0, ciphertextWithMac, ciphertext.Length, mac.Length);
+
+                    //var ciphertextWithMac = new byte[ciphertext.Length + mac.Length];
+                    //Array.Copy(ciphertext, 0, ciphertextWithMac, 0, ciphertext.Length);
+                    //Array.Copy(mac, 0, ciphertextWithMac, ciphertext.Length, mac.Length);
 
                     // header (length)
-                    var length = new[] { (byte)(ciphertextWithMac.Length >> 8), (byte)(ciphertextWithMac.Length % 256) };
+                    var totalLength = ciphertext.Length + mac.Length;
+                    var length = new[] { (byte)(totalLength >> 8), (byte)(totalLength % 256) };
 
                     // Send data
-                    var packet = new byte[length.Length + ciphertextWithMac.Length];
-                    Array.Copy(length, 0, packet, 0, length.Length);
-                    Array.Copy(ciphertextWithMac, 0, packet, length.Length, ciphertextWithMac.Length);
+                    //var packet = new byte[length.Length + ciphertextWithMac.Length];
+                    //Array.Copy(length, 0, packet, 0, length.Length);
+                    //Array.Copy(ciphertextWithMac, 0, packet, length.Length, ciphertextWithMac.Length);
 
-                    this.tcpConnection.Client.Send(packet);
+                    // len || ct|| mac
+                    this.connectionStream.Write(length, 0, length.Length);
+                    this.connectionStream.Write(ciphertext, 0, ciphertext.Length);
+                    this.connectionStream.Write(mac, 0, mac.Length);
 
                     // prepare next loop iteration
                     totalBytes += dataLen;
@@ -201,7 +207,7 @@
                 }
 
                 // read header from socket
-                var bufHeader = this.ReadFromUntil(this.tcpConnection, 2);
+                var bufHeader = this.ReadFromUntil(this.connectionStream, 2);
 
                 var length = (bufHeader[0] << 8) | bufHeader[1];
 
@@ -211,7 +217,7 @@
                 }
 
                 // read noise message from socket
-                var noiseMessage = this.ReadFromUntil(this.tcpConnection, length);
+                var noiseMessage = this.ReadFromUntil(this.connectionStream, length);
 
                 // decrypt
                 if (length < Symmetric.TagSize)
@@ -220,16 +226,14 @@
                 }
 
                 var plaintextLength = noiseMessage.Length - Symmetric.TagSize;
-                var cipherText = new byte[plaintextLength];
-                Array.Copy(noiseMessage, 0, cipherText, 0, plaintextLength);
+                //var cipherText = new byte[plaintextLength];
+                //Array.Copy(noiseMessage, 0, cipherText, 0, plaintextLength);
                 var plaintext = this.strobeIn.RecvEncUnauthenticated(
                     false,
-                    cipherText);
+                    noiseMessage, 0, plaintextLength);
 
                 var macLen = noiseMessage.Length - plaintextLength;
-                var mac = new byte[macLen];
-                Array.Copy(noiseMessage, plaintextLength, mac, 0, macLen);
-                var ok = this.strobeIn.RecvMac(false, mac);
+                var ok = this.strobeIn.RecvMac(false, noiseMessage, plaintextLength, macLen);
 
                 if (!ok)
                 {
@@ -237,7 +241,7 @@
                 }
 
                 // append to the input buffer
-                var newInputBufferConcat = new byte[this.inputBuffer.Length+ plaintext.Length];
+                var newInputBufferConcat = new byte[this.inputBuffer.Length + plaintext.Length];
                 Array.Copy(this.inputBuffer, 0, newInputBufferConcat, 0, this.inputBuffer.Length);
                 Array.Copy(plaintext, 0, newInputBufferConcat, this.inputBuffer.Length, plaintext.Length);
                 this.inputBuffer = newInputBufferConcat;
@@ -304,19 +308,21 @@
         /// Read detected amount of bytes from connection
         /// </summary>
         /// <param name="connection">Connection to read from</param>
-        /// <param name="n">Number of bytes</param>
+        /// <param name="count">Number of bytes</param>
         /// <returns>Read bytes</returns>
-        private byte[] ReadFromUntil(TcpClient connection, int n)
+        private byte[] ReadFromUntil(NetworkStream connection, int count)
         {
-            byte[] result = new byte[n];
-            int received = 0;
-            do
+            var buffer = new byte[count];
+            int offset = 0;
+            while (offset < count)
             {
-                received += connection.Client.Receive(result, received, n-received, SocketFlags.None);
+                int read = connection.Read(buffer, offset, count - offset);
+                if (read == 0)
+                    throw new System.IO.EndOfStreamException();
+                offset += read;
             }
-            while (received != n);
 
-            return result;
+            return buffer;
         }
 
         /// <summary>
@@ -356,7 +362,7 @@
                     Array.Copy(this.config.RemoteKey, remoteKeyPair.PublicKey, this.config.RemoteKey.Length);
                 }
 
-                handshakeState = Api.InitializeDisco(
+                handshakeState = DiscoHelper.InitializeDisco(
                     this.config.HandshakePattern,
                     this.isClient,
                     this.config.Prologue,
@@ -391,11 +397,11 @@
                         var length = new[] { (byte)(bufToWrite.Length >> 8), (byte)(bufToWrite.Length % 256) };
                         // write
                         var dataToWrite = length.Concat(bufToWrite).ToArray();
-                        this.tcpConnection.Client.Send(dataToWrite);
+                        this.connectionStream.Write(dataToWrite, 0, dataToWrite.Length);
                     }
                     else
                     {
-                        var bufHeader = this.ReadFromUntil(this.tcpConnection, 2);
+                        var bufHeader = this.ReadFromUntil(this.connectionStream, 2);
 
                         var length = (bufHeader[0] << 8) | bufHeader[1];
 
@@ -404,7 +410,7 @@
                             throw new Exception("disco: Disco message received exceeds DiscoMessageLength");
                         }
 
-                        var noiseMessage = this.ReadFromUntil(this.tcpConnection, length);
+                        var noiseMessage = this.ReadFromUntil(this.connectionStream, length);
 
                         (c1, c2) = handshakeState.ReadMessage(noiseMessage, out receivedPayload);
                     }
@@ -475,8 +481,52 @@
             this.handshakeMutex?.Dispose();
             this.inLock?.Dispose();
             this.outLock?.Dispose();
-            this.tcpConnection?.Close();
-            this.tcpConnection?.Dispose();
+            this.connectionStream?.Close();
+            this.connectionStream?.Dispose();
+        }
+
+
+        /// <summary>
+        /// Check Disco configuration requirements
+        /// </summary>
+        /// <param name="isClient">Is client connection</param>
+        /// <param name="config">Disco config</param>
+        private static void CheckRequirements(bool isClient, Config config)
+        {
+            var ht = config.HandshakePattern;
+            if (ht == NoiseHandshakeType.NoiseNX || ht == NoiseHandshakeType.NoiseKX || ht == NoiseHandshakeType.NoiseXX
+                || ht == NoiseHandshakeType.NoiseIX)
+            {
+                if (isClient && config.PublicKeyVerifier == null)
+                {
+                    throw new Exception("Disco: no public key verifier set in Config");
+                }
+
+                if (!isClient && config.StaticPublicKeyProof == null)
+                {
+                    throw new Exception("Disco: no public key proof set in Config");
+                }
+            }
+
+            if (ht == NoiseHandshakeType.NoiseXN || ht == NoiseHandshakeType.NoiseXK || ht == NoiseHandshakeType.NoiseXX
+                || ht == NoiseHandshakeType.NoiseX || ht == NoiseHandshakeType.NoiseIN
+                || ht == NoiseHandshakeType.NoiseIK || ht == NoiseHandshakeType.NoiseIX)
+            {
+                if (isClient && config.StaticPublicKeyProof == null)
+                {
+                    throw new Exception("Disco: no public key proof set in Config");
+                }
+
+                if (!isClient && config.PublicKeyVerifier == null)
+                {
+                    throw new Exception("Disco: no public key verifier set in Config");
+                }
+            }
+
+            if (ht == NoiseHandshakeType.NoiseNNpsk2 && config.PreSharedKey.Length != Symmetric.PskKeySize)
+            {
+                throw new Exception($"noise: a {Symmetric.PskKeySize}-byte pre-shared key needs to be passed as noise Config");
+            }
         }
     }
 }

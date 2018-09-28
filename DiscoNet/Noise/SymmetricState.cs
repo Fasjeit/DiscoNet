@@ -80,8 +80,14 @@
             }
 
             var plaintextLength = cipherText.Length - Symmetric.TagSize;
-            var plaintext = this.strobeState.RecvEncUnauthenticated(false, cipherText.Take(plaintextLength).ToArray());
-            var verificationResult = this.strobeState.RecvMac(false, cipherText.Skip(plaintextLength).ToArray());
+            var encrypted = new byte[plaintextLength];
+            Array.Copy(cipherText, 0, encrypted, 0, plaintextLength);
+            var plaintext = this.strobeState.RecvEncUnauthenticated(false, encrypted);
+
+            var mac = new byte[Symmetric.TagSize];
+            Array.Copy(cipherText, plaintextLength, mac, 0, Symmetric.TagSize);
+
+            var verificationResult = this.strobeState.RecvMac(false, mac);
 
             if (!verificationResult)
             {
