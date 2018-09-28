@@ -162,7 +162,8 @@ namespace Benchmark
         private void PrepareDiscoClient(Config clientConfig, int port)
         {
             var client = new TcpClient("127.0.0.1", port);
-            this.discoClient = new Connection(client.GetStream(), clientConfig, true);
+            this.discoClient = new Connection(client.GetStream());
+            this.discoClient.AuthenticateAsClient(clientConfig);
 
         }
 
@@ -175,8 +176,9 @@ namespace Benchmark
                 {
                     using (this.client = this.tlsListener.AcceptTcpClient())
                     {
-                        using (var listener = new Connection(this.client.GetStream(), serverConfig, false))
+                        using (var listener = new Connection(this.client.GetStream()))
                         {
+                            listener.AuthenticateAsServer(serverConfig);
                             while (true)
                             {
                                 try

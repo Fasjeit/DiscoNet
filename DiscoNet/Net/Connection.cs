@@ -15,7 +15,7 @@
     /// </summary>
     public class Connection : IDisposable
     {
-        private readonly Config config;
+        private Config config;
 
         private readonly Mutex halfDuplexLock = new Mutex();
 
@@ -23,7 +23,7 @@
 
         private readonly Mutex inLock = new Mutex();
 
-        private readonly bool isClient;
+        private bool isClient;
 
         private readonly Mutex outLock = new Mutex();
 
@@ -51,14 +51,9 @@
         /// Create Disco connection
         /// </summary>
         /// <param name="connectionStream">connection to use</param>
-        /// <param name="config">Noise config</param>
-        /// <param name="isClient"></param>
-        public Connection(NetworkStream connectionStream, Config config, bool isClient = false)
+        public Connection(NetworkStream connectionStream)
         {
-            Connection.CheckRequirements(isClient, config);
             this.connectionStream = connectionStream;
-            this.config = config;
-            this.isClient = isClient;
         }
 
         /// <summary>
@@ -483,6 +478,34 @@
             this.outLock?.Dispose();
             this.connectionStream?.Close();
             this.connectionStream?.Dispose();
+        }
+
+        /// <summary>
+        /// Authentice as Server with Disco
+        /// </summary>
+        /// <param name="config">Disco config</param>
+        public void AuthenticateAsServer(Config config)
+        {
+            this.config = config;
+            this.isClient = false;
+
+            Connection.CheckRequirements(this.isClient, config);
+
+            this.HandShake();
+        }
+
+        /// <summary>
+        /// Authentice as Client with Disco
+        /// </summary>
+        /// <param name="config">Disco config</param>
+        public void AuthenticateAsClient(Config config)
+        {
+            this.config = config;
+            this.isClient = true;
+
+            Connection.CheckRequirements(this.isClient, config);
+
+            this.HandShake();
         }
 
 
