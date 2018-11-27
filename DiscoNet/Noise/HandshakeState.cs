@@ -115,11 +115,7 @@
                         }
                         else
                         {
-#if DEBUG_DETERMINISTIC
-                            this.E = Asymmetric.GenerateKeyPair(new byte[Asymmetric.DhLen]);
-#else
                             this.E = Asymmetric.GenerateKeyPair();
-#endif
                         }
 
                         messageBuffer = messageBuffer.Concat(this.E.PublicKey).ToArray();

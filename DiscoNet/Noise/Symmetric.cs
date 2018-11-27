@@ -170,7 +170,7 @@
                     $"({Symmetric.KeySize} bytes) has security consequences");
             }
 
-            var ae = new Strobe("DiscoAEAD", Symmetric.SecurityParameter);
+            var ae = new Strobe("DiscoAE", Symmetric.SecurityParameter);
 
             // Absorb the key
             ae.Ad(false, key);
@@ -219,10 +219,118 @@
                     $"minimum a {Symmetric.NonceSize * 8}-bit nonce and a {Symmetric.NonceSize * 8}-bit tag");
             }
 
+            // instantiate
+            var ae = new Strobe("DiscoAE", Symmetric.SecurityParameter);
+
+            // Absorb the key
+            ae.Ad(false, key);
+
+            // Absorb the nonce
+            var nonce = new byte[Symmetric.NonceSize];
+            Array.Copy(ciphertext, 0, nonce, 0, Symmetric.NonceSize);
+
+            ae.Ad(false, nonce);
+
+            var plaintextSize = ciphertext.Length - Symmetric.TagSize - Symmetric.NonceSize;
+
+            // Decrypt
+            var encrypted = new byte[plaintextSize];
+            Array.Copy(ciphertext, Symmetric.NonceSize, encrypted, 0, plaintextSize);
+            var plainText = ae.RecvEncUnauthenticated(
+                false,
+                encrypted.ToArray());
+
+            // Verify tag
+            var mac = new byte[Symmetric.TagSize];
+            Array.Copy(ciphertext, ciphertext.Length - Symmetric.TagSize, mac, 0, Symmetric.TagSize);
+            var authCkeck = ae.RecvMac(false, mac);
+            if (!authCkeck)
+            {
+                throw new Exception("disco: cannot decrypt the payload");
+            }
+
+            return plainText;
+        }
+
+        /// <summary>
+        /// Encrypt a plaintext message with a key of any size greater than 128 bits (16 bytes).
+        /// </summary>
+        /// <param name="key">
+        /// Symmetric key for encryption
+        /// </param>
+        /// <param name="plaintext">
+        /// Plaintext to encrypt
+        /// </param>
+        /// <returns>Encrypted data</returns>
+        public static byte[] EncryptAndAuthenticate(byte[] key, byte[] plaintext, byte[] ad)
+        {
+            if (key.Length < Symmetric.KeySize)
+            {
+                throw new Exception(
+                    $"disco: using a key smaller than {Symmetric.KeySize * 8}-bit " +
+                    $"({Symmetric.KeySize} bytes) has security consequences");
+            }
+
             var ae = new Strobe("DiscoAEAD", Symmetric.SecurityParameter);
 
             // Absorb the key
             ae.Ad(false, key);
+
+            // absorb the AD
+            ae.Ad(false, ad);
+
+            // Generate 192-bit nonce
+            var random = new RNGCryptoServiceProvider();
+            var nonce = new byte[Symmetric.NonceSize];
+
+# if !DEBUG_DETERMINISTIC
+            random.GetBytes(nonce, 0, Symmetric.NonceSize);
+#endif
+
+            // Absorb the nonce
+            ae.Ad(false, nonce);
+
+            // nonce + send_ENC(plaintext) + send_MAC(16)
+            var ciphertext = nonce.Concat(ae.SendEncUnauthenticated(false, plaintext));
+            ciphertext = ciphertext.Concat(ae.SendMac(false, Symmetric.TagSize));
+
+            return ciphertext.ToArray();
+        }
+
+        /// <summary>
+        /// Decrypt a message and check integrity
+        /// </summary>
+        /// <param name="key">
+        /// Symmetric key for encryption
+        /// </param>
+        /// <param name="ciphertext">
+        /// Ciphertext to decrypt
+        /// </param>
+        /// <returns>Decrypted plaintext</returns>
+        public static byte[] DecryptAndAuthenticate(byte[] key, byte[] ciphertext, byte[] ad)
+        {
+            if (key.Length < Symmetric.KeySize)
+            {
+                throw new Exception(
+                    $"disco: using a key smaller than {Symmetric.KeySize * 8}-bit "
+                    + $"({Symmetric.KeySize} bytes) has security consequences");
+            }
+
+            if (ciphertext.Length < Symmetric.MinimumCiphertextSize)
+            {
+                throw new Exception(
+                    $"disco: ciphertext is too small, it should contain at a " +
+                    $"minimum a {Symmetric.NonceSize * 8}-bit nonce and a {Symmetric.NonceSize * 8}-bit tag");
+            }
+
+            // instantiate
+            var ae = new Strobe("DiscoAEAD", Symmetric.SecurityParameter);
+
+            // Absorb the key
+            ae.Ad(false, key);
+
+            // absorb the AD
+            ae.Ad(false, ad);
 
             // Absorb the nonce
             var nonce = new byte[Symmetric.NonceSize];

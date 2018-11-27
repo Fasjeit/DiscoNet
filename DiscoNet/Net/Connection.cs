@@ -34,13 +34,18 @@
         private byte[] inputBuffer = { };
 
         // half duplex
-        private bool isHalfDuplex;
+        public bool IsHalfDuplex { get; private set; }
 
         // IsRemoteAuthenticated can be used to check if the remote peer 
         // has been properly authenticated.It serves no real purpose for 
         // the moment as the handshake will not go through if a peer is not 
         // properly authenticated in patterns where the peer needs to be authenticated.
         private bool isRemoteAuthenticated;
+
+        /// <summary>
+        /// Remote party static key
+        /// </summary>
+        public byte[] RemotePublicKey { get; private set; }
 
         // input/output
         private Strobe strobeIn;
@@ -82,7 +87,7 @@
             Mutex mutex;
 
             // Lock the write socket
-            if (this.isHalfDuplex)
+            if (this.IsHalfDuplex)
             {
                 mutex = this.halfDuplexLock;
             }
@@ -171,7 +176,7 @@
 
             // Lock the read socket
             Mutex mutex;
-            if (this.isHalfDuplex)
+            if (this.IsHalfDuplex)
             {
                 mutex = this.halfDuplexLock;
             }
@@ -429,6 +434,9 @@
                         {
                             throw new Exception("disco: the received public key could not be authenticated");
                         }
+
+                        this.isRemoteAuthenticated = true;
+                        this.RemotePublicKey = handshakeState.Rs.PublicKey;
                     }
                 }
 
@@ -448,7 +456,7 @@
                 }
                 else
                 {
-                    this.isHalfDuplex = true;
+                    this.IsHalfDuplex = true;
                     this.strobeIn = c1;
                     this.strobeOut = c1;
                 }

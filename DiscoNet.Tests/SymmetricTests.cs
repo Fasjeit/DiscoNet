@@ -271,5 +271,62 @@
                 throw new Exception("Tuple hashing doesn't work properly with streaming");
             }
         }
+
+        [Fact]
+        public void TestEncryptDecryptAndAuthenticate()
+        {
+            var key = "eda8506c1fb0bbcc3f62626fef074bbf2d09a8c7c608f3fa1482c9a625d00f75".ToByteArray();
+
+            var plaintexs = new[]
+            {
+                "", "a", "ab", "abc", "abcd", "short", "hello, how are you?", "this is very short",
+                "this is very long though, like, very very long, should we test very very long things here?",
+                "Domestic cats are similar in size to the other members of the genus Felis, typically weighing "
+                + "between 4 and 5 kg (9 and 10 lb).[36] Some breeds, such as the Maine Coon, can occasionally "
+                + "exceed 11 kg (24 lb). Conversely, very small cats, less than 2 kg (4 lb), have been reported.[59] "
+                + "The world record for the largest cat is 21 kg(50 lb).[60][self - published source] "
+                + "The smallest adult cat ever officially recorded weighed around 1 kg(2 lb).[60] "
+                + "Feral cats tend to be lighter, as they have more limited access to food than house cats."
+                + "The Boston Cat Hospital weighed trapped feral cats, and found the average feral adult "
+                + "male to weigh 4 kg(9 lb), and average adult female 3 kg(7 lb).[61] Cats average about "
+                + "23–25 cm(9–10 in) in height and 46 cm(18 in) in head / body length(males being larger than females), "
+                + "with tails averaging 30 cm(12 in) in length;[62] feral cats may be smaller on average.ats have seven"
+                + " cervical vertebrae, as do almost all mammals; 13 thoracic vertebrae(humans have 12); seven lumbar"
+                + " vertebrae(humans have five); three sacral vertebrae like most mammals(humans have five);"
+                + " and a variable number of caudal vertebrae in the tail(humans have only vestigial caudal"
+                + " vertebrae, fused into an internal coccyx).[63]:11 The extra lumbar and thoracic vertebrae"
+                + " account for the cat's spinal mobility and flexibility. Attached to the spine are 13 ribs,"
+                + " the shoulder, and the pelvis.[63] :16 Unlike human arms, cat forelimbs are attached to the"
+                + " shoulder by free-floating clavicle bones which allow them to pass their body through any"
+                + " space into which they can fit their head.[64]",
+            };
+
+            var ads = new[] {
+                "blou blou",
+                "a",
+                "haahahAHAHAHhahaHAHAHahah so funny",
+                "you must be fun at parties",
+                "this is insanely long oh lala voulait dire le boulanger. C'est a dire que. Je ne sais pas. Merci.",
+                "do I really need to do this? This is not fun anymore. Help me please. I am stuck in a keyboard and nobody knows I am here. This is getting quite uncomfortable",
+                "bunch of \x00 and stuff \x00 you know",
+                "89032",
+                "9032ir9032kf9032fk093fewk90 fkwe09fk 903i2r 0932ir 0932ir 3029ir 230rk we0rkwe 09rkwer9 w0ekrw e09rkwe 09rew",
+                "",
+                "4815162342"
+            };
+
+            for (var plaintextIndex = 0; plaintextIndex < plaintexs.Length; plaintextIndex++)
+            {
+                var plaintex = Encoding.ASCII.GetBytes(plaintexs[plaintextIndex]);
+                var ad = Encoding.ASCII.GetBytes(ads[plaintextIndex]);
+                var ciphertext = Symmetric.EncryptAndAuthenticate(key, plaintex, ad);
+                var decrypted = Symmetric.DecryptAndAuthenticate(key, ciphertext, ad);
+
+                if (!plaintex.SequenceEqual(decrypted))
+                {
+                    throw new Exception("Decrypt did not work");
+                }
+            }
+        }
     }
 }
