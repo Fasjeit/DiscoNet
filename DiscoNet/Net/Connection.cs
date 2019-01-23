@@ -1,12 +1,18 @@
 ﻿namespace DiscoNet.Net
 {
     using System;
+    using System.Buffers;
+    using System.Collections.Generic;
     using System.Linq;
     using System.Net.Sockets;
     using System.Threading;
+    using System.Threading.Tasks;
 
     using DiscoNet.Noise;
     using DiscoNet.Noise.Enums;
+
+    using System.IO.Pipes;
+    using System.IO.Pipelines;
 
     using StrobeNet;
 
@@ -188,83 +194,90 @@
             mutex.WaitOne();
             try
             {
-                // read whatever there is to read in the buffer
-                if (this.inputBuffer.Length > 0)
-                {
-                    var toRead = this.inputBuffer.Length > count ? count : this.inputBuffer.Length;
-                    Array.Copy(this.inputBuffer, 0, data, offset, toRead);
-                    if (this.inputBuffer.Length > count)
-                    {
-                        //this.inputBuffer = this.inputBuffer.Skip(count).ToArray();
-                        var newInputBuffer = new byte[this.inputBuffer.Length - count];
-                        Array.Copy(this.inputBuffer, count, newInputBuffer, 0, newInputBuffer.Length);
-                        this.inputBuffer = newInputBuffer;
+                //this.ProcessLinesAsync(this.connectionStream).GetAwaiter().GetResult();
+                data = this.ProcessLinesAsync(this.connectionStream).GetAsyncEnumerator().Current;
+                this.ProcessLinesAsync(this.connectionStream).GetAsyncEnumerator().MoveNextAsync().GetAwaiter().GetResult();
+                //data = new byte[128];
+                //return count > 128 ? 128 : count ;
+                return data.Length;
 
-                        return count;
-                    }
-                    this.inputBuffer = new byte[] { };
-                    return toRead;
-                }
+                //// read whatever there is to read in the buffer
+                //if (this.inputBuffer.Length > 0)
+                //{
+                //    var toRead = this.inputBuffer.Length > count ? count : this.inputBuffer.Length;
+                //    Array.Copy(this.inputBuffer, 0, data, offset, toRead);
+                //    if (this.inputBuffer.Length > count)
+                //    {
+                //        //this.inputBuffer = this.inputBuffer.Skip(count).ToArray();
+                //        var newInputBuffer = new byte[this.inputBuffer.Length - count];
+                //        Array.Copy(this.inputBuffer, count, newInputBuffer, 0, newInputBuffer.Length);
+                //        this.inputBuffer = newInputBuffer;
 
-                // read header from socket
-                var bufHeader = this.ReadFromUntil(this.connectionStream, 2);
+                //        return count;
+                //    }
+                //    this.inputBuffer = new byte[] { };
+                //    return toRead;
+                //}
 
-                var length = (bufHeader[0] << 8) | bufHeader[1];
+                //// read header from socket
+                //var bufHeader = this.ReadFromUntil(this.connectionStream, 2);
 
-                if (length > Config.NoiseMessageLength)
-                {
-                    throw new Exception("disco: Disco message received exceeds DiscoMessageLength");
-                }
+                //var length = (bufHeader[0] << 8) | bufHeader[1];
 
-                // read noise message from socket
-                var noiseMessage = this.ReadFromUntil(this.connectionStream, length);
+                //if (length > Config.NoiseMessageLength)
+                //{
+                //    throw new Exception("disco: Disco message received exceeds DiscoMessageLength");
+                //}
 
-                // decrypt
-                if (length < Symmetric.TagSize)
-                {
-                    throw new Exception($"disco: the received payload is shorter {Symmetric.TagSize} bytes");
-                }
+                //// read noise message from socket
+                //var noiseMessage = this.ReadFromUntil(this.connectionStream, length);
 
-                var plaintextLength = noiseMessage.Length - Symmetric.TagSize;
-                //var cipherText = new byte[plaintextLength];
-                //Array.Copy(noiseMessage, 0, cipherText, 0, plaintextLength);
-                var plaintext = this.strobeIn.RecvEncUnauthenticated(
-                    false,
-                    noiseMessage, 0, plaintextLength);
+                //// decrypt
+                //if (length < Symmetric.TagSize)
+                //{
+                //    throw new Exception($"disco: the received payload is shorter {Symmetric.TagSize} bytes");
+                //}
 
-                var macLen = noiseMessage.Length - plaintextLength;
-                var ok = this.strobeIn.RecvMac(false, noiseMessage, plaintextLength, macLen);
+                //var plaintextLength = noiseMessage.Length - Symmetric.TagSize;
+                ////var cipherText = new byte[plaintextLength];
+                ////Array.Copy(noiseMessage, 0, cipherText, 0, plaintextLength);
+                //var plaintext = this.strobeIn.RecvEncUnauthenticated(
+                //    false,
+                //    noiseMessage, 0, plaintextLength);
 
-                if (!ok)
-                {
-                    throw new Exception("disco: cannot decrypt the payload");
-                }
+                //var macLen = noiseMessage.Length - plaintextLength;
+                //var ok = this.strobeIn.RecvMac(false, noiseMessage, plaintextLength, macLen);
 
-                // append to the input buffer
-                var newInputBufferConcat = new byte[this.inputBuffer.Length + plaintext.Length];
-                Array.Copy(this.inputBuffer, 0, newInputBufferConcat, 0, this.inputBuffer.Length);
-                Array.Copy(plaintext, 0, newInputBufferConcat, this.inputBuffer.Length, plaintext.Length);
-                this.inputBuffer = newInputBufferConcat;
-                //this.inputBuffer = this.inputBuffer.Concat(plaintext).ToArray();
+                //if (!ok)
+                //{
+                //    throw new Exception("disco: cannot decrypt the payload");
+                //}
 
-                // read whatever we can read
-                var rest = count;
-                var restToRead = this.inputBuffer.Length > rest ? rest : this.inputBuffer.Length;
-                Array.Copy(this.inputBuffer, 0, data, offset, restToRead);
-                if (this.inputBuffer.Length > restToRead)
-                {
-                    var newBuffer = new byte[this.inputBuffer.Length - restToRead];
-                    Array.Copy(this.inputBuffer, restToRead, newBuffer, 0, newBuffer.Length);
-                    this.inputBuffer = newBuffer;
-                    //this.inputBuffer = this.inputBuffer.Skip(restToRead).ToArray();
+                //// append to the input buffer
+                //var newInputBufferConcat = new byte[this.inputBuffer.Length + plaintext.Length];
+                //Array.Copy(this.inputBuffer, 0, newInputBufferConcat, 0, this.inputBuffer.Length);
+                //Array.Copy(plaintext, 0, newInputBufferConcat, this.inputBuffer.Length, plaintext.Length);
+                //this.inputBuffer = newInputBufferConcat;
+                ////this.inputBuffer = this.inputBuffer.Concat(plaintext).ToArray();
 
-                    return count;
-                }
+                //// read whatever we can read
+                //var rest = count;
+                //var restToRead = this.inputBuffer.Length > rest ? rest : this.inputBuffer.Length;
+                //Array.Copy(this.inputBuffer, 0, data, offset, restToRead);
+                //if (this.inputBuffer.Length > restToRead)
+                //{
+                //    var newBuffer = new byte[this.inputBuffer.Length - restToRead];
+                //    Array.Copy(this.inputBuffer, restToRead, newBuffer, 0, newBuffer.Length);
+                //    this.inputBuffer = newBuffer;
+                //    //this.inputBuffer = this.inputBuffer.Skip(restToRead).ToArray();
 
-                // we haven't filled the buffer
-                this.inputBuffer = new byte[] { };
+                //    return count;
+                //}
 
-                return restToRead;
+                //// we haven't filled the buffer
+                //this.inputBuffer = new byte[] { };
+
+                //return restToRead;
             }
 
             finally
@@ -559,5 +572,143 @@
                 throw new Exception($"noise: a {Symmetric.PskKeySize}-byte pre-shared key needs to be passed as noise Config");
             }
         }
+
+        ///
+        ///
+        /// 
+
+        private async Task<byte[]> DecryptNoiseMessageAsync(ReadOnlySequence<byte> noiseMessage)
+        {
+            var plaintextLength = (int)noiseMessage.Length - Symmetric.TagSize;
+            var cipherText = noiseMessage.Slice(0, plaintextLength);
+            var plaintext = this.strobeIn.RecvEncUnauthenticated(false, cipherText.ToArray());
+
+            var macLen = noiseMessage.Length - plaintextLength;
+            var mac = noiseMessage.Slice(plaintextLength, macLen);
+            var ok = this.strobeIn.RecvMac(false, mac.ToArray());
+
+            if (!ok)
+            {
+                throw new Exception("disco: cannot decrypt the payload");
+            }
+
+            return plaintext;
+        }
+
+        async IAsyncEnumerable<byte[]> ProcessLinesAsync(NetworkStream socket)
+        {
+            var pipe = new Pipe();
+            await this.FillPipeAsync(socket, pipe.Writer);
+
+            var enumerator = this.ReadPipeAsync(pipe.Reader).GetAsyncEnumerator();
+            yield return enumerator.Current;
+            await enumerator.MoveNextAsync();
+
+        }
+
+        async Task FillPipeAsync(NetworkStream socket, PipeWriter writer)
+        {
+            const int MinimumBufferSize = 512;
+
+            while (true)
+            {
+                // Allocate at least 512 bytes from the PipeWriter
+                Memory<byte> memory = writer.GetMemory(MinimumBufferSize);
+                try
+                {
+                    int bytesRead = await socket.ReadAsync(memory);
+                    if (bytesRead == 0)
+                    {
+                        break;
+                    }
+                    // Tell the PipeWriter how much was read from the Socket
+                    writer.Advance(bytesRead);
+                }
+                catch (Exception ex)
+                {
+                    throw ex;
+                    //LogError(ex);
+                    break;
+                }
+
+                // Make the data available to the PipeReader
+                FlushResult result = await writer.FlushAsync();
+
+                if (result.IsCompleted)
+                {
+                    break;
+                }
+            }
+
+            // Tell the PipeReader that there's no more data coming
+            writer.Complete();
+        }
+
+        private async IAsyncEnumerable<byte[]> ReadPipeAsync(PipeReader reader)
+        {
+            while (true)
+            {
+                ReadResult result = await reader.ReadAsync();
+
+                ReadOnlySequence<byte> buffer = result.Buffer;
+
+                do
+                {
+                    var bufHeader = buffer.Slice(0, 2).ToArray();
+                    var length = (bufHeader[0] << 8) | bufHeader[1];
+
+                    if (length > Config.NoiseMessageLength)
+                    {
+                        throw new Exception("disco: Disco message received exceeds DiscoMessageLength");
+                    }
+
+                    var toRead = length > buffer.Length - 2 ? buffer.Length - 2 : length;
+
+                    // Process the line
+                    yield return await this.DecryptNoiseMessageAsync(buffer.Slice(2, toRead));
+
+                    // Skip the message + length (2 bytes)
+                    buffer = buffer.Slice(2 + toRead);
+                }
+                while (!buffer.IsEmpty);
+
+                // Tell the PipeReader how much of the buffer we have consumed
+                reader.AdvanceTo(buffer.Start, buffer.End);
+
+                // Stop reading if there's no more data coming
+                if (result.IsCompleted)
+                {
+                    break;
+                }
+            }
+
+            // Mark the PipeReader as complete
+            reader.Complete();
+        }
     }
+}
+
+//// tmp for vs preview 1
+//namespace System.Threading.Tasks
+//{
+//    using System.Runtime.CompilerServices;
+//    using System.Threading.Tasks.Sources;
+
+//    internal struct ManualResetValueTaskSourceLogic<TResult>
+//    {
+//        private ManualResetValueTaskSourceCore<TResult> _core;
+//        public ManualResetValueTaskSourceLogic(IStrongBox<ManualResetValueTaskSourceLogic<TResult>> parent) : this() { }
+//        public short Version => _core.Version;
+//        public TResult GetResult(short token) => _core.GetResult(token);
+//        public ValueTaskSourceStatus GetStatus(short token) => _core.GetStatus(token);
+//        public void OnCompleted(Action<object> continuation, object state, short token, ValueTaskSourceOnCompletedFlags flags) => _core.OnCompleted(continuation, state, token, flags);
+//        public void Reset() => _core.Reset();
+//        public void SetResult(TResult result) => _core.SetResult(result);
+//        public void SetException(Exception error) => _core.SetException(error);
+//    }
+//}
+
+//namespace System.Runtime.CompilerServices
+//{
+//    internal interface IStrongBox<T> { ref T Value { get; } }
 }

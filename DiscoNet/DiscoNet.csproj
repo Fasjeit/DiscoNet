@@ -1,28 +1,30 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
     <Version>0.0.0.2</Version>
     <Description>.NET Core implementation of the Disco protocol framework</Description>
     <PackageProjectUrl>https://github.com/Fasjeit/DiscoNet</PackageProjectUrl>
     <PackageLicenseUrl>https://github.com/Fasjeit/DiscoNet/blob/master/LICENSE</PackageLicenseUrl>
     <Authors>Artyom Makarov</Authors>
+    <LangVersion>8.0</LangVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DefineConstants>TRACE;DEBUG</DefineConstants>
-    <DocumentationFile>bin\Debug\netstandard2.0\DiscoNet.xml</DocumentationFile>
+    <DocumentationFile>bin\Debug\netcoreapp2.1\DiscoNet.xml</DocumentationFile>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DocumentationFile>bin\Release\netstandard2.0\DiscoNet.xml</DocumentationFile>
+    <DocumentationFile>bin\Release\netcoreapp2.1\DiscoNet.xml</DocumentationFile>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Sodium.Core" Version="1.2.0" />
     <PackageReference Include="StrobeNet" Version="0.0.2.4" />
+    <PackageReference Include="System.IO.Pipelines" Version="4.5.3" />
   </ItemGroup>
 
 </Project>

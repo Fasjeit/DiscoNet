@@ -27,7 +27,7 @@ namespace DiscoNet.Tests
 
         Connection discoClient;
 
-        public int N = 1048576;
+        public int N = 128;
 
         private byte[] dataC
         {
